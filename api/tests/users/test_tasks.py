@@ -7,9 +7,10 @@ from funkwhale_api.users import tasks
 def test_delete_account(factories, mocker):
     user = factories["users.User"]()
     actor = user.create_actor()
+    factories["federation.Follow"](target=actor, approved=True)
     library = factories["music.Library"](actor=actor)
     unrelated_library = factories["music.Library"]()
-    dispatch = mocker.patch.object(routes.outbox, "dispatch")
+    dispatch = mocker.spy(routes.outbox, "dispatch")
 
     tasks.delete_account(user_id=user.pk)
 
@@ -30,3 +31,5 @@ def test_delete_account(factories, mocker):
     assert actor.type == "Tombstone"
     assert actor.name is None
     assert actor.summary is None
+    # this activity shouldn't be deleted
+    assert actor.outbox_activities.filter(type="Delete").count() == 1

@@ -67,7 +67,11 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     lookup_field = "preferred_username"
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
-    queryset = models.Actor.objects.local().select_related("user")
+    queryset = (
+        models.Actor.objects.local()
+        .select_related("user", "channel__artist", "channel__attributed_to")
+        .prefetch_related("channel__artist__tagged_items__tag")
+    )
     serializer_class = serializers.ActorSerializer
 
     def get_queryset(self):

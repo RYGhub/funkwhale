@@ -1,3 +1,5 @@
+from . import schema_org
+
 CONTEXTS = [
     {
         "shortId": "LDP",
@@ -219,6 +221,12 @@ CONTEXTS = [
         },
     },
     {
+        "shortId": "SC",
+        "contextUrl": None,
+        "documentUrl": "http://schema.org",
+        "document": {"@context": schema_org.CONTEXT},
+    },
+    {
         "shortId": "SEC",
         "contextUrl": None,
         "documentUrl": "https://w3id.org/security/v1",
@@ -280,6 +288,7 @@ CONTEXTS = [
                 "type": "@type",
                 "as": "https://www.w3.org/ns/activitystreams#",
                 "fw": "https://funkwhale.audio/ns#",
+                "schema": "http://schema.org#",
                 "xsd": "http://www.w3.org/2001/XMLSchema#",
                 "Album": "fw:Album",
                 "Track": "fw:Track",
@@ -298,6 +307,8 @@ CONTEXTS = [
                 "musicbrainzId": "fw:musicbrainzId",
                 "license": {"@id": "fw:license", "@type": "@id"},
                 "copyright": "fw:copyright",
+                "category": "schema:category",
+                "language": "schema:inLanguage",
             }
         },
     },
@@ -364,4 +375,5 @@ AS = NS(CONTEXTS_BY_ID["AS"])
 LDP = NS(CONTEXTS_BY_ID["LDP"])
 SEC = NS(CONTEXTS_BY_ID["SEC"])
 FW = NS(CONTEXTS_BY_ID["FW"])
+SC = NS(CONTEXTS_BY_ID["SC"])
 LITEPUB = NS(CONTEXTS_BY_ID["LITEPUB"])

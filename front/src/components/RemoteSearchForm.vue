@@ -99,6 +99,8 @@ export default {
           return {name: 'library.tracks.detail', params: {id: this.objInfo.id}}
         case 'upload':
           return {name: 'library.uploads.detail', params: {id: this.objInfo.uuid}}
+        case 'channel':
+          return {name: 'channels.detail', params: {id: this.objInfo.uuid}}
 
         default:
           break;
@@ -147,7 +149,6 @@ export default {
         return
       }
       if (this.standalone) {
-        console.log('HELLO')
         this.$router.replace({name: "search", query: {id: this.id, type: 'rss'}})
       }
       this.fetch = null

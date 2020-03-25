@@ -795,6 +795,17 @@ def test_activity_pub_album_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
+def test_activity_pub_album_serializer_to_ap_channel_artist(factories):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist,)
+
+    serializer = serializers.AlbumSerializer(album)
+
+    assert serializer.data["artists"] == [
+        {"type": channel.actor.type, "id": channel.actor.fid}
+    ]
+
+
 def test_activity_pub_album_serializer_from_ap_create(factories, faker, now):
     actor = factories["federation.Actor"]()
     artist = factories["music.Artist"]()
@@ -834,6 +845,30 @@ def test_activity_pub_album_serializer_from_ap_create(factories, faker, now):
         "Punk",
         "Rock",
     ]
+
+
+def test_activity_pub_album_serializer_from_ap_create_channel_artist(
+    factories, faker, now
+):
+    actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"]()
+    released = faker.date_object()
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Album",
+        "id": "https://album.example",
+        "name": faker.sentence(),
+        "published": now.isoformat(),
+        "released": released.isoformat(),
+        "artists": [{"type": channel.actor.type, "id": channel.actor.fid}],
+        "attributedTo": actor.fid,
+    }
+    serializer = serializers.AlbumSerializer(data=payload)
+    assert serializer.is_valid(raise_exception=True) is True
+
+    album = serializer.save()
+
+    assert album.artist == channel.artist
 
 
 def test_activity_pub_album_serializer_from_ap_update(factories, faker):
@@ -1395,7 +1430,9 @@ def test_track_serializer_update_license(factories):
 
 def test_channel_actor_serializer(factories):
     channel = factories["audio.Channel"](
-        actor__attachment_icon=None, artist__with_cover=True
+        actor__attachment_icon=None,
+        artist__with_cover=True,
+        artist__set_tags=["punk", "rock"],
     )
 
     serializer = serializers.ActorSerializer(channel.actor)
@@ -1418,6 +1455,164 @@ def test_channel_actor_serializer(factories):
     }
     assert serializer.data["url"] == expected_url
     assert serializer.data["icon"] == expected_icon
+    assert serializer.data["attributedTo"] == channel.attributed_to.fid
+    assert serializer.data["category"] == channel.artist.content_category
+    assert serializer.data["tag"] == [
+        {"type": "Hashtag", "name": "#punk"},
+        {"type": "Hashtag", "name": "#rock"},
+    ]
+
+
+def test_channel_actor_serializer_from_ap_create(mocker, factories):
+    domain = factories["federation.Domain"](name="test.pod")
+    attributed_to = factories["federation.Actor"](domain=domain)
+    get_actor = mocker.patch.object(actors, "get_actor", return_value=attributed_to)
+    actor_data = {
+        "@context": jsonld.get_default_context(),
+        "followers": "https://test.pod/federation/actors/mychannel/followers",
+        "preferredUsername": "mychannel",
+        "id": "https://test.pod/federation/actors/mychannel",
+        "endpoints": {"sharedInbox": "https://test.pod/federation/shared/inbox"},
+        "name": "mychannel",
+        "following": "https://test.pod/federation/actors/mychannel/following",
+        "outbox": "https://test.pod/federation/actors/mychannel/outbox",
+        "url": [
+            {
+                "mediaType": "text/html",
+                "href": "https://test.pod/channels/mychannel",
+                "type": "Link",
+            },
+            {
+                "mediaType": "application/rss+xml",
+                "href": "https://test.pod/api/v1/channels/mychannel/rss",
+                "type": "Link",
+            },
+        ],
+        "type": "Person",
+        "category": "podcast",
+        "attributedTo": attributed_to.fid,
+        "manuallyApprovesFollowers": False,
+        "inbox": "https://test.pod/federation/actors/mychannel/inbox",
+        "icon": {
+            "mediaType": "image/jpeg",
+            "type": "Image",
+            "url": "https://test.pod/media/attachments/dd/ce/b2/nosmile.jpeg",
+        },
+        "summary": "<p>content</p>",
+        "publicKey": {
+            "owner": "https://test.pod/federation/actors/mychannel",
+            "publicKeyPem": "-----BEGIN RSA PUBLIC KEY-----\n+KwIDAQAB\n-----END RSA PUBLIC KEY-----\n",
+            "id": "https://test.pod/federation/actors/mychannel#main-key",
+        },
+        "tag": [
+            {"type": "Hashtag", "name": "#Indie"},
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+
+    serializer = serializers.ActorSerializer(data=actor_data)
+    assert serializer.is_valid(raise_exception=True) is True
+    actor = serializer.save()
+
+    get_actor.assert_called_once_with(actor_data["attributedTo"])
+    assert actor.preferred_username == actor_data["preferredUsername"]
+    assert actor.fid == actor_data["id"]
+    assert actor.name == actor_data["name"]
+    assert actor.type == actor_data["type"]
+    assert actor.public_key == actor_data["publicKey"]["publicKeyPem"]
+    assert actor.outbox_url == actor_data["outbox"]
+    assert actor.inbox_url == actor_data["inbox"]
+    assert actor.shared_inbox_url == actor_data["endpoints"]["sharedInbox"]
+    assert actor.channel.attributed_to == attributed_to
+    assert actor.channel.rss_url == actor_data["url"][1]["href"]
+    assert actor.channel.artist.attributed_to == attributed_to
+    assert actor.channel.artist.content_category == actor_data["category"]
+    assert actor.channel.artist.name == actor_data["name"]
+    assert actor.channel.artist.get_tags() == ["Indie", "Punk", "Rock"]
+    assert actor.channel.artist.description.text == actor_data["summary"]
+    assert actor.channel.artist.description.content_type == "text/html"
+    assert actor.channel.artist.attachment_cover.url == actor_data["icon"]["url"]
+    assert (
+        actor.channel.artist.attachment_cover.mimetype
+        == actor_data["icon"]["mediaType"]
+    )
+    assert actor.channel.library.fid is not None
+    assert actor.channel.library.actor == attributed_to
+    assert actor.channel.library.privacy_level == "everyone"
+    assert actor.channel.library.name == actor_data["name"]
+
+
+def test_channel_actor_serializer_from_ap_update(mocker, factories):
+    domain = factories["federation.Domain"](name="test.pod")
+    attributed_to = factories["federation.Actor"](domain=domain)
+    actor = factories["federation.Actor"](domain=domain)
+    channel = factories["audio.Channel"](actor=actor, attributed_to=attributed_to)
+    get_actor = mocker.patch.object(actors, "get_actor", return_value=attributed_to)
+    library = channel.library
+    actor_data = {
+        "@context": jsonld.get_default_context(),
+        "followers": "https://test.pod/federation/actors/mychannel/followers",
+        "preferredUsername": "mychannel",
+        "id": actor.fid,
+        "endpoints": {"sharedInbox": "https://test.pod/federation/shared/inbox"},
+        "name": "mychannel",
+        "following": "https://test.pod/federation/actors/mychannel/following",
+        "outbox": "https://test.pod/federation/actors/mychannel/outbox",
+        "url": [
+            {
+                "mediaType": "text/html",
+                "href": "https://test.pod/channels/mychannel",
+                "type": "Link",
+            },
+            {
+                "mediaType": "application/rss+xml",
+                "href": "https://test.pod/api/v1/channels/mychannel/rss",
+                "type": "Link",
+            },
+        ],
+        "type": "Person",
+        "category": "podcast",
+        "attributedTo": attributed_to.fid,
+        "manuallyApprovesFollowers": False,
+        "inbox": "https://test.pod/federation/actors/mychannel/inbox",
+        "icon": {
+            "mediaType": "image/jpeg",
+            "type": "Image",
+            "url": "https://test.pod/media/attachments/dd/ce/b2/nosmile.jpeg",
+        },
+        "summary": "<p>content</p>",
+        "publicKey": {
+            "owner": "https://test.pod/federation/actors/mychannel",
+            "publicKeyPem": "-----BEGIN RSA PUBLIC KEY-----\n+KwIDAQAB\n-----END RSA PUBLIC KEY-----\n",
+            "id": "https://test.pod/federation/actors/mychannel#main-key",
+        },
+        "tag": [
+            {"type": "Hashtag", "name": "#Indie"},
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+
+    serializer = serializers.ActorSerializer(data=actor_data)
+    assert serializer.is_valid(raise_exception=True) is True
+    serializer.save()
+    channel.refresh_from_db()
+    get_actor.assert_called_once_with(actor_data["attributedTo"])
+    assert channel.actor == actor
+    assert channel.attributed_to == attributed_to
+    assert channel.rss_url == actor_data["url"][1]["href"]
+    assert channel.artist.attributed_to == attributed_to
+    assert channel.artist.content_category == actor_data["category"]
+    assert channel.artist.name == actor_data["name"]
+    assert channel.artist.get_tags() == ["Indie", "Punk", "Rock"]
+    assert channel.artist.description.text == actor_data["summary"]
+    assert channel.artist.description.content_type == "text/html"
+    assert channel.artist.attachment_cover.url == actor_data["icon"]["url"]
+    assert channel.artist.attachment_cover.mimetype == actor_data["icon"]["mediaType"]
+    assert channel.library.actor == attributed_to
+    assert channel.library.privacy_level == library.privacy_level
+    assert channel.library.name == library.name
 
 
 def test_channel_actor_outbox_serializer(factories):
@@ -1449,12 +1644,21 @@ def test_channel_actor_outbox_serializer(factories):
 def test_channel_upload_serializer(factories):
     channel = factories["audio.Channel"](library__privacy_level="everyone")
     content = factories["common.Content"]()
+    cover = factories["common.Attachment"]()
     upload = factories["music.Upload"](
         playable=True,
+        bitrate=543,
+        size=543,
+        duration=54,
         library=channel.library,
         import_status="finished",
         track__set_tags=["Punk"],
+        track__attachment_cover=cover,
         track__description=content,
+        track__disc_number=3,
+        track__position=12,
+        track__license="cc0-1.0",
+        track__copyright="Copyright something",
         track__album__set_tags=["Rock"],
         track__artist__set_tags=["Indie"],
     )
@@ -1463,25 +1667,38 @@ def test_channel_upload_serializer(factories):
         "@context": jsonld.get_default_context(),
         "type": "Audio",
         "id": upload.fid,
-        "name": upload.track.full_name,
+        "name": upload.track.title,
         "summary": "#Indie #Punk #Rock",
         "attributedTo": channel.actor.fid,
         "published": upload.creation_date.isoformat(),
         "mediaType": "text/html",
         "content": common_utils.render_html(content.text, content.content_type),
         "to": "https://www.w3.org/ns/activitystreams#Public",
+        "position": upload.track.position,
+        "duration": upload.duration,
+        "album": upload.track.album.fid,
+        "disc": upload.track.disc_number,
+        "copyright": upload.track.copyright,
+        "license": upload.track.local_license["identifiers"][0],
         "url": [
-            {
-                "type": "Link",
-                "mediaType": upload.mimetype,
-                "href": utils.full_url(upload.listen_url_no_download),
-            },
             {
                 "type": "Link",
                 "mediaType": "text/html",
                 "href": utils.full_url(upload.track.get_absolute_url()),
             },
+            {
+                "type": "Link",
+                "mediaType": upload.mimetype,
+                "href": utils.full_url(upload.listen_url_no_download),
+                "bitrate": upload.bitrate,
+                "size": upload.size,
+            },
         ],
+        "image": {
+            "type": "Image",
+            "url": upload.track.attachment_cover.download_url_original,
+            "mediaType": upload.track.attachment_cover.mimetype,
+        },
         "tag": [
             {"type": "Hashtag", "name": "#Indie"},
             {"type": "Hashtag", "name": "#Punk"},
@@ -1492,6 +1709,166 @@ def test_channel_upload_serializer(factories):
     serializer = serializers.ChannelUploadSerializer(upload)
 
     assert serializer.data == expected
+
+
+def test_channel_upload_serializer_from_ap_create(factories, now):
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
+    album = factories["music.Album"](artist=channel.artist)
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Audio",
+        "id": "https://test.pod/uuid",
+        "name": "My test track",
+        "summary": "#Indie #Punk #Rock",
+        "attributedTo": channel.actor.fid,
+        "published": now.isoformat(),
+        "mediaType": "text/html",
+        "content": "<p>Hello</p>",
+        "duration": 543,
+        "position": 4,
+        "disc": 2,
+        "album": album.fid,
+        "to": "https://www.w3.org/ns/activitystreams#Public",
+        "copyright": "Copyright test",
+        "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "url": [
+            {
+                "type": "Link",
+                "mediaType": "text/html",
+                "href": "https://test.pod/track",
+            },
+            {
+                "type": "Link",
+                "mediaType": "audio/mpeg",
+                "href": "https://test.pod/file.mp3",
+                "bitrate": 192000,
+                "size": 15492738,
+            },
+        ],
+        "tag": [
+            {"type": "Hashtag", "name": "#Indie"},
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "url": "https://image.example/image.png",
+        },
+    }
+
+    serializer = serializers.ChannelUploadSerializer(
+        data=payload, context={"channel": channel}
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+
+    upload = serializer.save(channel=channel)
+
+    assert upload.library == channel.library
+    assert upload.import_status == "finished"
+    assert upload.creation_date == now
+    assert upload.fid == payload["id"]
+    assert upload.source == payload["url"][1]["href"]
+    assert upload.mimetype == payload["url"][1]["mediaType"]
+    assert upload.size == payload["url"][1]["size"]
+    assert upload.bitrate == payload["url"][1]["bitrate"]
+    assert upload.duration == payload["duration"]
+    assert upload.track.artist == channel.artist
+    assert upload.track.position == payload["position"]
+    assert upload.track.disc_number == payload["disc"]
+    assert upload.track.attributed_to == channel.attributed_to
+    assert upload.track.title == payload["name"]
+    assert upload.track.creation_date == now
+    assert upload.track.description.content_type == payload["mediaType"]
+    assert upload.track.description.text == payload["content"]
+    assert upload.track.fid == payload["id"]
+    assert upload.track.license.pk == "cc0-1.0"
+    assert upload.track.copyright == payload["copyright"]
+    assert upload.track.get_tags() == ["Indie", "Punk", "Rock"]
+    assert upload.track.attachment_cover.mimetype == payload["image"]["mediaType"]
+    assert upload.track.attachment_cover.url == payload["image"]["url"]
+    assert upload.track.album == album
+
+
+def test_channel_upload_serializer_from_ap_update(factories, now):
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
+    album = factories["music.Album"](artist=channel.artist)
+    upload = factories["music.Upload"](track__album=album, track__artist=channel.artist)
+
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Audio",
+        "id": upload.fid,
+        "name": "Hello there",
+        "attributedTo": channel.actor.fid,
+        "published": now.isoformat(),
+        "mediaType": "text/html",
+        "content": "<p>Hello</p>",
+        "duration": 543,
+        "position": 4,
+        "disc": 2,
+        "album": album.fid,
+        "to": "https://www.w3.org/ns/activitystreams#Public",
+        "copyright": "Copyright test",
+        "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "url": [
+            {
+                "type": "Link",
+                "mediaType": "text/html",
+                "href": "https://test.pod/track",
+            },
+            {
+                "type": "Link",
+                "mediaType": "audio/mpeg",
+                "href": "https://test.pod/file.mp3",
+                "bitrate": 192000,
+                "size": 15492738,
+            },
+        ],
+        "tag": [
+            {"type": "Hashtag", "name": "#Indie"},
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "url": "https://image.example/image.png",
+        },
+    }
+
+    serializer = serializers.ChannelUploadSerializer(
+        data=payload, context={"channel": channel}
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save(channel=channel)
+    upload.refresh_from_db()
+
+    assert upload.library == channel.library
+    assert upload.import_status == "finished"
+    assert upload.creation_date == now
+    assert upload.fid == payload["id"]
+    assert upload.source == payload["url"][1]["href"]
+    assert upload.mimetype == payload["url"][1]["mediaType"]
+    assert upload.size == payload["url"][1]["size"]
+    assert upload.bitrate == payload["url"][1]["bitrate"]
+    assert upload.duration == payload["duration"]
+    assert upload.track.artist == channel.artist
+    assert upload.track.position == payload["position"]
+    assert upload.track.disc_number == payload["disc"]
+    assert upload.track.attributed_to == channel.attributed_to
+    assert upload.track.title == payload["name"]
+    assert upload.track.creation_date == now
+    assert upload.track.description.content_type == payload["mediaType"]
+    assert upload.track.description.text == payload["content"]
+    assert upload.track.fid == payload["id"]
+    assert upload.track.license.pk == "cc0-1.0"
+    assert upload.track.copyright == payload["copyright"]
+    assert upload.track.get_tags() == ["Indie", "Punk", "Rock"]
+    assert upload.track.attachment_cover.mimetype == payload["image"]["mediaType"]
+    assert upload.track.attachment_cover.url == payload["image"]["url"]
+    assert upload.track.album == album
 
 
 def test_channel_create_upload_serializer(factories):

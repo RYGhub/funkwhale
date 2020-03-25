@@ -7,11 +7,14 @@ import requests
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q, F
+from django.db.models.deletion import Collector
 from django.utils import timezone
 from dynamic_preferences.registries import global_preferences_registry
 from requests.exceptions import RequestException
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.common import preferences
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.moderation import mrf
@@ -254,8 +257,11 @@ def handle_purge_actors(ids, only=[]):
 
     # purge audio content
     if not only or "media" in only:
+        delete_qs(common_models.Attachment.objects.filter(actor__in=ids))
         delete_qs(models.LibraryFollow.objects.filter(actor_id__in=ids))
         delete_qs(models.Follow.objects.filter(target_id__in=ids))
+        delete_qs(audio_models.Channel.objects.filter(attributed_to__in=ids))
+        delete_qs(audio_models.Channel.objects.filter(actor__in=ids))
         delete_qs(music_models.Upload.objects.filter(library__actor_id__in=ids))
         delete_qs(music_models.Library.objects.filter(actor_id__in=ids))
 
@@ -390,9 +396,76 @@ def fetch(fetch_obj):
         error("save", message=str(e))
         raise
 
+    # special case for channels
+    # when obj is an actor, we check if the actor has a channel associated with it
+    # if it is the case, we consider the fetch obj to be a channel instead
+    if isinstance(obj, models.Actor) and obj.get_channel():
+        obj = obj.get_channel()
     fetch_obj.object = obj
     fetch_obj.status = "finished"
     fetch_obj.fetch_date = timezone.now()
     return fetch_obj.save(
         update_fields=["fetch_date", "status", "object_id", "object_content_type"]
     )
+
+
+class PreserveSomeDataCollector(Collector):
+    """
+    We need to delete everything related to an actor. Well… Almost everything.
+    But definitely not the Delete Activity we send to announce the actor is deleted.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.creation_date = timezone.now()
+        super().__init__(*args, **kwargs)
+
+    def related_objects(self, related, *args, **kwargs):
+        qs = super().related_objects(related, *args, **kwargs)
+        if related.name == "outbox_activities":
+            # exclude the delete activity can be broadcasted properly
+            qs = qs.exclude(type="Delete", creation_date__gte=self.creation_date)
+
+        return qs
+
+
+@celery.app.task(name="federation.remove_actor")
+@transaction.atomic
+@celery.require_instance(
+    models.Actor.objects.all(), "actor",
+)
+def remove_actor(actor):
+    # Then we broadcast the info over federation. We do this *before* deleting objects
+    # associated with the actor, otherwise follows are removed and we don't know where
+    # to broadcast
+    logger.info("Broadcasting deletion to federation…")
+    collector = PreserveSomeDataCollector(using="default")
+    routes.outbox.dispatch(
+        {"type": "Delete", "object": {"type": actor.type}}, context={"actor": actor}
+    )
+
+    # then we delete any object associated with the actor object, but *not* the actor
+    # itself. We keep it for auditability and sending the Delete ActivityPub message
+    logger.info(
+        "Prepare deletion of objects associated with account %s…",
+        actor.preferred_username,
+    )
+    collector.collect([actor])
+    for model, instances in collector.data.items():
+        if issubclass(model, actor.__class__):
+            # we skip deletion of the actor itself
+            continue
+
+        to_delete = model.objects.filter(pk__in=[instance.pk for instance in instances])
+        logger.info(
+            "Deleting %s objects associated with account %s…",
+            len(instances),
+            actor.preferred_username,
+        )
+        to_delete.delete()
+
+    # Finally, we update the actor itself and mark it as removed
+    logger.info("Marking actor as Tombsone…")
+    actor.type = "Tombstone"
+    actor.name = None
+    actor.summary = None
+    actor.save(update_fields=["type", "name", "summary"])

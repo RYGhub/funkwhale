@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import models as music_models
@@ -171,6 +172,7 @@ FETCH_OBJECT_CONFIG = {
     "library": {"queryset": music_models.Library.objects.all(), "id_attr": "uuid"},
     "upload": {"queryset": music_models.Upload.objects.all(), "id_attr": "uuid"},
     "account": {"queryset": models.Actor.objects.all(), "id_attr": "full_username"},
+    "channel": {"queryset": audio_models.Channel.objects.all(), "id_attr": "uuid"},
 }
 FETCH_OBJECT_FIELD = common_fields.GenericRelation(FETCH_OBJECT_CONFIG)
 

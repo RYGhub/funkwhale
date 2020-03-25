@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import Q
+
 from funkwhale_api.music import models as music_models
 
 from . import activity
@@ -158,18 +160,26 @@ def outbox_create_audio(context):
 
 @inbox.register({"type": "Create", "object.type": "Audio"})
 def inbox_create_audio(payload, context):
-    serializer = serializers.UploadSerializer(
-        data=payload["object"],
-        context={"activity": context.get("activity"), "actor": context["actor"]},
-    )
-
+    is_channel = "library" not in payload["object"]
+    if is_channel:
+        channel = context["actor"].get_channel()
+        serializer = serializers.ChannelUploadSerializer(
+            data=payload["object"], context={"channel": channel},
+        )
+    else:
+        serializer = serializers.UploadSerializer(
+            data=payload["object"],
+            context={"activity": context.get("activity"), "actor": context["actor"]},
+        )
     if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
         logger.warn("Discarding invalid audio create")
         return
 
     upload = serializer.save()
-
-    return {"object": upload, "target": upload.library}
+    if is_channel:
+        return {"object": upload, "target": channel}
+    else:
+        return {"object": upload, "target": upload.library}
 
 
 @inbox.register({"type": "Delete", "object.type": "Library"})
@@ -252,9 +262,10 @@ def inbox_delete_audio(payload, context):
         # we did not receive a list of Ids, so we can probably use the value directly
         upload_fids = [payload["object"]["id"]]
 
-    candidates = music_models.Upload.objects.filter(
-        library__actor=actor, fid__in=upload_fids
+    query = Q(fid__in=upload_fids) & (
+        Q(library__actor=actor) | Q(track__artist__channel__actor=actor)
     )
+    candidates = music_models.Upload.objects.filter(query)
 
     total = candidates.count()
     logger.info("Deleting %s uploads with ids %s", total, upload_fids)
@@ -481,5 +492,46 @@ def outbox_flag(context):
             # Mastodon requires the report to be sent to the reported actor inbox
             # (and not the shared inbox)
             to=[{"type": "actor_inbox", "actor": report.target_owner}],
+        ),
+    }
+
+
+@inbox.register({"type": "Delete", "object.type": "Album"})
+def inbox_delete_album(payload, context):
+    actor = context["actor"]
+    album_id = payload["object"].get("id")
+    if not album_id:
+        logger.debug("Discarding deletion of empty library")
+        return
+
+    query = Q(fid=album_id) & (Q(attributed_to=actor) | Q(artist__channel__actor=actor))
+    try:
+        album = music_models.Album.objects.get(query)
+    except music_models.Album.DoesNotExist:
+        logger.debug("Discarding deletion of unkwnown album %s", album_id)
+        return
+
+    album.delete()
+
+
+@outbox.register({"type": "Delete", "object.type": "Album"})
+def outbox_delete_album(context):
+    album = context["album"]
+    actor = (
+        album.artist.channel.actor
+        if album.artist.get_channel()
+        else album.attributed_to
+    )
+    actor = actor or actors.get_service_actor()
+    serializer = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Album", "id": album.fid}}
+    )
+
+    yield {
+        "type": "Delete",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
         ),
     }

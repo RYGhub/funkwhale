@@ -148,18 +148,16 @@ def test_channel_delete(logged_in_api_client, factories, mocker):
     channel = factories["audio.Channel"](attributed_to=actor)
 
     url = reverse("api:v1:channels-detail", kwargs={"composite": channel.uuid})
-    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
     response = logged_in_api_client.delete(url)
 
     assert response.status_code == 204
 
+    on_commit.assert_called_once_with(
+        views.federation_tasks.remove_actor.delay, actor_id=channel.actor.pk
+    )
     with pytest.raises(channel.DoesNotExist):
         channel.refresh_from_db()
-
-    dispatch.assert_called_once_with(
-        {"type": "Delete", "object": {"type": channel.actor.type}},
-        context={"actor": channel.actor},
-    )
 
 
 def test_channel_delete_permission(logged_in_api_client, factories):
@@ -216,6 +214,38 @@ def test_channel_unsubscribe(factories, logged_in_api_client):
 
     with pytest.raises(subscription.DoesNotExist):
         subscription.refresh_from_db()
+
+
+def test_channel_subscribe_remote(factories, logged_in_api_client, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    actor = logged_in_api_client.user.create_actor()
+    channel_actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"](artist__description=None, actor=channel_actor)
+    url = reverse("api:v1:channels-subscribe", kwargs={"composite": channel.uuid})
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 201
+    subscription = actor.emitted_follows.latest("id")
+    dispatch.assert_called_once_with(
+        {"type": "Follow"}, context={"follow": subscription}
+    )
+
+
+def test_channel_unsubscribe_remote(factories, logged_in_api_client, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    actor = logged_in_api_client.user.create_actor()
+    channel_actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"](actor=channel_actor)
+    subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
+    url = reverse("api:v1:channels-unsubscribe", kwargs={"composite": channel.uuid})
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 204
+    dispatch.assert_called_once_with(
+        {"type": "Undo", "object": {"type": "Follow"}}, context={"follow": subscription}
+    )
 
 
 def test_subscriptions_list(factories, logged_in_api_client):

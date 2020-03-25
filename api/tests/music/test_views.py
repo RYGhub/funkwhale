@@ -1407,7 +1407,8 @@ def test_channel_owner_can_create_album(factories, logged_in_api_client):
     assert album.description.text == "hello world"
 
 
-def test_channel_owner_can_delete_album(factories, logged_in_api_client):
+def test_channel_owner_can_delete_album(factories, logged_in_api_client, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
     actor = logged_in_api_client.user.create_actor()
     channel = factories["audio.Channel"](attributed_to=actor)
     album = factories["music.Album"](artist=channel.artist)
@@ -1416,6 +1417,10 @@ def test_channel_owner_can_delete_album(factories, logged_in_api_client):
     response = logged_in_api_client.delete(url)
 
     assert response.status_code == 204
+
+    dispatch.assert_called_once_with(
+        {"type": "Delete", "object": {"type": "Album"}}, context={"album": album}
+    )
     with pytest.raises(album.DoesNotExist):
         album.refresh_from_db()
 
@@ -1452,15 +1457,22 @@ def test_other_user_cannot_delete_album(factories, logged_in_api_client):
     album.refresh_from_db()
 
 
-def test_channel_owner_can_delete_track(factories, logged_in_api_client):
+def test_channel_owner_can_delete_track(factories, logged_in_api_client, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
     actor = logged_in_api_client.user.create_actor()
     channel = factories["audio.Channel"](attributed_to=actor)
     track = factories["music.Track"](artist=channel.artist)
+    upload1 = factories["music.Upload"](track=track)
+    upload2 = factories["music.Upload"](track=track)
     url = reverse("api:v1:tracks-detail", kwargs={"pk": track.pk})
 
     response = logged_in_api_client.delete(url)
 
     assert response.status_code == 204
+    dispatch.assert_called_once_with(
+        {"type": "Delete", "object": {"type": "Audio"}},
+        context={"uploads": [upload1, upload2]},
+    )
     with pytest.raises(track.DoesNotExist):
         track.refresh_from_db()
 

@@ -5,7 +5,8 @@ import uuid
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import transaction
-
+from django.urls import reverse
+from django.utils import timezone
 from rest_framework import serializers
 
 from funkwhale_api.common import utils as common_utils
@@ -23,6 +24,34 @@ from . import activity, actors, contexts, jsonld, models, tasks, utils
 logger = logging.getLogger(__name__)
 
 
+def include_if_not_none(data, value, field):
+    if value is not None:
+        data[field] = value
+
+
+class MultipleSerializer(serializers.Serializer):
+    """
+    A serializer that will try multiple serializers in turn
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.allowed = kwargs.pop("allowed")
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, v):
+        last_exception = None
+        for serializer_class in self.allowed:
+            s = serializer_class(data=v)
+            try:
+                s.is_valid(raise_exception=True)
+            except serializers.ValidationError as e:
+                last_exception = e
+            else:
+                return s.validated_data
+
+        raise last_exception
+
+
 class TruncatedCharField(serializers.CharField):
     def __init__(self, *args, **kwargs):
         self.truncate_length = kwargs.pop("truncate_length")
@@ -33,6 +62,38 @@ class TruncatedCharField(serializers.CharField):
         if v:
             v = v[: self.truncate_length]
         return v
+
+
+class TagSerializer(jsonld.JsonLdSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Hashtag])
+    name = serializers.CharField(max_length=100)
+
+    class Meta:
+        jsonld_mapping = {"name": jsonld.first_val(contexts.AS.name)}
+
+    def validate_name(self, value):
+        if value.startswith("#"):
+            # remove trailing #
+            value = value[1:]
+        return value
+
+
+def tag_list(tagged_items):
+    return [
+        repr_tag(item.tag.name)
+        for item in sorted(set(tagged_items.all()), key=lambda i: i.tag.name)
+    ]
+
+
+def is_mimetype(mt, allowed_mimetypes):
+    for allowed in allowed_mimetypes:
+        if allowed.endswith("/*"):
+            if mt.startswith(allowed.replace("*", "")):
+                return True
+        else:
+            if mt == allowed:
+                return True
+    return False
 
 
 class MediaSerializer(jsonld.JsonLdSerializer):
@@ -52,28 +113,49 @@ class MediaSerializer(jsonld.JsonLdSerializer):
         if self.allow_empty_mimetype and not v:
             return None
 
-        for mt in self.allowed_mimetypes:
-
-            if mt.endswith("/*"):
-                if v.startswith(mt.replace("*", "")):
-                    return v
-            else:
-                if v == mt:
-                    return v
-        raise serializers.ValidationError(
-            "Invalid mimetype {}. Allowed: {}".format(v, self.allowed_mimetypes)
-        )
+        if not is_mimetype(v, self.allowed_mimetypes):
+            raise serializers.ValidationError(
+                "Invalid mimetype {}. Allowed: {}".format(v, self.allowed_mimetypes)
+            )
+        return v
 
 
 class LinkSerializer(MediaSerializer):
     type = serializers.ChoiceField(choices=[contexts.AS.Link])
     href = serializers.URLField(max_length=500)
+    bitrate = serializers.IntegerField(min_value=0, required=False)
+    size = serializers.IntegerField(min_value=0, required=False)
 
     class Meta:
         jsonld_mapping = {
             "href": jsonld.first_id(contexts.AS.href),
             "mediaType": jsonld.first_val(contexts.AS.mediaType),
+            "bitrate": jsonld.first_val(contexts.FW.bitrate),
+            "size": jsonld.first_val(contexts.FW.size),
         }
+
+
+class LinkListSerializer(serializers.ListField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("child", LinkSerializer(jsonld_expand=False))
+        self.keep_mediatype = kwargs.pop("keep_mediatype", [])
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, v):
+        links = super().to_internal_value(v)
+        if not self.keep_mediatype:
+            # no further filtering required
+            return links
+        links = [
+            link
+            for link in links
+            if link.get("mediaType")
+            and is_mimetype(link["mediaType"], self.keep_mediatype)
+        ]
+        if not self.allow_empty and len(links) == 0:
+            self.fail("empty")
+
+        return links
 
 
 class ImageSerializer(MediaSerializer):
@@ -133,6 +215,16 @@ def get_by_media_type(urls, media_type):
             return url
 
 
+class BasicActorSerializer(jsonld.JsonLdSerializer):
+    id = serializers.URLField(max_length=500)
+    type = serializers.ChoiceField(
+        choices=[getattr(contexts.AS, c[0]) for c in models.TYPE_CHOICES]
+    )
+
+    class Meta:
+        jsonld_mapping = {}
+
+
 class ActorSerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
     outbox = serializers.URLField(max_length=500, required=False)
@@ -163,6 +255,16 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         required=False,
         allow_empty_mimetype=True,
     )
+    attributedTo = serializers.URLField(max_length=500, required=False)
+
+    tags = serializers.ListField(
+        child=TagSerializer(), min_length=0, required=False, allow_null=True
+    )
+
+    category = serializers.CharField(required=False)
+    # languages = serializers.Char(
+    #     music_models.ARTIST_CONTENT_CATEGORY_CHOICES, required=False, default="music",
+    # )
 
     class Meta:
         # not strictly necessary because it's not a model serializer
@@ -185,7 +287,18 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             "endpoints": jsonld.first_obj(contexts.AS.endpoints),
             "icon": jsonld.first_obj(contexts.AS.icon),
             "url": jsonld.raw(contexts.AS.url),
+            "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
+            "tags": jsonld.raw(contexts.AS.tag),
+            "category": jsonld.first_val(contexts.SC.category),
+            # "language": jsonld.first_val(contexts.SC.inLanguage),
         }
+
+    def validate_category(self, v):
+        return (
+            v
+            if v in [t for t, _ in music_models.ARTIST_CONTENT_CATEGORY_CHOICES]
+            else None
+        )
 
     def to_representation(self, instance):
         ret = {
@@ -231,6 +344,9 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             include_image(ret, channel.artist.attachment_cover, "icon")
             if channel.artist.description_id:
                 ret["summary"] = channel.artist.description.rendered
+            ret["attributedTo"] = channel.attributed_to.fid
+            ret["category"] = channel.artist.content_category
+            ret["tag"] = tag_list(channel.artist.tagged_items.all())
         else:
             ret["url"] = [
                 {
@@ -312,6 +428,22 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                 if new_value
                 else None,
             )
+
+        rss_url = get_by_media_type(
+            self.validated_data.get("url", []), "application/rss+xml"
+        )
+        if rss_url:
+            rss_url = rss_url["href"]
+        attributed_to = self.validated_data.get("attributedTo")
+        if rss_url and attributed_to:
+            # if the actor is attributed to another actor, and there is a RSS url,
+            # then we consider it's a channel
+            create_or_update_channel(
+                actor,
+                rss_url=rss_url,
+                attributed_to_fid=attributed_to,
+                **self.validated_data
+            )
         return actor
 
     def validate(self, data):
@@ -324,6 +456,56 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         else:
             validated_data["summary"] = None
         return validated_data
+
+
+def create_or_update_channel(actor, rss_url, attributed_to_fid, **validated_data):
+    from funkwhale_api.audio import models as audio_models
+
+    attributed_to = actors.get_actor(attributed_to_fid)
+    artist_defaults = {
+        "name": validated_data.get("name", validated_data["preferredUsername"]),
+        "fid": validated_data["id"],
+        "content_category": validated_data.get("category", "music") or "music",
+        "attributed_to": attributed_to,
+    }
+    artist, created = music_models.Artist.objects.update_or_create(
+        channel__attributed_to=attributed_to,
+        channel__actor=actor,
+        defaults=artist_defaults,
+    )
+    common_utils.attach_content(artist, "description", validated_data.get("summary"))
+    if "icon" in validated_data:
+        new_value = validated_data["icon"]
+        common_utils.attach_file(
+            artist,
+            "attachment_cover",
+            {"url": new_value["url"], "mimetype": new_value.get("mediaType")}
+            if new_value
+            else None,
+        )
+    tags = [t["name"] for t in validated_data.get("tags", []) or []]
+    tags_models.set_tags(artist, *tags)
+    if created:
+        uid = uuid.uuid4()
+        fid = utils.full_url(
+            reverse("federation:music:libraries-detail", kwargs={"uuid": uid})
+        )
+        library = attributed_to.libraries.create(
+            privacy_level="everyone", name=artist_defaults["name"], fid=fid, uuid=uid,
+        )
+    else:
+        library = artist.channel.library
+    channel_defaults = {
+        "actor": actor,
+        "attributed_to": attributed_to,
+        "rss_url": rss_url,
+        "artist": artist,
+        "library": library,
+    }
+    channel, created = audio_models.Channel.objects.update_or_create(
+        actor=actor, attributed_to=attributed_to, defaults=channel_defaults,
+    )
+    return channel
 
 
 class APIActorSerializer(serializers.ModelSerializer):
@@ -936,20 +1118,6 @@ MUSIC_ENTITY_JSONLD_MAPPING = {
 }
 
 
-class TagSerializer(jsonld.JsonLdSerializer):
-    type = serializers.ChoiceField(choices=[contexts.AS.Hashtag])
-    name = serializers.CharField(max_length=100)
-
-    class Meta:
-        jsonld_mapping = {"name": jsonld.first_val(contexts.AS.name)}
-
-    def validate_name(self, value):
-        if value.startswith("#"):
-            # remove trailing #
-            value = value[1:]
-        return value
-
-
 def repr_tag(tag_name):
     return {"type": "Hashtag", "name": "#{}".format(tag_name)}
 
@@ -1025,10 +1193,7 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         return instance
 
     def get_tags_repr(self, instance):
-        return [
-            repr_tag(item.tag.name)
-            for item in sorted(instance.tagged_items.all(), key=lambda i: i.tag.name)
-        ]
+        return tag_list(instance.tagged_items.all())
 
     def validate_updated_data(self, instance, validated_data):
         try:
@@ -1108,7 +1273,10 @@ class ArtistSerializer(MusicEntitySerializer):
 
 class AlbumSerializer(MusicEntitySerializer):
     released = serializers.DateField(allow_null=True, required=False)
-    artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
+    artists = serializers.ListField(
+        child=MultipleSerializer(allowed=[BasicActorSerializer, ArtistSerializer]),
+        min_length=1,
+    )
     # XXX: 1.0 rename to image
     cover = ImageSerializer(
         allowed_mimetypes=["image/*"],
@@ -1146,16 +1314,24 @@ class AlbumSerializer(MusicEntitySerializer):
             "released": instance.release_date.isoformat()
             if instance.release_date
             else None,
-            "artists": [
-                ArtistSerializer(
-                    instance.artist, context={"include_ap_context": False}
-                ).data
-            ],
             "attributedTo": instance.attributed_to.fid
             if instance.attributed_to
             else None,
             "tag": self.get_tags_repr(instance),
         }
+        if instance.artist.get_channel():
+            d["artists"] = [
+                {
+                    "type": instance.artist.channel.actor.type,
+                    "id": instance.artist.channel.actor.fid,
+                }
+            ]
+        else:
+            d["artists"] = [
+                ArtistSerializer(
+                    instance.artist, context={"include_ap_context": False}
+                ).data
+            ]
         include_content(d, instance.description)
         if instance.attachment_cover:
             d["cover"] = {
@@ -1172,12 +1348,18 @@ class AlbumSerializer(MusicEntitySerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         if not self.parent:
-            validated_data["_artist"] = utils.retrieve_ap_object(
-                validated_data["artists"][0]["id"],
-                actor=self.context.get("fetch_actor"),
-                queryset=music_models.Artist,
-                serializer_class=ArtistSerializer,
-            )
+            artist_data = validated_data["artists"][0]
+            if artist_data.get("type", "Artist") == "Artist":
+                validated_data["_artist"] = utils.retrieve_ap_object(
+                    artist_data["id"],
+                    actor=self.context.get("fetch_actor"),
+                    queryset=music_models.Artist,
+                    serializer_class=ArtistSerializer,
+                )
+            else:
+                # we have an actor as an artist, so it's a channel
+                actor = actors.get_actor(artist_data["id"])
+                validated_data["_artist"] = actor.channel.artist
 
         return validated_data
 
@@ -1569,12 +1751,85 @@ class ChannelOutboxSerializer(PaginatedCollectionSerializer):
         return r
 
 
-class ChannelUploadSerializer(serializers.Serializer):
+class ChannelUploadSerializer(jsonld.JsonLdSerializer):
+    id = serializers.URLField(max_length=500)
+    type = serializers.ChoiceField(choices=[contexts.AS.Audio])
+    url = LinkListSerializer(keep_mediatype=["audio/*"], min_length=1)
+    name = TruncatedCharField(truncate_length=music_models.MAX_LENGTHS["TRACK_TITLE"])
+    published = serializers.DateTimeField(required=False)
+    duration = serializers.IntegerField(min_value=0, required=False)
+    position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
+    disc = serializers.IntegerField(min_value=1, allow_null=True, required=False)
+    album = serializers.URLField(max_length=500, required=False)
+    license = serializers.URLField(allow_null=True, required=False)
+    copyright = TruncatedCharField(
+        truncate_length=music_models.MAX_LENGTHS["COPYRIGHT"],
+        allow_null=True,
+        required=False,
+    )
+    image = ImageSerializer(
+        allowed_mimetypes=["image/*"],
+        allow_null=True,
+        required=False,
+        allow_empty_mimetype=True,
+    )
+
+    mediaType = serializers.ChoiceField(
+        choices=common_models.CONTENT_TEXT_SUPPORTED_TYPES,
+        default="text/html",
+        required=False,
+    )
+    content = TruncatedCharField(
+        truncate_length=common_models.CONTENT_TEXT_MAX_LENGTH,
+        required=False,
+        allow_null=True,
+    )
+
+    tags = serializers.ListField(
+        child=TagSerializer(), min_length=0, required=False, allow_null=True
+    )
+
+    class Meta:
+        jsonld_mapping = {
+            "name": jsonld.first_val(contexts.AS.name),
+            "url": jsonld.raw(contexts.AS.url),
+            "published": jsonld.first_val(contexts.AS.published),
+            "mediaType": jsonld.first_val(contexts.AS.mediaType),
+            "content": jsonld.first_val(contexts.AS.content),
+            "duration": jsonld.first_val(contexts.AS.duration),
+            "album": jsonld.first_id(contexts.FW.album),
+            "copyright": jsonld.first_val(contexts.FW.copyright),
+            "disc": jsonld.first_val(contexts.FW.disc),
+            "license": jsonld.first_id(contexts.FW.license),
+            "position": jsonld.first_val(contexts.FW.position),
+            "image": jsonld.first_obj(contexts.AS.image),
+            "tags": jsonld.raw(contexts.AS.tag),
+        }
+
+    def validate_album(self, v):
+        return utils.retrieve_ap_object(
+            v,
+            actor=actors.get_service_actor(),
+            serializer_class=AlbumSerializer,
+            queryset=music_models.Album.objects.filter(
+                artist__channel=self.context["channel"]
+            ),
+        )
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if data.get("content"):
+            validated_data["description"] = {
+                "content_type": data["mediaType"],
+                "text": data["content"],
+            }
+        return validated_data
+
     def to_representation(self, upload):
         data = {
             "id": upload.fid,
             "type": "Audio",
-            "name": upload.track.full_name,
+            "name": upload.track.title,
             "attributedTo": upload.library.channel.actor.fid,
             "published": upload.creation_date.isoformat(),
             "to": contexts.AS.Public
@@ -1583,17 +1838,29 @@ class ChannelUploadSerializer(serializers.Serializer):
             "url": [
                 {
                     "type": "Link",
-                    "mediaType": upload.mimetype,
-                    "href": utils.full_url(upload.listen_url_no_download),
-                },
-                {
-                    "type": "Link",
                     "mediaType": "text/html",
                     "href": utils.full_url(upload.track.get_absolute_url()),
                 },
+                {
+                    "type": "Link",
+                    "mediaType": upload.mimetype,
+                    "href": utils.full_url(upload.listen_url_no_download),
+                },
             ],
         }
+        if upload.track.album:
+            data["album"] = upload.track.album.fid
+        if upload.track.local_license:
+            data["license"] = upload.track.local_license["identifiers"][0]
+
+        include_if_not_none(data, upload.duration, "duration")
+        include_if_not_none(data, upload.track.position, "position")
+        include_if_not_none(data, upload.track.disc_number, "disc")
+        include_if_not_none(data, upload.track.copyright, "copyright")
+        include_if_not_none(data["url"][1], upload.bitrate, "bitrate")
+        include_if_not_none(data["url"][1], upload.size, "size")
         include_content(data, upload.track.description)
+        include_image(data, upload.track.attachment_cover)
         tags = [item.tag.name for item in upload.get_all_tagged_items()]
         if tags:
             data["tag"] = [repr_tag(name) for name in tags]
@@ -1603,6 +1870,68 @@ class ChannelUploadSerializer(serializers.Serializer):
             data["@context"] = jsonld.get_default_context()
 
         return data
+
+    def update(self, instance, validated_data):
+        return self.update_or_create(validated_data)
+
+    @transaction.atomic
+    def update_or_create(self, validated_data):
+        channel = self.context["channel"]
+        now = timezone.now()
+        track_defaults = {
+            "fid": validated_data["id"],
+            "artist": channel.artist,
+            "position": validated_data.get("position", 1),
+            "disc_number": validated_data.get("disc", 1),
+            "title": validated_data["name"],
+            "copyright": validated_data.get("copyright"),
+            "attributed_to": channel.attributed_to,
+            "album": validated_data.get("album"),
+            "creation_date": validated_data.get("published", now),
+        }
+        if validated_data.get("license"):
+            track_defaults["license"] = licenses.match(validated_data["license"])
+
+        track, created = music_models.Track.objects.update_or_create(
+            artist__channel=channel, fid=validated_data["id"], defaults=track_defaults
+        )
+
+        if "image" in validated_data:
+            new_value = self.validated_data["image"]
+            common_utils.attach_file(
+                track,
+                "attachment_cover",
+                {"url": new_value["url"], "mimetype": new_value.get("mediaType")}
+                if new_value
+                else None,
+            )
+
+        common_utils.attach_content(
+            track, "description", validated_data.get("description")
+        )
+
+        tags = [t["name"] for t in validated_data.get("tags", []) or []]
+        tags_models.set_tags(track, *tags)
+
+        upload_defaults = {
+            "fid": validated_data["id"],
+            "track": track,
+            "library": channel.library,
+            "creation_date": validated_data.get("published", now),
+            "duration": validated_data.get("duration"),
+            "bitrate": validated_data["url"][0].get("bitrate"),
+            "size": validated_data["url"][0].get("size"),
+            "mimetype": validated_data["url"][0]["mediaType"],
+            "source": validated_data["url"][0]["href"],
+            "import_status": "finished",
+        }
+        upload, created = music_models.Upload.objects.update_or_create(
+            fid=validated_data["id"], defaults=upload_defaults
+        )
+        return upload
+
+    def create(self, validated_data):
+        return self.update_or_create(validated_data)
 
 
 class ChannelCreateUploadSerializer(serializers.Serializer):

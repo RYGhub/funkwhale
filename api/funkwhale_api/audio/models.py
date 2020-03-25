@@ -107,6 +107,4 @@ def generate_actor(username, **kwargs):
 @receiver(post_delete, sender=Channel)
 def delete_channel_related_objs(instance, **kwargs):
     instance.library.delete()
-    if instance.actor != instance.attributed_to:
-        instance.actor.delete()
     instance.artist.delete()
