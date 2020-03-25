@@ -43,6 +43,9 @@
               </div>
             </template>
           </h1>
+          <div class="ui center aligned text">
+            <radio-button type="account" :object-id="{username: object.preferred_username, fullUsername: object.full_username}" :client-only="true"></radio-button>
+          </div>
           <div class="ui small hidden divider"></div>
           <div v-if="$store.getters['ui/layoutVersion'] === 'large'">
             <rendered-description
@@ -82,12 +85,16 @@ import { mapState } from "vuex"
 import axios from 'axios'
 
 import ReportMixin from '@/components/mixins/Report'
+import RadioButton from "@/components/radios/Button"
 
 export default {
   mixins: [ReportMixin],
   props: {
     username: {type: String, required: true},
     domain: {type: String, required: false, default: null},
+  },
+  components: {
+    RadioButton,
   },
   data () {
     return {

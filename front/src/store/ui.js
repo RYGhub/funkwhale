@@ -31,6 +31,7 @@ export default {
       'mutation.updated': {},
       'report.created': {},
       'user_request.created': {},
+      'Listen': {},
     },
     pageTitle: null,
     routePreferences: {

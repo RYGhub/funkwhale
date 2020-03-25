@@ -29,7 +29,7 @@
               <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="object.track.tags"></tags-list>
 
               <div class="extra" v-if="isActivity">
-                <span class="left floated">@{{ object.user.username }}</span>
+                <router-link class="left floated" :to="{name: 'profile.overview', params: {username: object.user.username}}">@{{ object.user.username }}</router-link>
                 <span class="right floated"><human-date :date="object.creation_date" /></span>
               </div>
             </div>
