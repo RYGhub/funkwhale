@@ -491,6 +491,21 @@ def test_fetch_url(factory_name, serializer_class, factories, r_mock, mocker):
     assert save.call_count == 1
 
 
+def test_fetch_channel_actor_returns_channel(factories, r_mock):
+    obj = factories["audio.Channel"]()
+    fetch = factories["federation.Fetch"](url=obj.actor.fid)
+    payload = serializers.ActorSerializer(obj.actor).data
+
+    r_mock.get(obj.fid, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+
+    assert fetch.status == "finished"
+    assert fetch.object == obj
+
+
 def test_fetch_honor_instance_policy_domain(factories):
     domain = factories["moderation.InstancePolicy"](
         block_all=True, for_domain=True

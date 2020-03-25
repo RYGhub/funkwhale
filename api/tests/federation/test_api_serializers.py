@@ -167,6 +167,7 @@ def test_fetch_serializer_no_obj(factories, to_api_date):
         ("music.Track", "track", "id"),
         ("music.Library", "library", "uuid"),
         ("music.Upload", "upload", "uuid"),
+        ("audio.Channel", "channel", "uuid"),
         ("federation.Actor", "account", "full_username"),
     ],
 )

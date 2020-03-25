@@ -26,6 +26,7 @@ from funkwhale_api.moderation import serializers as moderation_serializers
             routes.inbox_delete_library,
         ),
         ({"type": "Delete", "object": {"type": "Audio"}}, routes.inbox_delete_audio),
+        ({"type": "Delete", "object": {"type": "Album"}}, routes.inbox_delete_album),
         ({"type": "Undo", "object": {"type": "Follow"}}, routes.inbox_undo_follow),
         ({"type": "Update", "object": {"type": "Artist"}}, routes.inbox_update_artist),
         ({"type": "Update", "object": {"type": "Album"}}, routes.inbox_update_album),
@@ -58,6 +59,7 @@ def test_inbox_routes(route, handler):
             routes.outbox_delete_library,
         ),
         ({"type": "Delete", "object": {"type": "Audio"}}, routes.outbox_delete_audio),
+        ({"type": "Delete", "object": {"type": "Album"}}, routes.outbox_delete_album),
         ({"type": "Undo", "object": {"type": "Follow"}}, routes.outbox_undo_follow),
         ({"type": "Update", "object": {"type": "Track"}}, routes.outbox_update_track),
         (
@@ -349,6 +351,34 @@ def test_inbox_create_audio(factories, mocker):
     assert save.call_count == 1
 
 
+def test_inbox_create_audio_channel(factories, mocker):
+    activity = factories["federation.Activity"]()
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist)
+    upload = factories["music.Upload"](track__album=album, library=channel.library,)
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Create",
+        "actor": channel.actor.fid,
+        "object": serializers.ChannelUploadSerializer(upload).data,
+    }
+    upload.delete()
+    init = mocker.spy(serializers.ChannelUploadSerializer, "__init__")
+    save = mocker.spy(serializers.ChannelUploadSerializer, "save")
+    result = routes.inbox_create_audio(
+        payload,
+        context={"actor": channel.actor, "raise_exception": True, "activity": activity},
+    )
+    assert channel.library.uploads.count() == 1
+    assert result == {"object": channel.library.uploads.latest("id"), "target": channel}
+
+    assert init.call_count == 1
+    args = init.call_args
+    assert args[1]["data"] == payload["object"]
+    assert args[1]["context"] == {"channel": channel}
+    assert save.call_count == 1
+
+
 def test_inbox_delete_library(factories):
     activity = factories["federation.Activity"]()
 
@@ -366,6 +396,73 @@ def test_inbox_delete_library(factories):
 
     with pytest.raises(library.__class__.DoesNotExist):
         library.refresh_from_db()
+
+
+def test_inbox_delete_album(factories):
+
+    album = factories["music.Album"](attributed=True)
+    payload = {
+        "type": "Delete",
+        "actor": album.attributed_to.fid,
+        "object": {"type": "Album", "id": album.fid},
+    }
+
+    routes.inbox_delete_album(
+        payload,
+        context={
+            "actor": album.attributed_to,
+            "raise_exception": True,
+            "activity": activity,
+        },
+    )
+
+    with pytest.raises(album.__class__.DoesNotExist):
+        album.refresh_from_db()
+
+
+def test_inbox_delete_album_channel(factories):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist)
+    payload = {
+        "type": "Delete",
+        "actor": channel.actor.fid,
+        "object": {"type": "Album", "id": album.fid},
+    }
+
+    routes.inbox_delete_album(
+        payload,
+        context={"actor": channel.actor, "raise_exception": True, "activity": activity},
+    )
+
+    with pytest.raises(album.__class__.DoesNotExist):
+        album.refresh_from_db()
+
+
+def test_outbox_delete_album(factories):
+    album = factories["music.Album"](attributed=True)
+    a = list(routes.outbox_delete_album({"album": album}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Album", "id": album.fid}}
+    ).data
+
+    expected["to"] = [activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}]
+
+    assert dict(a["payload"]) == dict(expected)
+    assert a["actor"] == album.attributed_to
+
+
+def test_outbox_delete_album_channel(factories):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist)
+    a = list(routes.outbox_delete_album({"album": album}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Album", "id": album.fid}}
+    ).data
+
+    expected["to"] = [activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}]
+
+    assert dict(a["payload"]) == dict(expected)
+    assert a["actor"] == channel.actor
 
 
 def test_inbox_delete_library_impostor(factories):
@@ -463,6 +560,25 @@ def test_inbox_delete_audio(factories):
     routes.inbox_delete_audio(
         payload,
         context={"actor": library.actor, "raise_exception": True, "activity": activity},
+    )
+
+    with pytest.raises(upload.__class__.DoesNotExist):
+        upload.refresh_from_db()
+
+
+def test_inbox_delete_audio_channel(factories):
+    activity = factories["federation.Activity"]()
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](track__artist=channel.artist)
+    payload = {
+        "type": "Delete",
+        "actor": channel.actor.fid,
+        "object": {"type": "Audio", "id": [upload.fid]},
+    }
+
+    routes.inbox_delete_audio(
+        payload,
+        context={"actor": channel.actor, "raise_exception": True, "activity": activity},
     )
 
     with pytest.raises(upload.__class__.DoesNotExist):

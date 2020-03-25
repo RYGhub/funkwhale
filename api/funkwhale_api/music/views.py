@@ -241,6 +241,14 @@ class AlbumViewSet(
             return serializers.AlbumCreateSerializer
         return super().get_serializer_class()
 
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Album"}},
+            context={"album": instance},
+        )
+        models.Album.objects.filter(pk=instance.pk).delete()
+
 
 class LibraryViewSet(
     mixins.CreateModelMixin,
@@ -379,6 +387,15 @@ class TrackViewSet(
         context = super().get_serializer_context()
         context["description"] = self.action in ["retrieve", "create", "update"]
         return context
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        uploads = instance.uploads.order_by("id")
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Audio"}},
+            context={"uploads": list(uploads)},
+        )
+        instance.delete()
 
 
 def strip_absolute_media_url(path):

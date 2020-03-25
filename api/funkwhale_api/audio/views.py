@@ -13,10 +13,12 @@ from django.utils import timezone
 from funkwhale_api.common import locales
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common.mixins import MultipleLookupDetailMixin
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
@@ -128,6 +130,8 @@ class ChannelViewSet(
         )
         # prefetch stuff
         subscription = SubscriptionsViewSet.queryset.get(pk=subscription.pk)
+        if not object.actor.is_local:
+            routes.outbox.dispatch({"type": "Follow"}, context={"follow": subscription})
 
         data = serializers.SubscriptionSerializer(subscription).data
         return response.Response(data, status=201)
@@ -139,7 +143,15 @@ class ChannelViewSet(
     )
     def unsubscribe(self, request, *args, **kwargs):
         object = self.get_object()
-        request.user.actor.emitted_follows.filter(target=object.actor).delete()
+        follow_qs = request.user.actor.emitted_follows.filter(target=object.actor)
+        follow = follow_qs.first()
+        if follow:
+            if not object.actor.is_local:
+                routes.outbox.dispatch(
+                    {"type": "Undo", "object": {"type": "Follow"}},
+                    context={"follow": follow},
+                )
+            follow_qs.delete()
         return response.Response(status=204)
 
     @decorators.action(
@@ -248,11 +260,10 @@ class ChannelViewSet(
 
     @transaction.atomic
     def perform_destroy(self, instance):
-        routes.outbox.dispatch(
-            {"type": "Delete", "object": {"type": instance.actor.type}},
-            context={"actor": instance.actor},
-        )
         instance.__class__.objects.filter(pk=instance.pk).delete()
+        common_utils.on_commit(
+            federation_tasks.remove_actor.delay, actor_id=instance.actor.pk
+        )
 
 
 class SubscriptionsViewSet(
