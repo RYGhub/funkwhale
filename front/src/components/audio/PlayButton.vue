@@ -7,7 +7,7 @@
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
-      <template v-if="!discrete && !iconOnly"><slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
+      <template v-if="!discrete && !iconOnly">&nbsp;<slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
     </button>
     <div
       v-if="!discrete && !iconOnly"
