@@ -147,15 +147,6 @@
                   </div>
                 </div>
               </h2>
-              <div v-if="$store.state.radios.running" class="ui info message">
-                <div class="content">
-                  <div class="header">
-                    <i class="feed icon"></i> <translate translate-context="Sidebar/Player/Title">You have a radio playing</translate>
-                  </div>
-                  <p><translate translate-context="Sidebar/Player/Paragraph">New tracks will be appended here automatically.</translate></p>
-                  <div @click="$store.dispatch('radios/stop')" class="ui basic primary button"><translate translate-context="*/Player/Button.Label/Short, Verb">Stop radio</translate></div>
-                </div>
-              </div>
             </div>
             <table class="ui compact very basic fixed single line selectable unstackable table">
               <draggable v-model="tracks" tag="tbody" @update="reorder" handle=".handle">
@@ -194,6 +185,16 @@
                 </tr>
               </draggable>
             </table>
+
+            <div v-if="$store.state.radios.running" class="ui info message">
+              <div class="content">
+                <div class="header">
+                  <i class="feed icon"></i> <translate translate-context="Sidebar/Player/Title">You have a radio playing</translate>
+                </div>
+                <p><translate translate-context="Sidebar/Player/Paragraph">New tracks will be appended here automatically.</translate></p>
+                <div @click="$store.dispatch('radios/stop')" class="ui basic primary button"><translate translate-context="*/Player/Button.Label/Short, Verb">Stop radio</translate></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
