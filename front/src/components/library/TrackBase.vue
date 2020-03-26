@@ -20,6 +20,7 @@
               <play-button class="orange" :track="track">
                 <translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate>
               </play-button>
+              &nbsp;
               <track-favorite-icon v-if="$store.state.auth.authenticated" :border="true" :track="track"></track-favorite-icon>
               <track-playlist-icon class="circular" v-if="$store.state.auth.authenticated" :border="true" :track="track"></track-playlist-icon>
               <a v-if="upload" :href="downloadUrl" target="_blank" class="ui basic circular icon button" :title="labels.download">
