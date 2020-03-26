@@ -220,3 +220,40 @@ def test_album_mutation_description(factory_name, factories, mocker):
         mutation.previous_state["description"]
         == common_serializers.ContentSerializer(content).data
     )
+
+
+@pytest.mark.parametrize(
+    "factory_name", ["music.Track", "music.Album", "music.Artist"],
+)
+def test_mutation_description_keep_tags(factory_name, factories, mocker):
+    mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    content = factories["common.Content"]()
+    obj = factories[factory_name](description=content, set_tags=["punk", "rock"])
+    mutation = factories["common.Mutation"](
+        type="update",
+        target=obj,
+        payload={"description": {"content_type": "text/plain", "text": "hello there"}},
+    )
+    mutation.apply()
+    obj.refresh_from_db()
+
+    assert obj.description.content_type == "text/plain"
+    assert obj.description.text == "hello there"
+    assert obj.get_tags() == ["punk", "rock"]
+
+
+@pytest.mark.parametrize(
+    "factory_name", ["music.Track", "music.Album", "music.Artist"],
+)
+def test_mutation_tags_keep_descriptions(factory_name, factories, mocker):
+    mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    content = factories["common.Content"]()
+    obj = factories[factory_name](description=content)
+    mutation = factories["common.Mutation"](
+        type="update", target=obj, payload={"tags": ["punk", "rock"]},
+    )
+    mutation.apply()
+    obj.refresh_from_db()
+
+    assert obj.description == content
+    assert obj.get_tags() == ["punk", "rock"]

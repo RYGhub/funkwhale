@@ -9,6 +9,8 @@ from funkwhale_api.tags import serializers as tags_serializers
 
 from . import models
 
+NOOP = object()
+
 
 def can_suggest(obj, actor):
     return obj.is_local
@@ -34,9 +36,10 @@ class TagMutation(mutations.UpdateMutationSerializer):
         return handlers
 
     def update(self, instance, validated_data):
-        tags = validated_data.pop("tags", [])
+        tags = validated_data.pop("tags", NOOP)
         r = super().update(instance, validated_data)
-        tags_models.set_tags(instance, *tags)
+        if tags != NOOP:
+            tags_models.set_tags(instance, *tags)
         return r
 
 
@@ -53,9 +56,10 @@ class DescriptionMutation(mutations.UpdateMutationSerializer):
         return handlers
 
     def update(self, instance, validated_data):
-        description = validated_data.pop("description", None)
+        description = validated_data.pop("description", NOOP)
         r = super().update(instance, validated_data)
-        common_utils.attach_content(instance, "description", description)
+        if description != NOOP:
+            common_utils.attach_content(instance, "description", description)
         return r
 
 
