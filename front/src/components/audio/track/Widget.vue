@@ -144,6 +144,9 @@ export default {
     },
     "$store.state.moderation.lastUpdate": function () {
       this.fetchData(this.url)
+    },
+    count (v) {
+      this.$emit('count', v)
     }
   }
 }
