@@ -9,7 +9,7 @@
   <button
     v-else
     @click.stop="$store.commit('playlists/chooseTrack', track)"
-    :class="['ui', 'basic', 'circular', 'icon', 'really', 'button']"
+    :class="['ui', 'basic', 'circular', 'icon', {'really': !border}, 'button']"
     :aria-label="labels.addToPlaylist"
     :title="labels.addToPlaylist">
     <i :class="['list', 'basic', 'icon']"></i>
@@ -21,7 +21,8 @@
 export default {
   props: {
     track: {type: Object},
-    button: {type: Boolean, default: false}
+    button: {type: Boolean, default: false},
+    border: {type: Boolean, default: false},
   },
   data () {
     return {

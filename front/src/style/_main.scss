@@ -206,7 +206,27 @@ html {
   white-space: nowrap;
   overflow: hidden;
 }
-
+.ellipsis-rows tr > {
+  td:nth-child(1) {
+    max-width: 4em;
+  }
+  td:nth-child(2) {
+    position: relative;
+    &:before {
+      content: '&nbsp;';
+      visibility: hidden;
+    }
+    > * {
+      position: absolute;
+      left: 0;
+      right: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0.5em;
+    }
+  }
+}
 .ui.small.text.container {
   max-width: 500px !important;
 }
@@ -684,6 +704,11 @@ input + .help {
   .meta {
     margin-top: 0.5em;
     font-size: 0.8em;
+  }
+}
+.button-group {
+  > *:not(:first-child) {
+    margin-left: 0.5em;
   }
 }
 @import "./themes/_light.scss";

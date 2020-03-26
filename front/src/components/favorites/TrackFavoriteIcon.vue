@@ -7,7 +7,7 @@
   <button
     v-else
     @click.stop="$store.dispatch('favorites/toggle', track.id)"
-    :class="['ui', 'favorite-icon', {'pink': isFavorite}, {'favorited': isFavorite}, 'basic', 'circular', 'icon', 'really', 'button']"
+    :class="['ui', 'favorite-icon', {'pink': isFavorite}, {'favorited': isFavorite}, 'basic', 'circular', 'icon', {'really': !border}, 'button']"
     :aria-label="title"
     :title="title">
     <i :class="['heart', {'pink': isFavorite}, 'basic', 'icon']"></i>
@@ -18,7 +18,8 @@
 export default {
   props: {
     track: {type: Object},
-    button: {type: Boolean, default: false}
+    button: {type: Boolean, default: false},
+    border: {type: Boolean, default: false},
   },
   computed: {
     title () {

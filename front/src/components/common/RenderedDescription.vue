@@ -1,6 +1,18 @@
 <template>
   <div>
-    <div v-html="html" v-if="content && !isUpdating"></div>
+    <template v-if="content && !isUpdating">
+      <div v-html="html"></div>
+      <template v-if="isTruncated">
+        <div class="ui small hidden divider"></div>
+        <a @click.stop.prevent="showMore = true" v-if="showMore === false">
+          <translate translate-context="*/*/Button,Label">Show more</translate>
+        </a>
+        <a @click.stop.prevent="showMore = false" v-else="showMore === true">
+          <translate translate-context="*/*/Button,Label">Show less</translate>
+        </a>
+
+      </template>
+    </template>
     <p v-else-if="!isUpdating">
       <translate translate-context="*/*/Placeholder">No description available</translate>
     </p>
@@ -33,6 +45,7 @@
 <script>
 import {secondsToObject} from '@/filters'
 import axios from 'axios'
+import clip from 'text-clipper'
 
 export default {
   props: {
@@ -42,11 +55,13 @@ export default {
     canUpdate: {required: false, default: true, type: Boolean},
     fetchHtml: {required: false, default: false, type: Boolean},
     permissive: {required: false, default: false, type: Boolean},
+    truncateLength: {required: false, default: 500, type: Number},
 
   },
   data () {
     return {
       isUpdating: false,
+      showMore: false,
       newText: (this.content || {text: ''}).text,
       errors: null,
       isLoading: false,
@@ -64,7 +79,16 @@ export default {
       if (this.fetchHtml) {
         return this.preview
       }
+      if (this.truncateLength > 0 && !this.showMore) {
+        return this.truncatedHtml
+      }
       return this.content.html
+    },
+    truncatedHtml () {
+      return clip(this.content.html, this.truncateLength)
+    },
+    isTruncated () {
+      return this.truncateLength > 0 && this.truncatedHtml.length < this.content.html.length
     }
   },
   methods: {
