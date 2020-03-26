@@ -85,7 +85,7 @@ export default {
       return this.content.html
     },
     truncatedHtml () {
-      return clip(this.content.html, this.truncateLength)
+      return clip(this.content.html, this.truncateLength, { html: true, maxLines: 3 })
     },
     isTruncated () {
       return this.truncateLength > 0 && this.truncatedHtml.length < this.content.html.length
