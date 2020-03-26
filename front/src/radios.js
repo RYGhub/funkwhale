@@ -36,7 +36,7 @@ const RADIOS = {
       if (event.actor.local_id === current.objectId.username) {
         axios.get(`tracks/${event.object.local_id}`).then((response) => {
           if (response.data.uploads.length > 0) {
-            store.dispatch('queue/append', {track: response.data, index: store.state.queue.currentIndex + 1})
+            store.dispatch('queue/append', {track: response.data})
             this.offset += 1
           }
         }, (error) => {
