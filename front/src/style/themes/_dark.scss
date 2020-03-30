@@ -31,7 +31,7 @@ $link-color: rgb(255, 144, 0);
       color: $text-color;
     }
   }
-  .main.with-background {
+  .main.with-background, .opaque {
     background-color: $background-color;
   }
   .ui.link.list.list .active.item,
