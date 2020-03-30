@@ -1,5 +1,5 @@
 <template>
-  <main v-title="labels.title">
+  <main v-title="labels.title" :key="$router.currentRoute.name">
     <section class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
