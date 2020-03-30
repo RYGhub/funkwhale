@@ -32,7 +32,7 @@ django-cors-headers>=3.2,<3.3
 musicbrainzngs==0.6
 djangorestframework>=3.11,<3.12
 djangorestframework-jwt>=1.11,<1.12
-pendulum>=2,<3
+arrow>=0.15.5,<0.16
 persisting-theory>=0.2,<0.3
 django-versatileimagefield>=2.0,<2.1
 django-filter>=2.1,<2.2

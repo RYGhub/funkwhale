@@ -2,7 +2,7 @@ import base64
 from collections.abc import Mapping
 import datetime
 import logging
-import pendulum
+import arrow
 
 import mutagen._util
 import mutagen.oggtheora
@@ -575,9 +575,9 @@ class PermissiveDateField(serializers.CharField):
                 return datetime.date(parsed.year, parsed.month, parsed.day)
 
         try:
-            parsed = pendulum.parse(str(value))
+            parsed = arrow.get(str(value))
             return datetime.date(parsed.year, parsed.month, parsed.day)
-        except (pendulum.exceptions.ParserError, ValueError):
+        except (arrow.parser.ParserError, ValueError):
             pass
 
         return None

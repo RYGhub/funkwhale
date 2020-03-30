@@ -6,7 +6,7 @@ import tempfile
 import urllib.parse
 import uuid
 
-import pendulum
+import arrow
 import pydub
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -286,7 +286,7 @@ def import_artist(v):
 
 
 def parse_date(v):
-    d = pendulum.parse(v).date()
+    d = arrow.get(v).date()
     return d
 
 
