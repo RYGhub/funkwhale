@@ -406,9 +406,9 @@ export default {
     },
     'serviceWorker.updateAvailable': {
       handler (v) {
-        // if (!v) {
-        //   return
-        // }
+        if (!v) {
+          return
+        }
         let self = this
         this.$store.commit('ui/addMessage', {
           content: this.$pgettext("App/Message/Paragraph", "A new version of the app is available."),

@@ -179,6 +179,7 @@ export default {
         label: this.$pgettext('*/*/*/Noun', 'Account'),
         icon: 'user',
         urls: {
+          getDetail: (obj) => { return {name: 'profile.full.overview', params: {username: obj.preferred_username, domain: obj.domain}}},
           getAdminDetail: (obj) => { return {name: 'manage.moderation.accounts.detail', params: {id: `${obj.preferred_username}@${obj.domain}`}}}
         },
         moderatedFields: [
@@ -191,6 +192,33 @@ export default {
             id: 'summary',
             label: this.$pgettext('*/*/*/Noun', 'Bio'),
             getValue: (obj) => { return obj.summary }
+          },
+        ]
+      },
+      channel: {
+        label: this.$pgettext('*/*/*', 'Channel'),
+        icon: 'stream',
+        urls: {
+          getDetail: (obj) => { return {name: 'channels.detail', params: {id: obj.uuid}}},
+          getAdminDetail: (obj) => { return {name: 'manage.channels.detail', params: {id: obj.uuid}}}
+        },
+        moderatedFields: [
+          {
+            id: 'name',
+            label: this.$pgettext('*/*/*/Noun', 'Name'),
+            getValue: (obj) => { return obj.name }
+          },
+          {
+            id: 'creation_date',
+            label: this.$pgettext('Content/*/*/Noun', 'Creation date'),
+            getValue: (obj) => { return obj.creation_date }
+          },
+          {
+            id: 'tags',
+            type: 'tags',
+            label: this.$pgettext('*/*/*/Noun', 'Tags'),
+            getValue: (obj) => { return obj.tags },
+            getValueRepr: getTagsValueRepr
           },
         ]
       },

@@ -482,6 +482,8 @@ def inbox_flag(payload, context):
 @outbox.register({"type": "Flag"})
 def outbox_flag(context):
     report = context["report"]
+    if not report.target or not report.target.fid:
+        return
     actor = actors.get_service_actor()
     serializer = serializers.FlagSerializer(report)
     yield {

@@ -145,6 +145,7 @@ class Domain(models.Model):
             actors=models.Count("actors", distinct=True),
             outbox_activities=models.Count("actors__outbox_activities", distinct=True),
             libraries=models.Count("actors__libraries", distinct=True),
+            channels=models.Count("actors__owned_channels", distinct=True),
             received_library_follows=models.Count(
                 "actors__libraries__received_follows", distinct=True
             ),
@@ -283,6 +284,7 @@ class Actor(models.Model):
         data = Actor.objects.filter(pk=self.pk).aggregate(
             outbox_activities=models.Count("outbox_activities", distinct=True),
             libraries=models.Count("libraries", distinct=True),
+            channels=models.Count("owned_channels", distinct=True),
             received_library_follows=models.Count(
                 "libraries__received_follows", distinct=True
             ),

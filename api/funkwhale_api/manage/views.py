@@ -6,12 +6,15 @@ from django.db.models import Count, Prefetch, Q, Sum, OuterRef, Subquery
 from django.db.models.functions import Coalesce, Length
 from django.shortcuts import get_object_or_404
 
+from funkwhale_api.audio import models as audio_models
+from funkwhale_api.common.mixins import MultipleLookupDetailMixin
 from funkwhale_api.common import models as common_models
 from funkwhale_api.common import preferences, decorators
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.favorites import models as favorites_models
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
@@ -25,37 +28,39 @@ from funkwhale_api.users import models as users_models
 from . import filters, serializers
 
 
-def get_stats(tracks, target):
-    data = {}
+def get_stats(tracks, target, ignore_fields=[]):
     tracks = list(tracks.values_list("pk", flat=True))
     uploads = music_models.Upload.objects.filter(track__in=tracks)
-    data["listenings"] = history_models.Listening.objects.filter(
-        track__in=tracks
-    ).count()
-    data["mutations"] = common_models.Mutation.objects.get_for_target(target).count()
-    data["playlists"] = (
-        playlists_models.PlaylistTrack.objects.filter(track__in=tracks)
-        .values_list("playlist", flat=True)
-        .distinct()
-        .count()
-    )
-    data["track_favorites"] = favorites_models.TrackFavorite.objects.filter(
-        track__in=tracks
-    ).count()
-    data["libraries"] = (
-        uploads.filter(library__channel=None)
-        .values_list("library", flat=True)
-        .distinct()
-        .count()
-    )
-    data["channels"] = (
-        uploads.exclude(library__channel=None)
-        .values_list("library", flat=True)
-        .distinct()
-        .count()
-    )
-    data["uploads"] = uploads.count()
-    data["reports"] = moderation_models.Report.objects.get_for_target(target).count()
+    fields = {
+        "listenings": history_models.Listening.objects.filter(track__in=tracks),
+        "mutations": common_models.Mutation.objects.get_for_target(target),
+        "playlists": (
+            playlists_models.PlaylistTrack.objects.filter(track__in=tracks)
+            .values_list("playlist", flat=True)
+            .distinct()
+        ),
+        "track_favorites": (
+            favorites_models.TrackFavorite.objects.filter(track__in=tracks)
+        ),
+        "libraries": (
+            uploads.filter(library__channel=None)
+            .values_list("library", flat=True)
+            .distinct()
+        ),
+        "channels": (
+            uploads.exclude(library__channel=None)
+            .values_list("library", flat=True)
+            .distinct()
+        ),
+        "uploads": uploads,
+        "reports": moderation_models.Report.objects.get_for_target(target),
+    }
+    data = {}
+    for key, qs in fields.items():
+        if key in ignore_fields:
+            continue
+        data[key] = qs.count()
+
     data.update(get_media_stats(uploads))
     return data
 
@@ -78,17 +83,10 @@ class ManageArtistViewSet(
     queryset = (
         music_models.Artist.objects.all()
         .order_by("-id")
-        .select_related("attributed_to", "attachment_cover",)
-        .prefetch_related(
-            "tracks",
-            Prefetch(
-                "albums",
-                queryset=music_models.Album.objects.select_related(
-                    "attachment_cover"
-                ).annotate(tracks_count=Count("tracks")),
-            ),
-            music_views.TAG_PREFETCH,
-        )
+        .select_related("attributed_to", "attachment_cover", "channel")
+        .annotate(_tracks_count=Count("tracks"))
+        .annotate(_albums_count=Count("albums"))
+        .prefetch_related(music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageArtistSerializer
     filterset_class = filters.ManageArtistFilterSet
@@ -661,3 +659,64 @@ class ManageUserRequestViewSet(
             )
         else:
             serializer.save()
+
+
+class ManageChannelViewSet(
+    MultipleLookupDetailMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+
+    url_lookups = [
+        {
+            "lookup_field": "uuid",
+            "validator": serializers.serializers.UUIDField().to_internal_value,
+        },
+        {
+            "lookup_field": "username",
+            "validator": federation_utils.get_actor_data_from_username,
+            "get_query": lambda v: Q(
+                actor__domain=v["domain"],
+                actor__preferred_username__iexact=v["username"],
+            ),
+        },
+    ]
+    queryset = (
+        audio_models.Channel.objects.all()
+        .order_by("-id")
+        .select_related("attributed_to", "actor",)
+        .prefetch_related(
+            Prefetch(
+                "artist",
+                queryset=(
+                    music_models.Artist.objects.all()
+                    .order_by("-id")
+                    .select_related("attributed_to", "attachment_cover", "channel")
+                    .annotate(_tracks_count=Count("tracks"))
+                    .annotate(_albums_count=Count("albums"))
+                    .prefetch_related(music_views.TAG_PREFETCH)
+                ),
+            )
+        )
+    )
+    serializer_class = serializers.ManageChannelSerializer
+    filterset_class = filters.ManageChannelFilterSet
+    required_scope = "instance:libraries"
+    ordering_fields = ["creation_date", "name"]
+
+    @rest_decorators.action(methods=["get"], detail=True)
+    def stats(self, request, *args, **kwargs):
+        channel = self.get_object()
+        tracks = music_models.Track.objects.filter(
+            Q(artist=channel.artist) | Q(album__artist=channel.artist)
+        )
+        data = get_stats(tracks, channel, ignore_fields=["libraries", "channels"])
+        data["follows"] = channel.actor.received_follows.count()
+        return response.Response(data, status=200)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context

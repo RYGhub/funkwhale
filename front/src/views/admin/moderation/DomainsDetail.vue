@@ -268,6 +268,16 @@
                   </tr>
                   <tr>
                     <td>
+                      <router-link :to="{name: 'manage.channels', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*">Channels</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.channels }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('domain', object.name) }}">
                         <translate translate-context="*/*/*/Noun">Libraries</translate>
                       </router-link>

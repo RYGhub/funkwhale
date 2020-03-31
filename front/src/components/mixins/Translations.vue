@@ -56,6 +56,14 @@ export default {
           summary: {
             label: this.$pgettext('Content/Account/*', 'Bio'),
           },
+          content_category: {
+            label: this.$pgettext('Content/*/Dropdown.Label/Noun', 'Content category'),
+            choices: {
+              podcast: this.$pgettext('Content/*/Dropdown', 'Podcast'),
+              music: this.$pgettext('*/*/*', 'Music'),
+              other: this.$pgettext('*/*/*', 'Other'),
+            },
+          }
         },
         filters: {
           creation_date: this.$pgettext('Content/*/*/Noun', 'Creation date'),

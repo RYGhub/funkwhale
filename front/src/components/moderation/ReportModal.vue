@@ -140,6 +140,9 @@ export default {
         return
       }
       let fid = this.target._obj.fid
+      if (this.target.type === 'channel' && this.target._obj.actor ) {
+        fid = this.target._obj.actor.fid
+      }
       if (!fid) {
         return this.$store.getters['instance/domain']
       }

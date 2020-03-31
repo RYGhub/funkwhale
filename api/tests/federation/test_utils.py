@@ -207,3 +207,9 @@ def test_get_obj_by_fid(factory_name, factories):
     obj = factories[factory_name]()
     factories[factory_name]()
     assert utils.get_object_by_fid(obj.fid) == obj
+
+
+def test_get_channel_by_fid(factories):
+    obj = factories["audio.Channel"]()
+    factories["audio.Channel"]()
+    assert utils.get_object_by_fid(obj.actor.fid) == obj

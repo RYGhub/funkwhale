@@ -47,6 +47,7 @@
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Account</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="*/*/*">Albums</translate></th>
           <th><translate translate-context="*/*/*">Tracks</translate></th>
@@ -54,27 +55,31 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="getUrl(scope.obj)">
-              {{ scope.obj.name }}
+            <router-link :to="{name: 'manage.channels.detail', params: {id: scope.obj.actor.full_username }}">{{ scope.obj.artist.name }}</router-link>
+          </td>
+          <td>
+            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.attributed_to.full_username }}">
+              <i class="wrench icon"></i>
             </router-link>
+            <span role="button" class="discrete link" @click="addSearchToken('account', scope.obj.attributed_to.full_username)" :title="scope.obj.attributed_to.full_username">{{ scope.obj.attributed_to.preferred_username }}</span>
           </td>
           <td>
             <template v-if="!scope.obj.is_local">
-              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.domain }}">
+              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.attributed_to.domain }}">
                 <i class="wrench icon"></i>
               </router-link>
-              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.domain)" :title="scope.obj.domain">{{ scope.obj.domain }}</span>
+              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.attributed_to.domain)" :title="scope.obj.attributed_to.domain">{{ scope.obj.attributed_to.domain }}</span>
             </template>
-            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.domain)">
+            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.attributed_to.domain)">
               <i class="home icon"></i>
               <translate translate-context="Content/Moderation/*/Short, Noun">Local</translate>
             </span>
           </td>
           <td>
-            {{ scope.obj.albums_count }}
+            {{ scope.obj.artist.albums_count }}
           </td>
           <td>
-            {{ scope.obj.tracks_count }}
+            {{ scope.obj.artist.tracks_count }}
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
@@ -147,12 +152,6 @@ export default {
     this.fetchData()
   },
   methods: {
-    getUrl (artist) {
-      if (artist.channel) {
-        return {name: 'manage.channels.detail', params: {id: artist.channel }}
-      }
-      return {name: 'manage.library.artists.detail', params: {id: artist.id }}
-    },
     fetchData () {
       let params = _.merge({
         'page': this.page,
@@ -163,7 +162,7 @@ export default {
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/manage/library/artists/', {params: params}).then((response) => {
+      axios.get('/manage/channels/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {
@@ -178,7 +177,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by domain, name, MusicBrainz ID…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by domain, name, account…')
       }
     },
     actionFilters () {
@@ -192,17 +191,17 @@ export default {
       }
     },
     actions () {
-      let deleteLabel = this.$pgettext('*/*/*/Verb', 'Delete')
-      let confirmationMessage = this.$pgettext('Popup/*/Paragraph', 'The selected artist will be removed, as well as associated uploads, tracks, albums, favorites and listening history. This action is irreversible.')
+      // let deleteLabel = this.$pgettext('*/*/*/Verb', 'Delete')
+      // let confirmationMessage = this.$pgettext('Popup/*/Paragraph', 'The selected artist will be removed, as well as associated uploads, tracks, albums, favorites and listening history. This action is irreversible.')
       return [
-        {
-          name: 'delete',
-          label: deleteLabel,
-          confirmationMessage: confirmationMessage,
-          isDangerous: true,
-          allowAll: false,
-          confirmColor: 'red',
-        },
+        // {
+        //   name: 'delete',
+        //   label: deleteLabel,
+        //   confirmationMessage: confirmationMessage,
+        //   isDangerous: true,
+        //   allowAll: false,
+        //   confirmColor: 'red',
+        // },
       ]
     }
   },

@@ -69,6 +69,15 @@ class Channel(models.Model):
 
     objects = ChannelQuerySet.as_manager()
 
+    @property
+    def fid(self):
+        if not self.is_external_rss:
+            return self.actor.fid
+
+    @property
+    def is_external_rss(self):
+        return self.actor.preferred_username.startswith("rssfeed-")
+
     def get_absolute_url(self):
         suffix = self.uuid
         if self.actor.is_local:
@@ -78,9 +87,7 @@ class Channel(models.Model):
         return federation_utils.full_url("/channels/{}".format(suffix))
 
     def get_rss_url(self):
-        if not self.artist.is_local or self.actor.preferred_username.startswith(
-            "rssfeed-"
-        ):
+        if not self.artist.is_local or self.is_external_rss:
             return self.rss_url
 
         return federation_utils.full_url(
@@ -89,10 +96,6 @@ class Channel(models.Model):
                 kwargs={"composite": self.actor.preferred_username},
             )
         )
-
-    @property
-    def fid(self):
-        return self.actor.fid
 
 
 def generate_actor(username, **kwargs):
