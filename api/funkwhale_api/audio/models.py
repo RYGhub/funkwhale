@@ -1,6 +1,7 @@
 import uuid
 
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -67,12 +68,21 @@ class Channel(models.Model):
         default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
 
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
     objects = ChannelQuerySet.as_manager()
 
     @property
     def fid(self):
         if not self.is_external_rss:
             return self.actor.fid
+
+    @property
+    def is_local(self):
+        return self.actor.is_local
 
     @property
     def is_external_rss(self):

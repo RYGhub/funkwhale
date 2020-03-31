@@ -491,10 +491,16 @@ def test_fetch_url(factory_name, serializer_class, factories, r_mock, mocker):
     assert save.call_count == 1
 
 
-def test_fetch_channel_actor_returns_channel(factories, r_mock):
+def test_fetch_channel_actor_returns_channel_and_fetch_outbox(
+    factories, r_mock, settings, mocker
+):
     obj = factories["audio.Channel"]()
     fetch = factories["federation.Fetch"](url=obj.actor.fid)
     payload = serializers.ActorSerializer(obj.actor).data
+    fetch_collection = mocker.patch.object(
+        tasks, "fetch_collection", return_value={"next_page": "http://outbox.url/page2"}
+    )
+    fetch_collection_delayed = mocker.patch.object(tasks.fetch_collection, "delay")
 
     r_mock.get(obj.fid, json=payload)
 
@@ -504,6 +510,15 @@ def test_fetch_channel_actor_returns_channel(factories, r_mock):
 
     assert fetch.status == "finished"
     assert fetch.object == obj
+    fetch_collection.assert_called_once_with(
+        obj.actor.outbox_url, channel_id=obj.pk, max_pages=1,
+    )
+    fetch_collection_delayed.assert_called_once_with(
+        "http://outbox.url/page2",
+        max_pages=settings.FEDERATION_COLLECTION_MAX_PAGES - 1,
+        is_page=True,
+        channel_id=obj.pk,
+    )
 
 
 def test_fetch_honor_instance_policy_domain(factories):
@@ -563,3 +578,71 @@ def test_fetch_honor_instance_policy_different_url_and_id(r_mock, factories):
 
     assert fetch.status == "errored"
     assert fetch.detail["error_code"] == "blocked"
+
+
+def test_fetch_collection(mocker, r_mock):
+    class DummySerializer(serializers.serializers.Serializer):
+        def validate(self, validated_data):
+            validated_data = self.initial_data
+            if "id" not in validated_data["object"]:
+                raise serializers.serializers.ValidationError()
+            return validated_data
+
+        def save(self):
+            return self.initial_data
+
+    mocker.patch.object(
+        tasks,
+        "COLLECTION_ACTIVITY_SERIALIZERS",
+        [({"type": "Create", "object.type": "Audio"}, DummySerializer)],
+    )
+    payloads = {
+        "outbox": {
+            "id": "https://actor.url/outbox",
+            "@context": jsonld.get_default_context(),
+            "type": "OrderedCollection",
+            "totalItems": 27094,
+            "first": "https://actor.url/outbox?page=1",
+            "last": "https://actor.url/outbox?page=3",
+        },
+        "page1": {
+            "@context": jsonld.get_default_context(),
+            "type": "OrderedCollectionPage",
+            "next": "https://actor.url/outbox?page=2",
+            "orderedItems": [
+                {"type": "Unhandled"},
+                {"type": "Unhandled"},
+                {
+                    "type": "Create",
+                    "object": {"type": "Audio", "id": "https://actor.url/audio1"},
+                },
+            ],
+        },
+        "page2": {
+            "@context": jsonld.get_default_context(),
+            "type": "OrderedCollectionPage",
+            "next": "https://actor.url/outbox?page=3",
+            "orderedItems": [
+                {"type": "Unhandled"},
+                {
+                    "type": "Create",
+                    "object": {"type": "Audio", "id": "https://actor.url/audio2"},
+                },
+                {"type": "Unhandled"},
+                {"type": "Create", "object": {"type": "Audio"}},
+            ],
+        },
+    }
+    r_mock.get(payloads["outbox"]["id"], json=payloads["outbox"])
+    r_mock.get(payloads["outbox"]["first"], json=payloads["page1"])
+    r_mock.get(payloads["page1"]["next"], json=payloads["page2"])
+    result = tasks.fetch_collection(payloads["outbox"]["id"], max_pages=2,)
+    assert result["items"] == [
+        payloads["page1"]["orderedItems"][2],
+        payloads["page2"]["orderedItems"][1],
+    ]
+    assert result["skipped"] == 4
+    assert result["errored"] == 1
+    assert result["seen"] == 7
+    assert result["total"] == 27094
+    assert result["next_page"] == payloads["page2"]["next"]

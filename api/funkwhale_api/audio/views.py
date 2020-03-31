@@ -110,6 +110,15 @@ class ChannelViewSet(
         else:
             return super().list(request, *args, **kwargs)
 
+    def get_object(self):
+        obj = super().get_object()
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = music_views.refetch_obj(obj, self.get_queryset())
+        return obj
+
     @decorators.action(
         detail=True,
         methods=["post"],

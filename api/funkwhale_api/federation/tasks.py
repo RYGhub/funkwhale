@@ -21,6 +21,7 @@ from funkwhale_api.moderation import mrf
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
+from . import activity
 from . import actors
 from . import jsonld
 from . import keys
@@ -399,8 +400,24 @@ def fetch(fetch_obj):
     # special case for channels
     # when obj is an actor, we check if the actor has a channel associated with it
     # if it is the case, we consider the fetch obj to be a channel instead
+    # and also trigger a fetch on the channel outbox
     if isinstance(obj, models.Actor) and obj.get_channel():
         obj = obj.get_channel()
+        if obj.actor.outbox_url:
+            # first page fetch is synchronous, so that at least some data is available
+            # in the UI after subscription
+            result = fetch_collection(
+                obj.actor.outbox_url, channel_id=obj.pk, max_pages=1,
+            )
+            if result.get("next_page"):
+                # additional pages are fetched in the background
+                result = fetch_collection.delay(
+                    result["next_page"],
+                    channel_id=obj.pk,
+                    max_pages=settings.FEDERATION_COLLECTION_MAX_PAGES - 1,
+                    is_page=True,
+                )
+
     fetch_obj.object = obj
     fetch_obj.status = "finished"
     fetch_obj.fetch_date = timezone.now()
@@ -469,3 +486,106 @@ def remove_actor(actor):
     actor.name = None
     actor.summary = None
     actor.save(update_fields=["type", "name", "summary"])
+
+
+COLLECTION_ACTIVITY_SERIALIZERS = [
+    (
+        {"type": "Create", "object.type": "Audio"},
+        serializers.ChannelCreateUploadSerializer,
+    )
+]
+
+
+def match_serializer(payload, conf):
+    return [
+        serializer_class
+        for route, serializer_class in conf
+        if activity.match_route(route, payload)
+    ]
+
+
+@celery.app.task(name="federation.fetch_collection")
+@celery.require_instance(
+    audio_models.Channel.objects.all(), "channel", allow_null=True,
+)
+def fetch_collection(url, max_pages, channel, is_page=False):
+    actor = actors.get_service_actor()
+    results = {
+        "items": [],
+        "skipped": 0,
+        "errored": 0,
+        "seen": 0,
+        "total": 0,
+    }
+    if is_page:
+        # starting immediatly from a page, no need to fetch the wrapping collection
+        logger.debug("Fetch collection page immediatly at %s", url)
+        results["next_page"] = url
+    else:
+        logger.debug("Fetching collection object at %s", url)
+        collection = utils.retrieve_ap_object(
+            url,
+            actor=actor,
+            serializer_class=serializers.PaginatedCollectionSerializer,
+        )
+        results["next_page"] = collection["first"]
+        results["total"] = collection.get("totalItems")
+
+    seen_pages = 0
+    context = {}
+    if channel:
+        context["channel"] = channel
+
+    for i in range(max_pages):
+        page_url = results["next_page"]
+        logger.debug("Handling page %s on max %s, at %s", i + 1, max_pages, page_url)
+        page = utils.retrieve_ap_object(page_url, actor=actor, serializer_class=None,)
+        try:
+            items = page["orderedItems"]
+        except KeyError:
+            try:
+                items = page["items"]
+            except KeyError:
+                logger.error("Invalid collection page at %s", page_url)
+                break
+
+        for item in items:
+            results["seen"] += 1
+
+            matching_serializer = match_serializer(
+                item, COLLECTION_ACTIVITY_SERIALIZERS
+            )
+            if not matching_serializer:
+                results["skipped"] += 1
+                logger.debug("Skipping unhandled activity %s", item.get("type"))
+                continue
+
+            s = matching_serializer[0](data=item, context=context)
+            if not s.is_valid():
+                logger.warn("Skipping invalid activity: %s", s.errors)
+                results["errored"] += 1
+                continue
+
+            results["items"].append(s.save())
+
+        seen_pages += 1
+        results["next_page"] = page.get("next", None) or None
+        if not results["next_page"]:
+            logger.debug("No more pages to fetch")
+            break
+
+    logger.info(
+        "Finished fetch of collection pages at %s. Results:\n"
+        "  Total in collection: %s\n"
+        "  Seen: %s\n"
+        "  Handled: %s\n"
+        "  Skipped: %s\n"
+        "  Errored: %s",
+        url,
+        results.get("total"),
+        results["seen"],
+        len(results["items"]),
+        results["skipped"],
+        results["errored"],
+    )
+    return results

@@ -107,7 +107,10 @@ def retrieve_ap_object(
         return data
     serializer = serializer_class(data=data, context={"fetch_actor": actor})
     serializer.is_valid(raise_exception=True)
-    return serializer.save()
+    try:
+        return serializer.save()
+    except NotImplementedError:
+        return serializer.validated_data
 
 
 def get_domain_query_from_url(domain, url_field="fid"):

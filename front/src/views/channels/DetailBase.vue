@@ -272,7 +272,7 @@ export default {
       this.showEditModal = false
       this.edit.isLoading = false
       this.isLoading = true
-      let channelPromise = axios.get(`channels/${this.id}`).then(response => {
+      let channelPromise = axios.get(`channels/${this.id}`, {params: {refresh: 'true'}}).then(response => {
         self.object = response.data
         if ((self.id == response.data.uuid) && response.data.actor) {
           // replace with the pretty channel url if possible
