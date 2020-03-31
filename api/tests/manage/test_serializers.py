@@ -287,8 +287,11 @@ def test_instance_policy_serializer_purges_target_actor(
 
 def test_manage_artist_serializer(factories, now, to_api_date):
     artist = factories["music.Artist"](attributed=True, with_cover=True)
-    track = factories["music.Track"](artist=artist)
-    album = factories["music.Album"](artist=artist)
+    channel = factories["audio.Channel"](artist=artist)
+    # put channel in cache
+    artist.get_channel()
+    setattr(artist, "_tracks_count", 12)
+    setattr(artist, "_albums_count", 13)
     expected = {
         "id": artist.id,
         "domain": artist.domain_name,
@@ -297,12 +300,14 @@ def test_manage_artist_serializer(factories, now, to_api_date):
         "name": artist.name,
         "mbid": artist.mbid,
         "creation_date": to_api_date(artist.creation_date),
-        "albums": [serializers.ManageNestedAlbumSerializer(album).data],
-        "tracks": [serializers.ManageNestedTrackSerializer(track).data],
+        "tracks_count": 12,
+        "albums_count": 13,
         "attributed_to": serializers.ManageBaseActorSerializer(
             artist.attributed_to
         ).data,
         "tags": [],
+        "channel": str(channel.uuid),
+        "content_category": artist.content_category,
         "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
     }
     s = serializers.ManageArtistSerializer(artist)
@@ -583,5 +588,24 @@ def test_manage_user_request_serializer(factories, to_api_date):
         "notes": [],
     }
     s = serializers.ManageUserRequestSerializer(user_request)
+
+    assert s.data == expected
+
+
+def test_manage_channel_serializer(factories, now, to_api_date):
+    channel = factories["audio.Channel"]()
+    expected = {
+        "id": channel.id,
+        "uuid": channel.uuid,
+        "artist": serializers.ManageArtistSerializer(channel.artist).data,
+        "actor": serializers.ManageBaseActorSerializer(channel.actor).data,
+        "attributed_to": serializers.ManageBaseActorSerializer(
+            channel.attributed_to
+        ).data,
+        "creation_date": to_api_date(channel.creation_date),
+        "rss_url": channel.get_rss_url(),
+        "metadata": channel.metadata,
+    }
+    s = serializers.ManageChannelSerializer(channel)
 
     assert s.data == expected

@@ -30,7 +30,11 @@
         :title="updatedTitle">
         {{ object.artist.modification_date | fromNow }}
       </time>
-      <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="true" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :artist="object.artist"></play-button>
+      <play-button
+        class="right floated basic icon"
+        :dropdown-only="true"
+        :is-playable="true"
+        :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :artist="object.artist" :channel="object" :account="object.attributed_to"></play-button>
     </div>
   </div>
 </template>

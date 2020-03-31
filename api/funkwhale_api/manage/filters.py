@@ -8,6 +8,7 @@ from funkwhale_api.common import fields
 from funkwhale_api.common import filters as common_filters
 from funkwhale_api.common import search
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
@@ -34,6 +35,34 @@ def get_actor_filter(actor_field):
     return {"field": ActorField(), "handler": handler}
 
 
+class ManageChannelFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "name": {"to": "artist__name"},
+                "username": {"to": "artist__name"},
+                "fid": {"to": "artist__fid"},
+                "rss": {"to": "rss_url"},
+            },
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "category": {"to": "artist__content_category"},
+                "domain": {
+                    "handler": lambda v: federation_utils.get_domain_query_from_url(
+                        v, url_field="attributed_to__fid"
+                    )
+                },
+                "tag": {"to": "artist__tagged_items__tag__name", "distinct": True},
+                "account": get_actor_filter("attributed_to"),
+            },
+        )
+    )
+
+    class Meta:
+        model = audio_models.Channel
+        fields = ["q"]
+
+
 class ManageArtistFilterSet(filters.FilterSet):
     q = fields.SmartSearchFilter(
         config=search.SearchConfig(
@@ -52,6 +81,7 @@ class ManageArtistFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                     "distinct": True,
                 },
+                "category": {"to": "content_category"},
                 "tag": {"to": "tagged_items__tag__name", "distinct": True},
             },
         )
@@ -59,7 +89,7 @@ class ManageArtistFilterSet(filters.FilterSet):
 
     class Meta:
         model = music_models.Artist
-        fields = ["q", "name", "mbid", "fid"]
+        fields = ["q", "name", "mbid", "fid", "content_category"]
 
 
 class ManageAlbumFilterSet(filters.FilterSet):

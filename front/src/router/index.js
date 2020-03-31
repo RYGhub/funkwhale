@@ -298,6 +298,28 @@ export default new Router({
         },
         {
           path: "channels",
+          name: "manage.channels",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/ChannelsList"
+            ),
+          props: route => {
+            return {
+              defaultQuery: route.query.q
+            }
+          }
+        },
+        {
+          path: "channels/:id",
+          name: "manage.channels.detail",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/ChannelDetail"
+            ),
+          props: true
+        },
+        {
+          path: "albums",
           name: "manage.library.albums",
           component: () =>
             import(

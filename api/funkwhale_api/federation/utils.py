@@ -266,5 +266,11 @@ def get_object_by_fid(fid, local=None):
 
     if not result:
         raise ObjectDoesNotExist()
+    model = apps.get_model(*result["__type"].split("."))
+    instance = model.objects.get(fid=fid)
+    if model._meta.label == "federation.Actor":
+        channel = instance.get_channel()
+        if channel:
+            return channel
 
-    return apps.get_model(*result["__type"].split(".")).objects.get(fid=fid)
+    return instance

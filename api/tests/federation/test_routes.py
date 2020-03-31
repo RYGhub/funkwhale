@@ -844,6 +844,7 @@ def test_inbox_delete_actor_doesnt_delete_local_actor(factories):
 @pytest.mark.parametrize(
     "factory_name, factory_kwargs",
     [
+        ("audio.Channel", {"local": True}),
         ("federation.Actor", {"local": True}),
         ("music.Artist", {"local": True}),
         ("music.Album", {"local": True}),
@@ -885,6 +886,7 @@ def test_inbox_flag(factory_name, factory_kwargs, factories, mocker):
 @pytest.mark.parametrize(
     "factory_name, factory_kwargs",
     [
+        ("audio.Channel", {"local": True}),
         ("federation.Actor", {"local": True}),
         ("music.Artist", {"local": True}),
         ("music.Album", {"local": True}),

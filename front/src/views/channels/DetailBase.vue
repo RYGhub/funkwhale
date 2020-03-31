@@ -84,7 +84,7 @@
                     <div
                       role="button"
                       class="basic item"
-                      v-for="obj in getReportableObjs({channel: object})"
+                      v-for="obj in getReportableObjs({account: object.attributed_to, channel: object})"
                       :key="obj.target.type + obj.target.id"
                       @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
                       <i class="share icon" /> {{ obj.label }}
@@ -112,7 +112,7 @@
                     </template>
                     <template v-if="$store.state.auth.availablePermissions['library']" >
                       <div class="divider"></div>
-                      <router-link class="basic item" :to="{name: 'manage.library.channels.detail', params: {id: object.uuid}}">
+                      <router-link class="basic item" :to="{name: 'manage.channels.detail', params: {id: object.uuid}}">
                         <i class="wrench icon"></i>
                         <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
                       </router-link>

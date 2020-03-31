@@ -599,3 +599,50 @@ def test_user_request_update_status_assigns(factories, superuser_api_client, moc
         new_status="refused",
         old_status="pending",
     )
+
+
+def test_channel_list(factories, superuser_api_client, settings):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == channel.id
+
+
+def test_channel_detail(factories, superuser_api_client):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-detail", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == channel.id
+
+
+def test_channel_delete(factories, superuser_api_client, mocker):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-detail", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_channel_detail_stats(factories, superuser_api_client):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-stats", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.get(url)
+    expected = {
+        "uploads": 0,
+        "playlists": 0,
+        "listenings": 0,
+        "mutations": 0,
+        "reports": 0,
+        "follows": 0,
+        "track_favorites": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected

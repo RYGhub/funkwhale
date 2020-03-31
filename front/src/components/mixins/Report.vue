@@ -49,7 +49,20 @@ export default {
           artist = album.artist
         }
       }
-      if (artist) {
+
+      if (channel) {
+        reportableObjs.push({
+          label: this.$pgettext('*/Moderation/*/Verb', "Report this channel…"),
+          target: {
+            type: 'channel',
+            uuid: channel.uuid,
+            label: channel.artist.name,
+            _obj: channel,
+            typeLabel: this.$pgettext("*/*/*", 'Channel'),
+          }
+        })
+      }
+      else if (artist) {
         reportableObjs.push({
           label: this.$pgettext('*/Moderation/*/Verb', "Report this artist…"),
           target: {

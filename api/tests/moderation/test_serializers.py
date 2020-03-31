@@ -52,6 +52,7 @@ def test_user_filter_serializer_save(factories):
             "full_username",
             serializers.ActorStateSerializer,
         ),
+        ("audio.Channel", "channel", "uuid", serializers.ChannelStateSerializer),
     ],
 )
 def test_report_federated_entity_serializer_save(
@@ -161,6 +162,7 @@ def test_report_serializer_save_anonymous(factories, mocker):
         ("music.Library", {}, "actor"),
         ("playlists.Playlist", {"user__with_actor": True}, "user.actor"),
         ("federation.Actor", {}, "self"),
+        ("audio.Channel", {}, "attributed_to"),
     ],
 )
 def test_get_target_owner(factory_name, factory_kwargs, owner_field, factories):

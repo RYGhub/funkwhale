@@ -35,7 +35,7 @@
           <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
         </button>
         <button
-          v-for="obj in getReportableObjs({track, album, artist, playlist, account})"
+          v-for="obj in getReportableObjs({track, album, artist, playlist, account, channel})"
           :key="obj.target.type + obj.target.id"
           class="item basic"
           @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
@@ -69,6 +69,7 @@ export default {
     artist: {type: Object, required: false},
     album: {type: Object, required: false},
     library: {type: Object, required: false},
+    channel: {type: Object, required: false},
     isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
