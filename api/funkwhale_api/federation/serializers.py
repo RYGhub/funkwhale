@@ -19,7 +19,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 from funkwhale_api.tags import models as tags_models
 
-from . import activity, actors, contexts, jsonld, models, tasks, utils
+from . import activity, actors, contexts, jsonld, models, utils
 
 logger = logging.getLogger(__name__)
 
@@ -391,6 +391,8 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         domain = urllib.parse.urlparse(kwargs["fid"]).netloc
         domain, domain_created = models.Domain.objects.get_or_create(pk=domain)
         if domain_created and not domain.is_local:
+            from . import tasks
+
             # first time we see the domain, we trigger nodeinfo fetching
             tasks.update_domain_nodeinfo(domain_name=domain.name)
 
@@ -896,8 +898,6 @@ def get_additional_fields(data):
 
 PAGINATED_COLLECTION_JSONLD_MAPPING = {
     "totalItems": jsonld.first_val(contexts.AS.totalItems),
-    "actor": jsonld.first_id(contexts.AS.actor),
-    "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
     "first": jsonld.first_id(contexts.AS.first),
     "last": jsonld.first_id(contexts.AS.last),
     "partOf": jsonld.first_id(contexts.AS.partOf),
@@ -905,28 +905,16 @@ PAGINATED_COLLECTION_JSONLD_MAPPING = {
 
 
 class PaginatedCollectionSerializer(jsonld.JsonLdSerializer):
-    type = serializers.ChoiceField(choices=[contexts.AS.Collection])
+    type = serializers.ChoiceField(
+        choices=[contexts.AS.Collection, contexts.AS.OrderedCollection]
+    )
     totalItems = serializers.IntegerField(min_value=0)
-    actor = serializers.URLField(max_length=500, required=False)
-    attributedTo = serializers.URLField(max_length=500, required=False)
     id = serializers.URLField(max_length=500)
     first = serializers.URLField(max_length=500)
     last = serializers.URLField(max_length=500)
 
     class Meta:
         jsonld_mapping = PAGINATED_COLLECTION_JSONLD_MAPPING
-
-    def validate(self, validated_data):
-        d = super().validate(validated_data)
-        actor = d.get("actor")
-        attributed_to = d.get("attributedTo")
-        if not actor and not attributed_to:
-            raise serializers.ValidationError(
-                "You need to provide at least actor or attributedTo"
-            )
-
-        d["attributedTo"] = attributed_to or actor
-        return d
 
     def to_representation(self, conf):
         paginator = Paginator(conf["items"], conf.get("page_size", 20))
@@ -954,6 +942,8 @@ class LibrarySerializer(PaginatedCollectionSerializer):
     type = serializers.ChoiceField(
         choices=[contexts.AS.Collection, contexts.FW.Library]
     )
+    actor = serializers.URLField(max_length=500, required=False)
+    attributedTo = serializers.URLField(max_length=500, required=False)
     name = serializers.CharField()
     summary = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     followers = serializers.URLField(max_length=500)
@@ -976,8 +966,22 @@ class LibrarySerializer(PaginatedCollectionSerializer):
                 "summary": jsonld.first_val(contexts.AS.summary),
                 "audience": jsonld.first_id(contexts.AS.audience),
                 "followers": jsonld.first_id(contexts.AS.followers),
+                "actor": jsonld.first_id(contexts.AS.actor),
+                "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
             },
         )
+
+    def validate(self, validated_data):
+        d = super().validate(validated_data)
+        actor = d.get("actor")
+        attributed_to = d.get("attributedTo")
+        if not actor and not attributed_to:
+            raise serializers.ValidationError(
+                "You need to provide at least actor or attributedTo"
+            )
+
+        d["attributedTo"] = attributed_to or actor
+        return d
 
     def to_representation(self, library):
         conf = {
@@ -1934,7 +1938,15 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
         return self.update_or_create(validated_data)
 
 
-class ChannelCreateUploadSerializer(serializers.Serializer):
+class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Create])
+    object = serializers.DictField()
+
+    class Meta:
+        jsonld_mapping = {
+            "object": jsonld.first_obj(contexts.AS.object),
+        }
+
     def to_representation(self, upload):
         return {
             "@context": jsonld.get_default_context(),
@@ -1944,3 +1956,13 @@ class ChannelCreateUploadSerializer(serializers.Serializer):
                 upload, context={"include_ap_context": False}
             ).data,
         }
+
+    def validate(self, validated_data):
+        serializer = ChannelUploadSerializer(
+            data=validated_data["object"], context=self.context, jsonld_expand=False
+        )
+        serializer.is_valid(raise_exception=True)
+        return {"audio_serializer": serializer}
+
+    def save(self, **kwargs):
+        return self.validated_data["audio_serializer"].save(**kwargs)

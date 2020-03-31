@@ -420,3 +420,18 @@ def test_subscribe_to_rss_creates_channel(factories, logged_in_api_client, mocke
     assert response.data["channel"]["uuid"] == channel.uuid
 
     get_channel_from_rss_url.assert_called_once_with(rss_url)
+
+
+def test_refresh_channel_when_param_is_true(
+    factories, mocker, logged_in_api_client, queryset_equal_queries,
+):
+    obj = factories["audio.Channel"]()
+    refetch_obj = mocker.patch(
+        "funkwhale_api.music.views.refetch_obj", return_value=obj
+    )
+    url = reverse("api:v1:channels-detail", kwargs={"composite": obj.uuid})
+    response = logged_in_api_client.get(url, {"refresh": "true"})
+
+    assert response.status_code == 200
+    assert refetch_obj.call_count == 1
+    assert refetch_obj.call_args[0][0] == obj

@@ -146,6 +146,8 @@ FEDERATION_ACTOR_FETCH_DELAY = env.int("FEDERATION_ACTOR_FETCH_DELAY", default=6
 FEDERATION_SERVICE_ACTOR_USERNAME = env(
     "FEDERATION_SERVICE_ACTOR_USERNAME", default="service"
 )
+# How many pages to fetch when crawling outboxes and third-party collections
+FEDERATION_COLLECTION_MAX_PAGES = env.int("FEDERATION_COLLECTION_MAX_PAGES", default=5)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[]) + [FUNKWHALE_HOSTNAME]
 
 # APP CONFIGURATION
