@@ -32,6 +32,23 @@ class GroupFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
+class EmailAddressFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    verified = False
+    primary = True
+
+    class Meta:
+        model = "account.EmailAddress"
+
+
+@registry.register
+class EmailConfirmationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    email_address = factory.SubFactory(EmailAddressFactory)
+
+    class Meta:
+        model = "account.EmailConfirmation"
+
+
+@registry.register
 class InvitationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     owner = factory.LazyFunction(lambda: UserFactory())
 
@@ -91,6 +108,16 @@ class UserFactory(factory.django.DjangoModelFactory):
         self.save(update_fields=["actor"])
         return self.actor
 
+    @factory.post_generation
+    def verified_email(self, create, extracted, **kwargs):
+        if not create or extracted is None:
+            return
+        return EmailConfirmationFactory(
+            email_address__verified=extracted,
+            email_address__email=self.email,
+            email_address__user=self,
+        )
+
 
 @registry.register(name="users.SuperUser")
 class SuperUserFactory(UserFactory):
@@ -129,6 +156,7 @@ class AccessTokenFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     expires = factory.Faker("future_datetime", tzinfo=pytz.UTC)
     token = factory.Faker("uuid4")
+    scope = "read"
 
     class Meta:
         model = "users.AccessToken"

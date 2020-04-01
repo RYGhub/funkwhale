@@ -9,13 +9,14 @@ import string
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager as BaseUserManager
 from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from allauth.account.models import EmailAddress
 from django_auth_ldap.backend import populate_user as ldap_populate_user
 from oauth2_provider import models as oauth2_models
 from oauth2_provider import validators as oauth2_validators
@@ -94,6 +95,26 @@ def get_default_funkwhale_support_message_display_date():
     )
 
 
+class UserQuerySet(models.QuerySet):
+    def for_auth(self):
+        """Optimization to avoid additional queries during authentication"""
+        qs = self.select_related("actor__domain")
+        verified_emails = EmailAddress.objects.filter(
+            user=models.OuterRef("id"), primary=True
+        ).values("verified")[:1]
+        subquery = models.Subquery(verified_emails)
+        return qs.annotate(has_verified_primary_email=subquery)
+
+
+class UserManager(BaseUserManager):
+    def get_queryset(self):
+        return UserQuerySet(self.model, using=self._db)
+
+    def get_by_natural_key(self, key):
+        obj = BaseUserManager.get_by_natural_key(self.all().for_auth(), key)
+        return obj
+
+
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns
@@ -168,6 +189,8 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
+
+    objects = UserManager()
 
     def __str__(self):
         return self.username

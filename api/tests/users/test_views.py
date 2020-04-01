@@ -477,3 +477,37 @@ def test_signup_with_approval_enabled_validation_error(
     }
     response = api_client.post(url, data, format="json")
     assert response.status_code == 400
+
+
+def test_user_login_jwt(factories, api_client):
+    user = factories["users.User"]()
+    data = {
+        "username": user.username,
+        "password": "test",
+    }
+    url = reverse("api:v1:token")
+    response = api_client.post(url, data)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "setting_value, verified_email, expected_status_code",
+    [
+        ("mandatory", False, 400),
+        ("mandatory", True, 200),
+        ("optional", False, 200),
+        ("optional", True, 200),
+    ],
+)
+def test_user_login_jwt_honor_email_verification(
+    setting_value, verified_email, expected_status_code, settings, factories, api_client
+):
+    settings.ACCOUNT_EMAIL_VERIFICATION = setting_value
+    user = factories["users.User"](verified_email=verified_email)
+    data = {
+        "username": user.username,
+        "password": "test",
+    }
+    url = reverse("api:v1:token")
+    response = api_client.post(url, data)
+    assert response.status_code == expected_status_code

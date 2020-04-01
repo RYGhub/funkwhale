@@ -1,11 +1,24 @@
 import urllib.parse
 import oauthlib.oauth2
 
+from funkwhale_api.common import authentication
+
+
+def check(request):
+    user = request.user
+    request.user = user.__class__.objects.all().for_auth().get(pk=user.pk)
+    if authentication.should_verify_email(request.user):
+        setattr(request, "oauth2_error", {"error": "unverified_email"})
+        return False
+    return True
+
 
 class OAuth2Server(oauthlib.oauth2.Server):
     def verify_request(self, uri, *args, **kwargs):
         valid, request = super().verify_request(uri, *args, **kwargs)
         if valid:
+            if not check(request):
+                return False, request
             return valid, request
 
         # maybe the token was given in the querystring?
@@ -21,5 +34,8 @@ class OAuth2Server(oauthlib.oauth2.Server):
             valid = self.request_validator.validate_bearer_token(
                 token, request.scopes, request
             )
+        if valid:
+            if not check(request):
+                return False, request
 
         return valid, request

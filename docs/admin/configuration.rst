@@ -16,16 +16,16 @@ and technical aspects of your instance, such as database credentials.
 
     You should restart all Funkwhale processes when you change the values
     on environment variables.
-    
+
 
 .. note::
 
     Some characters are unsafe to use in configuration variables that are URLs,
     such as the user and password in the database and SMTP sections.
-    If those variables contain such characters, they must be urlencoded, for 
-    instance using the following command: 
+    If those variables contain such characters, they must be urlencoded, for
+    instance using the following command:
     ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("p@ssword"))``
-    
+
     cf. https://github.com/joke2k/django-environ#using-unsafe-characters-in-urls
 
 .. _instance-settings:
@@ -58,6 +58,19 @@ settings in this interface.
 Configuration reference
 -----------------------
 
+.. _setting-ACCOUNT_EMAIL_VERIFICATION_ENFORCE:
+
+``ACCOUNT_EMAIL_VERIFICATION_ENFORCE``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Determine wether users need to verify their email address before using the service. Enabling this can be useful
+to reduce spam or bots accounts, however, you'll need to configure a SMTP server so that your users can receive the
+verification emails.
+
+Note that regardless of the setting value, superusers created through the command line will never require verification.
+
+Default: ``false``
+
 .. _setting-EMAIL_CONFIG:
 
 ``EMAIL_CONFIG``
@@ -76,13 +89,13 @@ Possible values:
 - ``smtp+tls://user:password@youremail.host:587``: Send emails via SMTP via youremail.host on port 587, using TLS encryption, authenticating as user "user" with password "password"
 
 .. note::
-    
-    If ``user`` or ``password`` contain special characters (eg. 
+
+    If ``user`` or ``password`` contain special characters (eg.
     ``noreply@youremail.host`` as ``user``), be sure to urlencode them, using
     for example the command:
-    ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("noreply@youremail.host"))'``  
+    ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("noreply@youremail.host"))'``
     (returns ``noreply%40youremail.host``)
-    
+
 
 .. _setting-DEFAULT_FROM_EMAIL:
 

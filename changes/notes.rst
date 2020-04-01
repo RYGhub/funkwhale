@@ -28,9 +28,6 @@ In addition, it's also possible to customize the sign-up form by:
 - Providing a custom help text, in markdown format
 - Including additional fields in the form, for instance to ask the user why they want to join. Data collected through these fields is included in the sign-up request and viewable by the mods
 
-
-
-
 Federated reports
 ^^^^^^^^^^^^^^^^^
 
@@ -51,6 +48,15 @@ or hard drives.
 
 We plan to remove the old engine in an upcoming release. In the meantime, if anything goes wrong,
 you can switch back by setting ``USE_FULL_TEXT_SEARCH=false`` in your ``.env`` file.
+
+Enforced email verification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The brand new ``ACCOUNT_EMAIL_VERIFICATION_ENFORCE`` setting can be used to make email verification
+mandatory for your users. It defaults to ``false``, and doesn't apply to superuser accounts created through
+the CLI.
+
+If you enable this, ensure you have a SMTP server configured too.
 
 User management through the server CLI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

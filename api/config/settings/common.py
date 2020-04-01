@@ -431,13 +431,18 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
     "funkwhale_api.users.auth_backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    "funkwhale_api.users.auth_backends.AllAuthBackend",
 )
 SESSION_COOKIE_HTTPONLY = False
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION_ENFORCE = env.bool(
+    "ACCOUNT_EMAIL_VERIFICATION_ENFORCE", default=False
+)
+ACCOUNT_EMAIL_VERIFICATION = (
+    "mandatory" if ACCOUNT_EMAIL_VERIFICATION_ENFORCE else "optional"
+)
 ACCOUNT_USERNAME_VALIDATORS = "funkwhale_api.users.serializers.username_validators"
 
 # Custom user app defaults
