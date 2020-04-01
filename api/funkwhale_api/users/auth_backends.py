@@ -43,9 +43,11 @@ class ModelBackend(backends.ModelBackend):
         return user if self.user_can_authenticate(user) else None
 
     def user_can_authenticate(self, user):
-        return super().user_can_authenticate(
-            user
-        ) and not authentication.should_verify_email(user)
+        can_authenticate = super().user_can_authenticate(user)
+        if authentication.should_verify_email(user):
+            raise authentication.UnverifiedEmail(user)
+
+        return can_authenticate
 
 
 class AllAuthBackend(auth_backends.AuthenticationBackend, ModelBackend):

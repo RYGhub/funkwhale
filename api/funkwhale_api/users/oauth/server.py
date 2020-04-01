@@ -8,8 +8,7 @@ def check(request):
     user = request.user
     request.user = user.__class__.objects.all().for_auth().get(pk=user.pk)
     if authentication.should_verify_email(request.user):
-        setattr(request, "oauth2_error", {"error": "unverified_email"})
-        return False
+        raise authentication.UnverifiedEmail(user)
     return True
 
 
