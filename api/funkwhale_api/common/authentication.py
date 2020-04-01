@@ -1,6 +1,13 @@
 from django.conf import settings
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
+
+from django.core.cache import cache
+
+from allauth.account.utils import send_email_confirmation
+from oauth2_provider.contrib.rest_framework.authentication import (
+    OAuth2Authentication as BaseOAuth2Authentication,
+)
 from rest_framework import exceptions
 from rest_framework_jwt import authentication
 from rest_framework_jwt.settings import api_settings
@@ -14,7 +21,40 @@ def should_verify_email(user):
     return has_unverified_email and mandatory_verification
 
 
+class UnverifiedEmail(Exception):
+    def __init__(self, user):
+        self.user = user
+
+
+def resend_confirmation_email(request, user):
+    THROTTLE_DELAY = 500
+    cache_key = "auth:resent-email-confirmation:{}".format(user.pk)
+    if cache.get(cache_key):
+        return False
+
+    done = send_email_confirmation(request, user)
+    cache.set(cache_key, True, THROTTLE_DELAY)
+    return done
+
+
+class OAuth2Authentication(BaseOAuth2Authentication):
+    def authenticate(self, request):
+        try:
+            return super().authenticate(request)
+        except UnverifiedEmail as e:
+            request.oauth2_error = {"error": "unverified_email"}
+            resend_confirmation_email(request, e.user)
+
+
 class BaseJsonWebTokenAuth(object):
+    def authenticate(self, request):
+        try:
+            return super().authenticate(request)
+        except UnverifiedEmail as e:
+            msg = _("You need to verify your email address.")
+            resend_confirmation_email(request, e.user)
+            raise exceptions.AuthenticationFailed(msg)
+
     def authenticate_credentials(self, payload):
         """
         We have to implement this method by hand to ensure we can check that the
@@ -38,9 +78,7 @@ class BaseJsonWebTokenAuth(object):
             raise exceptions.AuthenticationFailed(msg)
 
         if should_verify_email(user):
-
-            msg = _("You need to verify your email address.")
-            raise exceptions.AuthenticationFailed(msg)
+            raise UnverifiedEmail(user)
 
         return user
 

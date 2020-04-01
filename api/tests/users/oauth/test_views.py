@@ -381,9 +381,15 @@ def test_grant_delete(factories, logged_in_api_client, mocker, now):
     ],
 )
 def test_token_auth(
-    setting_value, verified_email, expected_status_code, api_client, factories, settings
+    setting_value,
+    verified_email,
+    expected_status_code,
+    api_client,
+    factories,
+    settings,
+    mailoutbox,
 ):
-
+    sent_emails = len(mailoutbox)
     user = factories["users.User"](verified_email=verified_email)
     token = factories["users.AccessToken"](user=user)
     settings.ACCOUNT_EMAIL_VERIFICATION = setting_value
@@ -392,3 +398,7 @@ def test_token_auth(
         HTTP_AUTHORIZATION="Bearer {}".format(token.token),
     )
     assert response.status_code == expected_status_code
+
+    if expected_status_code != 200:
+        # confirmation email should have been sent again
+        assert len(mailoutbox) == sent_emails + 1

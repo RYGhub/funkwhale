@@ -686,7 +686,7 @@ REST_FRAMEWORK = {
         "funkwhale_api.federation.parsers.ActivityParser",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "funkwhale_api.common.authentication.OAuth2Authentication",
         "funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS",
         "funkwhale_api.common.authentication.BearerTokenHeaderAuth",
         "funkwhale_api.common.authentication.JSONWebTokenAuthentication",
