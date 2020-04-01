@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 from rest_framework import exceptions
@@ -5,7 +6,48 @@ from rest_framework_jwt import authentication
 from rest_framework_jwt.settings import api_settings
 
 
-class JSONWebTokenAuthenticationQS(authentication.BaseJSONWebTokenAuthentication):
+def should_verify_email(user):
+    if user.is_superuser:
+        return False
+    has_unverified_email = not user.has_verified_primary_email
+    mandatory_verification = settings.ACCOUNT_EMAIL_VERIFICATION != "optional"
+    return has_unverified_email and mandatory_verification
+
+
+class BaseJsonWebTokenAuth(object):
+    def authenticate_credentials(self, payload):
+        """
+        We have to implement this method by hand to ensure we can check that the
+        User has a verified email, if required
+        """
+        User = authentication.get_user_model()
+        username = authentication.jwt_get_username_from_payload(payload)
+
+        if not username:
+            msg = _("Invalid payload.")
+            raise exceptions.AuthenticationFailed(msg)
+
+        try:
+            user = User.objects.get_by_natural_key(username)
+        except User.DoesNotExist:
+            msg = _("Invalid signature.")
+            raise exceptions.AuthenticationFailed(msg)
+
+        if not user.is_active:
+            msg = _("User account is disabled.")
+            raise exceptions.AuthenticationFailed(msg)
+
+        if should_verify_email(user):
+
+            msg = _("You need to verify your email address.")
+            raise exceptions.AuthenticationFailed(msg)
+
+        return user
+
+
+class JSONWebTokenAuthenticationQS(
+    BaseJsonWebTokenAuth, authentication.BaseJSONWebTokenAuthentication
+):
 
     www_authenticate_realm = "api"
 
@@ -22,7 +64,9 @@ class JSONWebTokenAuthenticationQS(authentication.BaseJSONWebTokenAuthentication
         )
 
 
-class BearerTokenHeaderAuth(authentication.BaseJSONWebTokenAuthentication):
+class BearerTokenHeaderAuth(
+    BaseJsonWebTokenAuth, authentication.BaseJSONWebTokenAuthentication
+):
     """
     For backward compatibility purpose, we used Authorization: JWT <token>
     but Authorization: Bearer <token> is probably better.
@@ -65,7 +109,9 @@ class BearerTokenHeaderAuth(authentication.BaseJSONWebTokenAuthentication):
         return auth
 
 
-class JSONWebTokenAuthentication(authentication.JSONWebTokenAuthentication):
+class JSONWebTokenAuthentication(
+    BaseJsonWebTokenAuth, authentication.JSONWebTokenAuthentication
+):
     def authenticate(self, request):
         auth = super().authenticate(request)
 

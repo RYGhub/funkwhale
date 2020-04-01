@@ -239,3 +239,24 @@ def test_creating_user_set_support_display_date(
     user = factories["users.User"]()
 
     assert getattr(user, field) == expected
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_no_email(factories):
+    user = factories["users.User"]()
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is None
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_true(factories):
+    user = factories["users.User"](verified_email=True)
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is True
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_false(factories):
+    user = factories["users.User"](verified_email=False)
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is False
