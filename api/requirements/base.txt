@@ -1,6 +1,6 @@
 # Bleeding edge Django
-django>=3.0.3,<3.1; python_version > '3.5'
-django>=2.2,<3; python_version < '3.6'
+django>=3.0.5,<3.1; python_version > '3.5'
+django>=2.2.12,<3; python_version < '3.6'
 setuptools>=36
 # Configuration
 django-environ>=0.4,<0.5
