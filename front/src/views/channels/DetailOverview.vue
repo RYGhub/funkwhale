@@ -49,7 +49,7 @@
         :can-update="false"></rendered-description>
         <div class="ui hidden divider"></div>
     </div>
-    <channel-entries :key="String(episodesKey) + 'entries'" :filters="{channel: object.uuid, ordering: '-creation_date', playable: 'true'}">
+    <channel-entries :key="String(episodesKey) + 'entries'" :filters="{channel: object.uuid, ordering: '-creation_date'}">
       <h2 class="ui header">
         <translate translate-context="Content/Channel/Paragraph">Latest episodes</translate>
       </h2>

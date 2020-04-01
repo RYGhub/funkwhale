@@ -38,6 +38,7 @@ def compute_status(jobs):
 
 AUDIO_EXTENSIONS_AND_MIMETYPE = [
     # keep the most correct mimetype for each extension at the bottom
+    ("mp3", "audio/mp3"),
     ("mp3", "audio/mpeg3"),
     ("mp3", "audio/x-mp3"),
     ("mp3", "audio/mpeg"),

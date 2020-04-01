@@ -29,7 +29,11 @@ class ChannelFilterSet(filters.FilterSet):
         if not value:
             return queryset
 
-        channel = audio_models.Channel.objects.filter(uuid=value).first()
+        channel = (
+            audio_models.Channel.objects.filter(uuid=value)
+            .select_related("library")
+            .first()
+        )
 
         if not channel:
             return queryset.none()
@@ -38,7 +42,7 @@ class ChannelFilterSet(filters.FilterSet):
         actor = utils.get_actor_from_request(self.request)
         uploads = uploads.playable_by(actor)
         ids = uploads.values_list(self.Meta.channel_filter_field, flat=True)
-        return queryset.filter(pk__in=ids)
+        return queryset.filter(pk__in=ids).distinct()
 
 
 class LibraryFilterSet(filters.FilterSet):
