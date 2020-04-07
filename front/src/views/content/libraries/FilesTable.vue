@@ -165,7 +165,7 @@
               <i class="question circle outline icon"></i>
             </button>
           </td>
-          <td v-if="scope.obj.duration">{{ time.parse(scope.obj.duration) }}</td>
+          <td v-if="scope.obj.duration">{{ scope.obj.duration | duration }}</td>
           <td v-else>
             <translate translate-context="*/*/*">N/A</translate>
           </td>

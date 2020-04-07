@@ -240,7 +240,7 @@
                     </td>
                     <td>
                       <template v-if="object.duration">
-                        {{ time.parse(object.duration) }}
+                        {{ object.duration | duration }}
                       </template>
                       <translate v-else translate-context="*/*/*">N/A</translate>
                     </td>

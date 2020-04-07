@@ -9,9 +9,16 @@ function pad (val) {
 export default {
   parse: function (sec) {
     let min = 0
+    let hours = Math.floor(sec/3600)
+    if (hours >= 1) {
+      sec = sec % 3600
+    }
     min = Math.floor(sec / 60)
     sec = sec - min * 60
-    return pad(min) + ':' + pad(sec)
+    if (hours >= 1) {
+      return hours + ':' + pad(min) + ':' + pad(sec)
+    }
+    return min + ':' + pad(sec)
   },
   durationFormatted (v) {
     let duration = parseInt(v)

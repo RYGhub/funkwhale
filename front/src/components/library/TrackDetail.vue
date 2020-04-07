@@ -16,7 +16,7 @@
                     <translate translate-context="Content/*/*">Duration</translate>
                   </td>
                   <td class="right aligned">
-                    <template v-if="upload.duration">{{ time.parse(upload.duration) }}</template>
+                    <template v-if="upload.duration">{{ upload.duration | duration }}</template>
                     <translate v-else translate-context="*/*/*">N/A</translate>
                   </td>
                 </tr>
@@ -60,7 +60,7 @@
 
           <rendered-description
             :content="track.description"
-            can-update="false"></rendered-description>
+            :can-update="false"></rendered-description>
           <h2 class="ui header">
             <translate translate-context="Content/*/*">Release Details</translate>
           </h2>
@@ -154,7 +154,6 @@
 </template>
 
 <script>
-import time from "@/utils/time"
 import axios from "axios"
 import url from "@/utils/url"
 import logger from "@/logging"
@@ -173,7 +172,6 @@ export default {
   },
   data() {
     return {
-      time,
       id: this.track.id,
       licenseData: null
     }

@@ -15,7 +15,7 @@
     <template v-if="!isLoading && objects.length === 0">
       <div class="ui placeholder segment">
         <div class="ui icon header">
-          <i class="compact disc icon"></i>
+          <i class="music icon"></i>
           No results matching your query
         </div>
       </div>
@@ -31,7 +31,7 @@ import ChannelEntryCard from '@/components/audio/ChannelEntryCard'
 export default {
   props: {
     filters: {type: Object, required: true},
-    limit: {type: Number, default: 5},
+    limit: {type: Number, default: 10},
   },
   components: {
     ChannelEntryCard

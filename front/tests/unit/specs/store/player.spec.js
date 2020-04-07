@@ -90,11 +90,11 @@ describe('store/player', () => {
   describe('getters', () => {
     it('durationFormatted', () => {
       const state = { duration: 12.51 }
-      expect(store.getters['durationFormatted'](state)).to.equal('00:13')
+      expect(store.getters['durationFormatted'](state)).to.equal('0:13')
     })
     it('currentTimeFormatted', () => {
       const state = { currentTime: 12.51 }
-      expect(store.getters['currentTimeFormatted'](state)).to.equal('00:13')
+      expect(store.getters['currentTimeFormatted'](state)).to.equal('0:13')
     })
     it('progress', () => {
       const state = { currentTime: 4, duration: 10 }

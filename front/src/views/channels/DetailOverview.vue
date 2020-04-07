@@ -51,13 +51,16 @@
     </div>
     <channel-entries :key="String(episodesKey) + 'entries'" :filters="{channel: object.uuid, ordering: '-creation_date'}">
       <h2 class="ui header">
-        <translate translate-context="Content/Channel/Paragraph">Latest episodes</translate>
+        <translate key="1" v-if="isPodcast" translate-context="Content/Channel/Paragraph">Latest episodes</translate>
+        <translate key="2" v-else translate-context="Content/Channel/Paragraph">Latest tracks</translate>
       </h2>
     </channel-entries>
     <div class="ui hidden divider"></div>
-    <channel-series :key="String(seriesKey) + 'series'" :filters="seriesFilters">
+    <channel-series :key="String(seriesKey) + 'series'" :filters="seriesFilters" :is-podcast="isPodcast">
       <h2 class="ui with-actions header">
-        <translate translate-context="Content/Channel/Paragraph">Series</translate>
+
+        <translate key="1" v-if="isPodcast" translate-context="Content/Channel/Paragraph">Series</translate>
+        <translate key="2" v-else translate-context="*/*/*">Albums</translate>
         <div class="actions" v-if="isOwner">
           <a @click.stop.prevent="$refs.albumModal.show = true">
             <i class="plus icon"></i>
@@ -114,6 +117,9 @@ export default {
     });
   },
   computed: {
+    isPodcast () {
+      return this.object.artist.content_category === 'podcast'
+    },
     isOwner () {
       return this.$store.state.auth.authenticated && this.object.attributed_to.full_username === this.$store.state.auth.fullUsername
     },

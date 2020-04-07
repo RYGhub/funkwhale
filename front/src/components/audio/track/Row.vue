@@ -26,7 +26,7 @@
       </router-link>
     </td>
     <td colspan="4" v-if="track.uploads && track.uploads.length > 0">
-      {{ time.parse(track.uploads[0].duration) }}
+      <human-duration :duration="track.uploads[0].duration"></human-duration>
     </td>
     <td colspan="4" v-else>
       <translate translate-context="*/*/*">N/A</translate>
@@ -49,7 +49,6 @@
 
 <script>
 import { mapGetters } from "vuex"
-import time from '@/utils/time'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 import PlayButton from '@/components/audio/PlayButton'
@@ -66,11 +65,6 @@ export default {
     TrackFavoriteIcon,
     TrackPlaylistIcon,
     PlayButton
-  },
-  data () {
-    return {
-      time
-    }
   },
   computed: {
     ...mapGetters({

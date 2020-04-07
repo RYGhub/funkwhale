@@ -4,131 +4,127 @@
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="object">
-      <section :class="['ui', 'head', {'with-background': object.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="object.title">
-        <div class="segment-content">
-          <h2 class="ui center aligned icon header">
-            <i class="circular inverted sound yellow icon"></i>
-            <div class="content">
-              {{ object.title }}
-              <div v-html="subtitle"></div>
-            </div>
-          </h2>
-          <tags-list v-if="object.tags && object.tags.length > 0" :tags="object.tags"></tags-list>
-          <div class="ui hidden divider"></div>
-          <div class="header-buttons">
-
-            <div class="ui buttons">
-              <play-button class="orange" :tracks="object.tracks">
-                <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
-              </play-button>
-            </div>
-
-            <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
-              <div class="header">
-                <translate translate-context="Popup/Album/Title/Verb">Embed this album on your website</translate>
-              </div>
-              <div class="content">
-                <div class="description">
-                  <embed-wizard type="album" :id="object.id" />
-
-                </div>
-              </div>
-              <div class="actions">
-                <div class="ui basic deny button">
-                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
-                </div>
-              </div>
-            </modal>
-            <div class="ui buttons">
-              <button class="ui button" @click="$refs.dropdown.click()">
-                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
-              </button>
-              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                  <div
-                    role="button"
-                    v-if="publicLibraries.length > 0"
-                    @click="showEmbedModal = !showEmbedModal"
-                    class="basic item">
-                    <i class="code icon"></i>
-                    <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+      <section class="ui vertical stripe segment channel-serie">
+        <div class="ui stackable grid container">
+          <div class="ui seven wide column">
+            <div v-if="isSerie" class="padded basic segment">
+              <div class="ui two column grid" v-if="isSerie">
+                <div class="column">
+                  <div class="large two-images">
+                    <img class="channel-image" v-if="object.cover && object.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+                    <img class="channel-image" v-else src="../../assets/audio/default-cover.png">
+                    <img class="channel-image" v-if="object.cover && object.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+                    <img class="channel-image" v-else src="../../assets/audio/default-cover.png">
                   </div>
-                  <a :href="wikipediaUrl" target="_blank" rel="noreferrer noopener" class="basic item">
-                    <i class="wikipedia w icon"></i>
-                    <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
-                  </a>
-                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
-                    <i class="external icon"></i>
-                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
-                  </a>
-		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
-		    <i class="external icon"></i>
-		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
-                  </a>
-		  <router-link
-                    v-if="object.is_local"
-                    :to="{name: 'library.albums.edit', params: {id: object.id }}"
-                    class="basic item">
-                    <i class="edit icon"></i>
-                    <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
-                  </router-link>
-                  <dangerous-button
-                    :class="['ui', {loading: isLoading}, 'item']"
-                    v-if="artist && $store.state.auth.authenticated && artist.channel && artist.attributed_to.full_username === $store.state.auth.fullUsername"
-                    @confirm="remove()">
-                    <i class="ui trash icon"></i>
-                    <translate translate-context="*/*/*/Verb">Delete…</translate>
-                    <p slot="modal-header"><translate translate-context="Popup/Channel/Title">Delete this album?</translate></p>
-                    <div slot="modal-content">
-                      <p><translate translate-context="Content/Moderation/Paragraph">The album will be deleted, as well as any related files and data. This action is irreversible.</translate></p>
-                    </div>
-                    <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
-                  </dangerous-button>
-                  <div class="divider"></div>
-                  <div
-                    role="button"
-                    class="basic item"
-                    v-for="obj in getReportableObjs({album: object})"
-                    :key="obj.target.type + obj.target.id"
-                    @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
-                    <i class="share icon" /> {{ obj.label }}
-                  </div>
-                  <div class="divider"></div>
-                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.albums.detail', params: {id: object.id}}">
-                    <i class="wrench icon"></i>
-                    <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
-                  </router-link>
-                  <a
-                    v-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
-                    class="basic item"
-                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${object.id}`)"
-                    target="_blank" rel="noopener noreferrer">
-                    <i class="wrench icon"></i>
-                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
-                  </a>
                 </div>
+                <div class="ui column right aligned">
+                  <tags-list v-if="object.tags && object.tags.length > 0" :tags="object.tags"></tags-list>
+                  <div class="ui small hidden divider"></div>
+                  <human-duration v-if="totalDuration > 0" :duration="totalDuration"></human-duration>
+                  <template v-if="totalTracks > 0">
+                    <div class="ui hidden very small divider"></div>
+                    <translate key="1" v-if="isSerie" translate-context="Content/Channel/Paragraph"
+                      translate-plural="%{ count } episodes"
+                      :translate-n="totalTracks"
+                      :translate-params="{count: totalTracks}">
+                      %{ count } episode
+                    </translate>
+                    <translate v-else translate-context="*/*/*" :translate-params="{count: totalTracks}" :translate-n="totalTracks" translate-plural="%{ count } tracks">%{ count } track</translate>
+                  </template>
+                  <div class="ui small hidden divider"></div>
+                  <play-button class="orange" :tracks="object.tracks"></play-button>
+                  <div class="ui hidden horizontal divider"></div>
+                  <album-dropdown
+                    :object="object"
+                    :public-libraries="publicLibraries"
+                    :is-loading="isLoading"
+                    :is-album="isAlbum"
+                    :is-serie="isSerie"
+                    :is-channel="isChannel"
+                    :artist="artist"></album-dropdown>
+                </div>
+              </div>
+              <div class="ui small hidden divider"></div>
+              <header>
+                <h2 class="ui header" :title="object.title">
+                  {{ object.title }}
+                </h2>
+                <artist-label :artist="artist"></artist-label>
+              </header>
+            </div>
+            <div v-else class="ui center aligned text padded basic segment">
+              <img class="channel-image" v-if="object.cover && object.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+              <img class="channel-image" v-else src="../../assets/audio/default-cover.png">
+              <div class="ui hidden divider"></div>
+              <header>
+                <h2 class="ui header" :title="object.title">
+                  {{ object.title }}
+                </h2>
+                <artist-label class="rounded" :artist="artist"></artist-label>
+              </header>
+              <div class="ui small hidden divider"></div>
+              <template v-if="totalTracks > 0">
+                <div class="ui hidden very small divider"></div>
+                <translate key="1" v-if="isSerie" translate-context="Content/Channel/Paragraph"
+                  translate-plural="%{ count } episodes"
+                  :translate-n="totalTracks"
+                  :translate-params="{count: totalTracks}">
+                  %{ count } episode
+                </translate>
+                <translate v-else translate-context="*/*/*" :translate-params="{count: totalTracks}" :translate-n="totalTracks" translate-plural="%{ count } tracks">%{ count } track</translate> ·
+              </template>
+              <human-duration v-if="totalDuration > 0" :duration="totalDuration"></human-duration>
+              <div class="ui small hidden divider"></div>
+              <play-button class="orange" :tracks="object.tracks"></play-button>
+              <div class="ui horizontal hidden divider"></div>
+              <album-dropdown
+                :object="object"
+                :public-libraries="publicLibraries"
+                :is-loading="isLoading"
+                :is-album="isAlbum"
+                :is-serie="isSerie"
+                :is-channel="isChannel"
+                :artist="artist"></album-dropdown>
+              <div v-if="(object.tags && object.tags.length > 0) || object.description || $store.state.auth.authenticated && object.is_local">
+                <div class="ui small hidden divider"></div>
+                <div class="ui divider"></div>
+                <div class="ui small hidden divider"></div>
+                <template v-if="object.tags && object.tags.length > 0" >
+                  <tags-list :tags="object.tags"></tags-list>
+                  <div class="ui small hidden divider"></div>
+                </template>
+                <rendered-description
+                  v-if="object.description"
+                  :content="object.description"
+                  :can-update="false"></rendered-description>
+                <router-link v-else-if="$store.state.auth.authenticated && object.is_local" :to="{name: 'library.albums.edit', params: {id: object.id }}">
+                  <i class="pencil icon"></i>
+                  <translate translate-context="Content/*/Button.Label/Verb">Add a description…</translate>
+                </router-link>
               </div>
             </div>
           </div>
+          <rendered-description
+            v-if="isSerie"
+            :content="object.description"
+            :can-update="false"></rendered-description>
+          <div class="nine wide column">
+            <router-view v-if="object" :is-serie="isSerie" :artist="artist" :discs="discs" @libraries-loaded="libraries = $event" :object="object" object-type="album" :key="$route.fullPath"></router-view>
+          </div>
         </div>
       </section>
-      <router-view v-if="object" :discs="discs" @libraries-loaded="libraries = $event" :object="object" object-type="album" :key="$route.fullPath"></router-view>
     </template>
   </main>
 </template>
 
 <script>
 import axios from "axios"
-import logger from "@/logging"
+import lodash from "@/lodash"
 import backend from "@/audio/backend"
 import PlayButton from "@/components/audio/PlayButton"
-import EmbedWizard from "@/components/audio/EmbedWizard"
-import Modal from '@/components/semantic/Modal'
 import TagsList from "@/components/tags/List"
-import ReportMixin from '@/components/mixins/Report'
-
-const FETCH_URL = "albums/"
+import ArtistLabel from '@/components/audio/ArtistLabel'
+import AlbumDropdown from './AlbumDropdown'
 
 
 function groupByDisc(acc, track) {
@@ -143,13 +139,12 @@ function groupByDisc(acc, track) {
 }
 
 export default {
-  mixins: [ReportMixin],
   props: ["id"],
   components: {
     PlayButton,
-    EmbedWizard,
-    Modal,
     TagsList,
+    ArtistLabel,
+    AlbumDropdown,
   },
   data() {
     return {
@@ -158,26 +153,24 @@ export default {
       artist: null,
       discs: [],
       libraries: [],
-      showEmbedModal: false
     }
   },
-  created() {
-    this.fetchData()
+  async created() {
+    await this.fetchData()
   },
   methods: {
-    fetchData() {
-      var self = this
+    async fetchData() {
       this.isLoading = true
-      let url = FETCH_URL + this.id + "/"
-      logger.default.debug('Fetching album "' + this.id + '"')
-      axios.get(url, {params: {refresh: 'true'}}).then(response => {
-        self.object = backend.Album.clean(response.data)
-        self.discs = self.object.tracks.reduce(groupByDisc, [])
-        axios.get(`artists/${response.data.artist.id}/`).then(response => {
-          self.artist = response.data
-        })
-        self.isLoading = false
-      })
+      let albumResponse = await axios.get(`albums/${this.id}/`, {params: {refresh: 'true'}})
+      let artistResponse = await axios.get(`artists/${albumResponse.data.artist.id}/`)
+      this.artist = artistResponse.data
+      if (this.artist.channel) {
+        this.artist.channel.artist = this.artist
+      }
+      this.object = backend.Album.clean(albumResponse.data)
+      this.discs = this.object.tracks.reduce(groupByDisc, [])
+      this.isLoading = false
+
     },
     remove () {
       let self = this
@@ -193,9 +186,30 @@ export default {
     }
   },
   computed: {
+    totalTracks () {
+      return this.object.tracks.length
+    },
+    isChannel () {
+      return this.object.artist.channel
+    },
+    isSerie () {
+      return this.object.artist.content_category === 'podcast'
+    },
+    isAlbum () {
+      return this.object.artist.content_category === 'music'
+    },
+    totalDuration () {
+      let durations = [0]
+      this.object.tracks.forEach((t) => {
+        if (t.uploads[0] && t.uploads[0].duration) {
+          durations.push(t.uploads[0].duration)
+        }
+      })
+      return lodash.sum(durations)
+    },
     labels() {
       return {
-        title: this.$pgettext('*/*/*', 'Album')
+        title: this.$pgettext('*/*/*', 'Album'),
       }
     },
     publicLibraries () {
@@ -203,39 +217,6 @@ export default {
         return l.privacy_level === 'everyone'
       })
     },
-    wikipediaUrl() {
-      return (
-        "https://en.wikipedia.org/w/index.php?search=" +
-        encodeURI(this.object.title + " " + this.object.artist.name)
-      )
-    },
-    musicbrainzUrl() {
-      if (this.object.mbid) {
-        return "https://musicbrainz.org/release/" + this.object.mbid
-      }
-    },
-    discogsUrl() {
-      return (
-        "https://discogs.com/search/?type=release&title=" +
-	encodeURI(this.object.title) + "&artist=" +
-	encodeURI(this.object.artist.name)
-	)
-    },
-    headerStyle() {
-      if (!this.object.cover.original) {
-        return ""
-      }
-      return (
-        "background-image: url(" +
-        this.$store.getters["instance/absoluteUrl"](this.object.cover.original) +
-        ")"
-      )
-    },
-    subtitle () {
-      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.object.artist.id }})
-      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.object.tracks.length)
-      return this.$gettextInterpolate(msg, {count: this.object.tracks.length, artist: this.object.artist.name, artistUrl: route.href})
-    }
   },
   watch: {
     id() {
