@@ -210,6 +210,7 @@ def serialize_album_track(track):
 
 
 class AlbumSerializer(OptionalDescriptionMixin, serializers.Serializer):
+    # XXX: remove in 1.0, it's expensive and can work with a filter/api call
     tracks = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     cover = cover_field

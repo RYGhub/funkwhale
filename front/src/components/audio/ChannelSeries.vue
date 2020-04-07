@@ -5,7 +5,12 @@
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
-    <channel-serie-card v-for="serie in objects" :serie="serie" :key="serie.id" />
+    <template v-if="isPodcast">
+      <channel-serie-card v-for="serie in objects" :serie="serie" :key="serie.id" />
+    </template>
+    <div v-else class="ui app-cards cards">
+      <album-card v-for="album in objects" :album="album" :key="album.id" />
+    </div>
     <template v-if="nextPage">
       <div class="ui hidden divider"></div>
       <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
@@ -27,14 +32,18 @@
 import _ from '@/lodash'
 import axios from 'axios'
 import ChannelSerieCard from '@/components/audio/ChannelSerieCard'
+import AlbumCard from '@/components/audio/album/Card'
+
 
 export default {
   props: {
     filters: {type: Object, required: true},
+    isPodcast: {type: Boolean, default: true},
     limit: {type: Number, default: 5},
   },
   components: {
-    ChannelSerieCard
+    ChannelSerieCard,
+    AlbumCard,
   },
   data () {
     return {

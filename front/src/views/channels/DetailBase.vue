@@ -206,7 +206,8 @@
                 <translate translate-context="Content/Channels/Link">Overview</translate>
               </router-link>
               <router-link class="item" :exact="true" :to="{name: 'channels.detail.episodes', params: {id: id}}">
-                <translate translate-context="Content/Channels/*">Episodes</translate>
+                <translate key="1" v-if="isPodcast" translate-context="Content/Channels/*">Episodes</translate>
+                <translate key="2" v-else translate-context="*/*/*">Tracks</translate>
               </router-link>
             </div>
             <div class="ui hidden divider"></div>
@@ -312,6 +313,9 @@ export default {
 
     isOwner () {
       return this.$store.state.auth.authenticated && this.object.attributed_to.full_username === this.$store.state.auth.fullUsername
+    },
+    isPodcast () {
+      return this.object.artist.content_category === 'podcast'
     },
     labels () {
       return {

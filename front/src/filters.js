@@ -1,5 +1,7 @@
 import Vue from 'vue'
 
+import time from '@/utils/time'
+
 import moment from 'moment'
 
 export function truncate (str, max, ellipsis, middle) {
@@ -88,6 +90,12 @@ export function padDuration (duration) {
 }
 
 Vue.filter('padDuration', padDuration)
+
+export function duration (seconds) {
+  return time.parse(seconds)
+}
+
+Vue.filter('duration', duration)
 
 export function momentFormat (date, format) {
   format = format || 'lll'
