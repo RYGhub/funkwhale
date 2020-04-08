@@ -172,7 +172,7 @@ def inbox_create_audio(payload, context):
             context={"activity": context.get("activity"), "actor": context["actor"]},
         )
     if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
-        logger.warn("Discarding invalid audio create")
+        logger.warn("Discarding invalid audio create: %s", serializer.errors)
         return
 
     upload = serializer.save()
