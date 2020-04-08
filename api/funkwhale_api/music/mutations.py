@@ -127,9 +127,18 @@ class TrackMutationSerializer(CoverMutation, TagMutation, DescriptionMutation):
         return serialized_relations
 
     def post_apply(self, obj, validated_data):
-        routes.outbox.dispatch(
-            {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
-        )
+        channel = obj.artist.get_channel()
+        if channel:
+            upload = channel.library.uploads.filter(track=obj).first()
+            if upload:
+                routes.outbox.dispatch(
+                    {"type": "Update", "object": {"type": "Audio"}},
+                    context={"upload": upload},
+                )
+        else:
+            routes.outbox.dispatch(
+                {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
+            )
 
 
 @mutations.registry.connect(

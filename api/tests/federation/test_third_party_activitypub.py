@@ -1,3 +1,6 @@
+import pytest
+
+from funkwhale_api.federation import routes
 from funkwhale_api.federation import serializers
 
 
@@ -141,3 +144,93 @@ def test_reel2bits_channel_from_actor_ap(db, mocker):
     assert channel.rss_url == payload["url"][1]["href"]
     assert channel.artist.name == actor.name
     assert channel.artist.attributed_to == actor
+
+
+def test_reel2bits_upload_create(factories):
+    channel = factories["audio.Channel"]()
+    payload = {
+        "id": "https://r2b.example/outbox/cb89c969224d7c9d",
+        "to": ["https://www.w3.org/ns/activitystreams#Public"],
+        "type": "Create",
+        "actor": "https://r2b.example/user/anna",
+        "object": {
+            "cc": ["https://r2b.example/user/anna/followers"],
+            "id": "https://r2b.example/outbox/cb89c969224d7c9d/activity",
+            "to": ["https://www.w3.org/ns/activitystreams#Public"],
+            "url": {
+                "href": "https://r2b.example/uploads/sounds/anna/test.mp3",
+                "type": "Link",
+                "mediaType": "audio/mpeg",
+            },
+            "name": "nya",
+            "tag": [
+                {"name": "#nya", "type": "Hashtag"},
+                {"name": "#cat", "type": "Hashtag"},
+                {"name": "#paws", "type": "Hashtag"},
+            ],
+            "type": "Audio",
+            "genre": "cat",
+            "image": {
+                "url": "https://r2b.example/uploads/artwork_sounds/anna/test.jpg",
+                "type": "Image",
+                "mediaType": "image/jpeg",
+            },
+            "content": "nya nya",
+            "licence": {"id": "0", "icon": "", "link": "", "name": "Not Specified"},
+            "mediaType": "text/plain",
+            "published": "2020-04-08T12:47:29Z",
+            "attributedTo": "https://r2b.example/user/anna",
+        },
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {
+                "toot": "http://joinmastodon.org/ns#",
+                "Hashtag": "as:Hashtag",
+                "featured": "toot:featured",
+                "sensitive": "as:sensitive",
+            },
+        ],
+        "published": "2020-04-08T12:47:29Z",
+    }
+    serializer = serializers.ChannelCreateUploadSerializer(
+        data=payload, context={"channel": channel}
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save()
+
+
+def test_reel2bits_upload_delete(factories):
+    actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"](actor=actor, attributed_to=actor)
+    upload = factories["music.Upload"](channel=channel, track__attributed_to=actor)
+    payload = {
+        "id": "https://r2b.example/outbox/4987acc5b25f0aac",
+        "to": [
+            "https://channels.tests.funkwhale.audio/federation/actors/demo",
+            "https://www.w3.org/ns/activitystreams#Public",
+        ],
+        "type": "Delete",
+        "actor": actor.fid,
+        "object": {"id": upload.fid, "type": "Tombstone"},
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {
+                "toot": "http://joinmastodon.org/ns#",
+                "Hashtag": "as:Hashtag",
+                "featured": "toot:featured",
+                "sensitive": "as:sensitive",
+            },
+        ],
+    }
+
+    routes.inbox_delete(
+        payload, context={"actor": actor, "raise_exception": True, "activity": payload},
+    )
+
+    with pytest.raises(upload.track.DoesNotExist):
+        upload.track.refresh_from_db()
+    with pytest.raises(upload.DoesNotExist):
+        upload.refresh_from_db()

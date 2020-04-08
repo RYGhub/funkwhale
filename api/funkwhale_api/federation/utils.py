@@ -277,3 +277,18 @@ def get_object_by_fid(fid, local=None):
             return channel
 
     return instance
+
+
+def can_manage(obj_owner, actor):
+    if not obj_owner:
+        return False
+
+    if not actor:
+        return False
+
+    if obj_owner == actor:
+        return True
+    if obj_owner.domain.service_actor == actor:
+        return True
+
+    return False

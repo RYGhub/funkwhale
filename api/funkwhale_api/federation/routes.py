@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from django.db.models import Q
 
@@ -333,6 +334,37 @@ def inbox_update_track(payload, context):
     )
 
 
+@inbox.register({"type": "Update", "object.type": "Audio"})
+def inbox_update_audio(payload, context):
+    serializer = serializers.ChannelCreateUploadSerializer(
+        data=payload, context=context
+    )
+
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.info("Skipped update, invalid payload")
+        return
+    serializer.save()
+
+
+@outbox.register({"type": "Update", "object.type": "Audio"})
+def outbox_update_audio(context):
+    upload = context["upload"]
+    channel = upload.library.get_channel()
+    actor = channel.actor
+    serializer = serializers.ChannelCreateUploadSerializer(
+        upload, context={"type": "Update", "activity_id_suffix": str(uuid.uuid4())[:8]}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }
+
+
 @inbox.register({"type": "Update", "object.type": "Artist"})
 def inbox_update_artist(payload, context):
     return handle_library_entry_update(
@@ -437,7 +469,6 @@ def outbox_delete_actor(context):
     {
         "type": "Delete",
         "object.type": [
-            "Tombstone",
             "Actor",
             "Person",
             "Application",
@@ -462,6 +493,17 @@ def inbox_delete_actor(payload, context):
         logger.warn("Cannot delete actor %s, no matching object found", actor.fid)
         return
     actor.delete()
+
+
+@inbox.register({"type": "Delete", "object.type": "Tombstone"})
+def inbox_delete(payload, context):
+    serializer = serializers.DeleteSerializer(data=payload, context=context)
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.info("Skipped deletion, invalid payload")
+        return
+
+    to_delete = serializer.validated_data["object"]
+    to_delete.delete()
 
 
 @inbox.register({"type": "Flag"})

@@ -31,7 +31,9 @@ from funkwhale_api.moderation import serializers as moderation_serializers
         ({"type": "Update", "object": {"type": "Artist"}}, routes.inbox_update_artist),
         ({"type": "Update", "object": {"type": "Album"}}, routes.inbox_update_album),
         ({"type": "Update", "object": {"type": "Track"}}, routes.inbox_update_track),
+        ({"type": "Update", "object": {"type": "Audio"}}, routes.inbox_update_audio),
         ({"type": "Delete", "object": {"type": "Person"}}, routes.inbox_delete_actor),
+        ({"type": "Delete", "object": {"type": "Tombstone"}}, routes.inbox_delete),
         ({"type": "Flag"}, routes.inbox_flag),
     ],
 )
@@ -62,6 +64,7 @@ def test_inbox_routes(route, handler):
         ({"type": "Delete", "object": {"type": "Album"}}, routes.outbox_delete_album),
         ({"type": "Undo", "object": {"type": "Follow"}}, routes.outbox_undo_follow),
         ({"type": "Update", "object": {"type": "Track"}}, routes.outbox_update_track),
+        ({"type": "Update", "object": {"type": "Audio"}}, routes.outbox_update_audio),
         (
             {"type": "Delete", "object": {"type": "Tombstone"}},
             routes.outbox_delete_actor,
@@ -354,7 +357,7 @@ def test_inbox_create_audio_channel(factories, mocker):
         "@context": jsonld.get_default_context(),
         "type": "Create",
         "actor": channel.actor.fid,
-        "object": serializers.ChannelCreateUploadSerializer(upload).data,
+        "object": serializers.ChannelUploadSerializer(upload).data,
     }
     upload.delete()
     init = mocker.spy(serializers.ChannelCreateUploadSerializer, "__init__")
@@ -368,7 +371,7 @@ def test_inbox_create_audio_channel(factories, mocker):
 
     assert init.call_count == 1
     args = init.call_args
-    assert args[1]["data"] == payload["object"]
+    assert args[1]["data"] == payload
     assert args[1]["context"] == {"channel": channel}
     assert save.call_count == 1
 
@@ -763,6 +766,46 @@ def test_inbox_update_track(factories, mocker):
     )
 
     update_library_entity.assert_called_once_with(obj, {"title": "New title"})
+
+
+def test_inbox_update_audio(factories, mocker, r_mock):
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](
+        library=channel.library,
+        track__artist=channel.artist,
+        track__attributed_to=channel.actor,
+    )
+    upload.track.fid = upload.fid
+    upload.track.save()
+    r_mock.get(
+        upload.track.album.fid,
+        json=serializers.AlbumSerializer(upload.track.album).data,
+    )
+    data = serializers.ChannelCreateUploadSerializer(upload).data
+    data["object"]["name"] = "New title"
+
+    routes.inbox_update_audio(
+        data, context={"actor": channel.actor, "raise_exception": True}
+    )
+
+    upload.track.refresh_from_db()
+
+    assert upload.track.title == "New title"
+
+
+def test_outbox_update_audio(factories, faker, mocker):
+    fake_uuid = faker.uuid4()
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    upload = factories["music.Upload"](channel=True)
+    activity = list(routes.outbox_update_audio({"upload": upload}))[0]
+    expected = serializers.ChannelCreateUploadSerializer(upload).data
+
+    expected["type"] = "Update"
+    expected["id"] += "/" + fake_uuid[:8]
+    expected["to"] = [contexts.AS.Public, {"type": "instances_with_followers"}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == upload.library.channel.actor
 
 
 def test_outbox_update_track(factories):
