@@ -13,11 +13,14 @@
       </strong>
       <div class="description">
         <translate class="meta ellipsis" translate-context="Content/Channel/Paragraph"
+          key="1"
+          v-if="object.artist.content_category === 'podcast'"
           translate-plural="%{ count } episodes"
           :translate-n="object.artist.tracks_count"
           :translate-params="{count: object.artist.tracks_count}">
           %{ count } episode
         </translate>
+        <translate key="2" v-else translate-context="*/*/*" :translate-params="{count: object.artist.tracks_count}" :translate-n="object.artist.tracks_count" translate-plural="%{ count } tracks">%{ count } track</translate>
         <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="object.artist.tags"></tags-list>
       </div>
 

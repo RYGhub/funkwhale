@@ -103,11 +103,19 @@
                 </router-link>
               </div>
             </div>
+            <template v-if="isSerie">
+              <div class="ui hidden divider"></div>
+              <rendered-description
+                v-if="object.description"
+                :content="object.description"
+                :can-update="false"></rendered-description>
+              <router-link v-else-if="$store.state.auth.authenticated && object.is_local" :to="{name: 'library.albums.edit', params: {id: object.id }}">
+                <i class="pencil icon"></i>
+                <translate translate-context="Content/*/Button.Label/Verb">Add a description…</translate>
+              </router-link>
+
+            </template>
           </div>
-          <rendered-description
-            v-if="isSerie"
-            :content="object.description"
-            :can-update="false"></rendered-description>
           <div class="nine wide column">
             <router-view v-if="object" :is-serie="isSerie" :artist="artist" :discs="discs" @libraries-loaded="libraries = $event" :object="object" object-type="album" :key="$route.fullPath"></router-view>
           </div>

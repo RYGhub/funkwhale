@@ -7,7 +7,8 @@
           <img class="image" v-if="cover && cover.original" v-lazy="$store.getters['instance/absoluteUrl'](cover.square_crop)">
           <template v-if="upload">
             <h3 class="ui header">
-              <translate translate-context="Content/*/*">Track Details</translate>
+              <translate key="1" v-if="track.artist.content_category === 'music'" translate-context="Content/*/*">Track Details</translate>
+              <translate key="2" v-else translate-context="Content/*/*">Episode Details</translate>
             </h3>
             <table class="ui basic table">
               <tbody>
@@ -78,7 +79,8 @@
               </tr>
               <tr v-if="track.album">
                 <td>
-                  <translate translate-context="*/*/*/Noun">Album</translate>
+                  <translate key="1" v-if="track.album.artist.content_category === 'music'" translate-context="*/*/*/Noun">Album</translate>
+                  <translate key="2" v-else translate-context="*/*/*">Serie</translate>
                 </td>
                 <td class="right aligned">
                   <router-link :to="{name: 'library.albums.detail', params: {id: track.album.id}}">
