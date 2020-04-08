@@ -164,7 +164,7 @@ def inbox_create_audio(payload, context):
     if is_channel:
         channel = context["actor"].get_channel()
         serializer = serializers.ChannelCreateUploadSerializer(
-            data=payload["object"], context={"channel": channel},
+            data=payload, context={"channel": channel},
         )
     else:
         serializer = serializers.UploadSerializer(
