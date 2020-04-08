@@ -232,16 +232,18 @@ class JsonLdSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.jsonld_expand = kwargs.pop("jsonld_expand", True)
         super().__init__(*args, **kwargs)
+        self.jsonld_context = []
 
     def run_validation(self, data=empty):
         if data and data is not empty:
 
+            self.jsonld_context = data.get("@context", [])
             if self.context.get("expand", self.jsonld_expand):
                 try:
                     data = expand(data)
-                except ValueError:
+                except ValueError as e:
                     raise serializers.ValidationError(
-                        "{} is not a valid jsonld document".format(data)
+                        "{} is not a valid jsonld document: {}".format(data, e)
                     )
             try:
                 config = self.Meta.jsonld_mapping
@@ -294,3 +296,15 @@ def first_obj(property, aliases=[]):
 
 def raw(property, aliases=[]):
     return {"property": property, "aliases": aliases}
+
+
+def is_present_recursive(data, key):
+    if isinstance(data, (dict, list)):
+        for v in data:
+            if is_present_recursive(v, key):
+                return True
+    else:
+        if data == key:
+            return True
+
+    return False

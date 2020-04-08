@@ -404,19 +404,25 @@ def fetch(fetch_obj):
     if isinstance(obj, models.Actor) and obj.get_channel():
         obj = obj.get_channel()
         if obj.actor.outbox_url:
-            # first page fetch is synchronous, so that at least some data is available
-            # in the UI after subscription
-            result = fetch_collection(
-                obj.actor.outbox_url, channel_id=obj.pk, max_pages=1,
-            )
-            if result.get("next_page"):
-                # additional pages are fetched in the background
-                result = fetch_collection.delay(
-                    result["next_page"],
-                    channel_id=obj.pk,
-                    max_pages=settings.FEDERATION_COLLECTION_MAX_PAGES - 1,
-                    is_page=True,
+            try:
+                # first page fetch is synchronous, so that at least some data is available
+                # in the UI after subscription
+                result = fetch_collection(
+                    obj.actor.outbox_url, channel_id=obj.pk, max_pages=1,
                 )
+            except Exception:
+                logger.exception(
+                    "Error while fetching actor outbox: %s", obj.actor.outbox.url
+                )
+            else:
+                if result.get("next_page"):
+                    # additional pages are fetched in the background
+                    result = fetch_collection.delay(
+                        result["next_page"],
+                        channel_id=obj.pk,
+                        max_pages=settings.FEDERATION_COLLECTION_MAX_PAGES - 1,
+                        is_page=True,
+                    )
 
     fetch_obj.object = obj
     fetch_obj.status = "finished"

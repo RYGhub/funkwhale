@@ -659,7 +659,7 @@ class OembedSerializer(serializers.Serializer):
             if track.attachment_cover:
                 data[
                     "thumbnail_url"
-                ] = track.album.attachment_cover.download_url_medium_square_crop
+                ] = track.attachment_cover.download_url_medium_square_crop
                 data["thumbnail_width"] = 200
                 data["thumbnail_height"] = 200
             elif track.album and track.album.attachment_cover:

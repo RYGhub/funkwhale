@@ -56,3 +56,88 @@ def test_pleroma_actor_from_ap(factories):
     assert actor.private_key is None
     assert actor.public_key == payload["publicKey"]["publicKeyPem"]
     assert actor.domain_id == "test.federation"
+
+
+def test_reel2bits_channel_from_actor_ap(db, mocker):
+    mocker.patch("funkwhale_api.federation.tasks.update_domain_nodeinfo")
+    payload = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {
+                "Hashtag": "as:Hashtag",
+                "PropertyValue": "schema:PropertyValue",
+                "artwork": "reel2bits:artwork",
+                "featured": "toot:featured",
+                "genre": "reel2bits:genre",
+                "licence": "reel2bits:licence",
+                "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+                "reel2bits": "http://reel2bits.org/ns#",
+                "schema": "http://schema.org#",
+                "sensitive": "as:sensitive",
+                "tags": "reel2bits:tags",
+                "toot": "http://joinmastodon.org/ns#",
+                "transcode_url": "reel2bits:transcode_url",
+                "transcoded": "reel2bits:transcoded",
+                "value": "schema:value",
+            },
+        ],
+        "endpoints": {"sharedInbox": "https://r2b.example/inbox"},
+        "followers": "https://r2b.example/user/anna/followers",
+        "following": "https://r2b.example/user/anna/followings",
+        "icon": {
+            "type": "Image",
+            "url": "https://r2b.example/uploads/avatars/anna/f4930.jpg",
+        },
+        "id": "https://r2b.example/user/anna",
+        "inbox": "https://r2b.example/user/anna/inbox",
+        "manuallyApprovesFollowers": False,
+        "name": "Anna",
+        "outbox": "https://r2b.example/user/anna/outbox",
+        "preferredUsername": "anna",
+        "publicKey": {
+            "id": "https://r2b.example/user/anna#main-key",
+            "owner": "https://r2b.example/user/anna",
+            "publicKeyPem": "MIIBIxaeikqh",
+        },
+        "type": "Person",
+        "url": [
+            {
+                "type": "Link",
+                "mediaType": "text/html",
+                "href": "https://r2b.example/@anna",
+            },
+            {
+                "type": "Link",
+                "mediaType": "application/rss+xml",
+                "href": "https://r2b.example/@anna.rss",
+            },
+        ],
+    }
+
+    serializer = serializers.ActorSerializer(data=payload)
+    assert serializer.is_valid(raise_exception=True)
+    actor = serializer.save()
+
+    assert actor.fid == payload["id"]
+    assert actor.url == payload["url"][0]["href"]
+    assert actor.inbox_url == payload["inbox"]
+    assert actor.shared_inbox_url == payload["endpoints"]["sharedInbox"]
+    assert actor.outbox_url is payload["outbox"]
+    assert actor.following_url == payload["following"]
+    assert actor.followers_url == payload["followers"]
+    assert actor.followers_url == payload["followers"]
+    assert actor.type == payload["type"]
+    assert actor.preferred_username == payload["preferredUsername"]
+    assert actor.name == payload["name"]
+    assert actor.manually_approves_followers is payload["manuallyApprovesFollowers"]
+    assert actor.private_key is None
+    assert actor.public_key == payload["publicKey"]["publicKeyPem"]
+    assert actor.domain_id == "r2b.example"
+
+    channel = actor.get_channel()
+
+    assert channel.attributed_to == actor
+    assert channel.rss_url == payload["url"][1]["href"]
+    assert channel.artist.name == actor.name
+    assert channel.artist.attributed_to == actor

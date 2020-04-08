@@ -436,8 +436,8 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         )
         if rss_url:
             rss_url = rss_url["href"]
-        attributed_to = self.validated_data.get("attributedTo")
-        if rss_url and attributed_to:
+        attributed_to = self.validated_data.get("attributedTo", actor.fid)
+        if rss_url:
             # if the actor is attributed to another actor, and there is a RSS url,
             # then we consider it's a channel
             create_or_update_channel(
@@ -533,6 +533,7 @@ class BaseActivitySerializer(serializers.Serializer):
     id = serializers.URLField(max_length=500, required=False)
     type = serializers.CharField(max_length=100)
     actor = serializers.URLField(max_length=500)
+    object = serializers.JSONField(required=False, allow_null=True)
 
     def validate_actor(self, v):
         expected = self.context.get("actor")
@@ -555,17 +556,30 @@ class BaseActivitySerializer(serializers.Serializer):
         )
 
     def validate(self, data):
-        data["recipients"] = self.validate_recipients(self.initial_data)
+        self.validate_recipients(data, self.initial_data)
         return super().validate(data)
 
-    def validate_recipients(self, payload):
+    def validate_recipients(self, data, payload):
         """
         Ensure we have at least a to/cc field with valid actors
         """
-        to = payload.get("to", [])
-        cc = payload.get("cc", [])
+        data["to"] = payload.get("to", [])
+        data["cc"] = payload.get("cc", [])
 
-        if not to and not cc and not self.context.get("recipients"):
+        if (
+            not data["to"]
+            and data.get("type") in ["Follow", "Accept"]
+            and data.get("object")
+        ):
+            # there isn't always a to field for Accept/Follow
+            # in their follow activity, so we consider the recipient
+            # to be the follow object
+            if data["type"] == "Follow":
+                data["to"].append(str(data.get("object")))
+            else:
+                data["to"].append(data.get("object", {}).get("actor"))
+
+        if not data["to"] and not data["cc"] and not self.context.get("recipients"):
             raise serializers.ValidationError(
                 "We cannot handle an activity with no recipient"
             )
@@ -1786,6 +1800,7 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
     content = TruncatedCharField(
         truncate_length=common_models.CONTENT_TEXT_MAX_LENGTH,
         required=False,
+        allow_blank=True,
         allow_null=True,
     )
 
@@ -1951,6 +1966,11 @@ class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
         return {
             "@context": jsonld.get_default_context(),
             "type": "Create",
+            "id": utils.full_url(
+                reverse(
+                    "federation:music:uploads-activity", kwargs={"uuid": upload.uuid}
+                )
+            ),
             "actor": upload.library.channel.actor.fid,
             "object": ChannelUploadSerializer(
                 upload, context={"include_ap_context": False}
