@@ -26,6 +26,14 @@
           </album-widget>
         </div>
       </div>
+      <template v-if="scope === 'all'">
+        <h3 class="ui header" >
+          <translate translate-context="*/*/*">New channels</translate>
+        </h3>
+        <channels-widget :show-modification-date="true" :limit="12" :filters="{ordering: '-creation_date'}"></channels-widget>
+      </template>
+
+
     </section>
   </main>
 </template>
@@ -34,6 +42,7 @@
 import axios from "axios"
 import Search from "@/components/audio/Search"
 import logger from "@/logging"
+import ChannelsWidget from "@/components/audio/ChannelsWidget"
 import ArtistCard from "@/components/audio/artist/Card"
 import TrackWidget from "@/components/audio/track/Widget"
 import AlbumWidget from "@/components/audio/album/Widget"
@@ -51,7 +60,8 @@ export default {
     ArtistCard,
     TrackWidget,
     AlbumWidget,
-    PlaylistWidget
+    PlaylistWidget,
+    ChannelsWidget,
   },
   data() {
     return {

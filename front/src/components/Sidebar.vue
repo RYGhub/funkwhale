@@ -135,7 +135,7 @@
           </div>
         </div>
         <router-link class="header item" :to="{name: 'subscriptions'}" v-if="$store.state.auth.authenticated">
-          <translate translate-context="*/*/*/Noun">Subscriptions</translate>
+          <translate translate-context="*/*/*">Channels</translate>
         </router-link>
         <div class="item">
           <header class="header">
