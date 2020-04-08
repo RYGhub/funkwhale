@@ -123,6 +123,19 @@ def test_track_mutation_apply_outbox(factories, mocker):
     )
 
 
+def test_channel_track_mutation_apply_outbox(factories, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    upload = factories["music.Upload"](channel=True, track__position=4)
+    mutation = factories["common.Mutation"](
+        type="update", target=upload.track, payload={"position": 12}
+    )
+    mutation.apply()
+
+    dispatch.assert_called_once_with(
+        {"type": "Update", "object": {"type": "Audio"}}, context={"upload": upload}
+    )
+
+
 @pytest.mark.parametrize("factory_name", ["music.Artist", "music.Album", "music.Track"])
 def test_mutation_set_tags(factory_name, factories, now, mocker):
     tags = ["tag1", "tag2"]

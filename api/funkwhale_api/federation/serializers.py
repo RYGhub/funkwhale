@@ -1,4 +1,5 @@
 import logging
+import os
 import urllib.parse
 import uuid
 
@@ -1967,7 +1968,6 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
 
 
 class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
-    type = serializers.ChoiceField(choices=[contexts.AS.Create])
     object = serializers.DictField()
 
     class Meta:
@@ -1976,9 +1976,9 @@ class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
         }
 
     def to_representation(self, upload):
-        return {
+        payload = {
             "@context": jsonld.get_default_context(),
-            "type": "Create",
+            "type": self.context.get("type", "Create"),
             "id": utils.full_url(
                 reverse(
                     "federation:music:uploads-activity", kwargs={"uuid": upload.uuid}
@@ -1989,6 +1989,12 @@ class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
                 upload, context={"include_ap_context": False}
             ).data,
         }
+        if self.context.get("activity_id_suffix"):
+            payload["id"] = os.path.join(
+                payload["id"], self.context["activity_id_suffix"]
+            )
+
+        return payload
 
     def validate(self, validated_data):
         serializer = ChannelUploadSerializer(
@@ -1999,3 +2005,28 @@ class ChannelCreateUploadSerializer(jsonld.JsonLdSerializer):
 
     def save(self, **kwargs):
         return self.validated_data["audio_serializer"].save(**kwargs)
+
+
+class DeleteSerializer(jsonld.JsonLdSerializer):
+    object = serializers.URLField(max_length=500)
+    type = serializers.ChoiceField(choices=[contexts.AS.Delete])
+
+    class Meta:
+        jsonld_mapping = {"object": jsonld.first_id(contexts.AS.object)}
+
+    def validate_object(self, url):
+        try:
+            obj = utils.get_object_by_fid(url)
+        except utils.ObjectDoesNotExist:
+            raise serializers.ValidationError("No object matching {}".format(url))
+        if isinstance(obj, music_models.Upload):
+            obj = obj.track
+
+        return obj
+
+    def validate(self, validated_data):
+        if not utils.can_manage(
+            validated_data["object"].attributed_to, self.context["actor"]
+        ):
+            raise serializers.ValidationError("You cannot delete this object")
+        return validated_data
