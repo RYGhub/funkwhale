@@ -62,6 +62,10 @@ export default {
       "label": "Taqbaylit"
     },
     {
+      "code": "ko_KR",
+      "label": "한국어"
+    },
+    {
       "code": "nb_NO",
       "label": "Bokmål"
     },
