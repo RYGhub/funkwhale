@@ -374,8 +374,8 @@ def fetch(fetch_obj):
     except IndexError:
         return error("missing_jsonld_type")
     try:
-        serializer_class = fetch_obj.serializers[type]
-        model = serializer_class.Meta.model
+        serializer_classes = fetch_obj.serializers[type]
+        model = serializer_classes[0].Meta.model
     except (KeyError, AttributeError):
         fetch_obj.status = "skipped"
         fetch_obj.fetch_date = timezone.now()
@@ -388,8 +388,14 @@ def fetch(fetch_obj):
     else:
         existing = model.objects.filter(fid=id).first()
 
-    serializer = serializer_class(existing, data=payload)
-    if not serializer.is_valid():
+    serializer = None
+    for serializer_class in serializer_classes:
+        serializer = serializer_class(existing, data=payload)
+        if not serializer.is_valid():
+            continue
+        else:
+            break
+    if serializer.errors:
         return error("validation", validation_errors=serializer.errors)
     try:
         obj = serializer.save()

@@ -388,16 +388,19 @@ class Fetch(models.Model):
         from . import serializers
 
         return {
-            contexts.FW.Artist: serializers.ArtistSerializer,
-            contexts.FW.Album: serializers.AlbumSerializer,
-            contexts.FW.Track: serializers.TrackSerializer,
-            contexts.AS.Audio: serializers.UploadSerializer,
-            contexts.FW.Library: serializers.LibrarySerializer,
-            contexts.AS.Group: serializers.ActorSerializer,
-            contexts.AS.Person: serializers.ActorSerializer,
-            contexts.AS.Organization: serializers.ActorSerializer,
-            contexts.AS.Service: serializers.ActorSerializer,
-            contexts.AS.Application: serializers.ActorSerializer,
+            contexts.FW.Artist: [serializers.ArtistSerializer],
+            contexts.FW.Album: [serializers.AlbumSerializer],
+            contexts.FW.Track: [serializers.TrackSerializer],
+            contexts.AS.Audio: [
+                serializers.UploadSerializer,
+                serializers.ChannelUploadSerializer,
+            ],
+            contexts.FW.Library: [serializers.LibrarySerializer],
+            contexts.AS.Group: [serializers.ActorSerializer],
+            contexts.AS.Person: [serializers.ActorSerializer],
+            contexts.AS.Organization: [serializers.ActorSerializer],
+            contexts.AS.Service: [serializers.ActorSerializer],
+            contexts.AS.Application: [serializers.ActorSerializer],
         }
 
 
