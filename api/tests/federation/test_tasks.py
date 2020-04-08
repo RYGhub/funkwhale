@@ -461,17 +461,25 @@ def test_fetch_rel_alternate(factories, r_mock, mocker):
 
 
 @pytest.mark.parametrize(
-    "factory_name, serializer_class",
+    "factory_name, factory_kwargs, serializer_class",
     [
-        ("federation.Actor", serializers.ActorSerializer),
-        ("music.Library", serializers.LibrarySerializer),
-        ("music.Artist", serializers.ArtistSerializer),
-        ("music.Album", serializers.AlbumSerializer),
-        ("music.Track", serializers.TrackSerializer),
+        ("federation.Actor", {}, serializers.ActorSerializer),
+        ("music.Library", {}, serializers.LibrarySerializer),
+        ("music.Artist", {}, serializers.ArtistSerializer),
+        ("music.Album", {}, serializers.AlbumSerializer),
+        ("music.Track", {}, serializers.TrackSerializer),
+        (
+            "music.Upload",
+            {"bitrate": 200, "duration": 20},
+            serializers.UploadSerializer,
+        ),
+        ("music.Upload", {"channel": True}, serializers.ChannelUploadSerializer),
     ],
 )
-def test_fetch_url(factory_name, serializer_class, factories, r_mock, mocker):
-    obj = factories[factory_name]()
+def test_fetch_url(
+    factory_name, factory_kwargs, serializer_class, factories, r_mock, mocker
+):
+    obj = factories[factory_name](**factory_kwargs)
     fetch = factories["federation.Fetch"](url=obj.fid)
     payload = serializer_class(obj).data
     init = mocker.spy(serializer_class, "__init__")

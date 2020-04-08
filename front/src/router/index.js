@@ -839,6 +839,15 @@ export default new Router({
           ]
         },
         {
+          path: "uploads/:id",
+          name: "library.uploads.detail",
+          props: true,
+          component: () =>
+            import(
+              /* webpackChunkName: "uploads" */ "@/components/library/UploadDetail"
+            ),
+        },
+        {
           // browse a single library via it's uuid
           path: ":id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})",
           props: true,

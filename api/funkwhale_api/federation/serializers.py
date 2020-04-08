@@ -1780,6 +1780,7 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
     disc = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     album = serializers.URLField(max_length=500, required=False)
     license = serializers.URLField(allow_null=True, required=False)
+    attributedTo = serializers.URLField(max_length=500, required=False)
     copyright = TruncatedCharField(
         truncate_length=music_models.MAX_LENGTHS["COPYRIGHT"],
         allow_null=True,
@@ -1823,9 +1824,10 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
             "position": jsonld.first_val(contexts.FW.position),
             "image": jsonld.first_obj(contexts.AS.image),
             "tags": jsonld.raw(contexts.AS.tag),
+            "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
         }
 
-    def validate_album(self, v):
+    def _validate_album(self, v):
         return utils.retrieve_ap_object(
             v,
             actor=actors.get_service_actor(),
@@ -1836,6 +1838,17 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
         )
 
     def validate(self, data):
+        if not self.context.get("channel"):
+            if not data.get("attributedTo"):
+                raise serializers.ValidationError(
+                    "Missing channel context and no attributedTo available"
+                )
+            actor = actors.get_actor(data["attributedTo"])
+            if not actor.get_channel():
+                raise serializers.ValidationError("Not a channel")
+            self.context["channel"] = actor.get_channel()
+        if data.get("album"):
+            data["album"] = self._validate_album(data["album"])
         validated_data = super().validate(data)
         if data.get("content"):
             validated_data["description"] = {

@@ -185,6 +185,16 @@ class UploadFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
             import_status="finished", library__privacy_level="everyone"
         )
 
+    @factory.post_generation
+    def channel(self, created, extracted, **kwargs):
+        if not extracted:
+            return
+        from funkwhale_api.audio import factories as audio_factories
+
+        audio_factories.ChannelFactory(
+            library=self.library, artist=self.track.artist, **kwargs
+        )
+
 
 @registry.register
 class UploadVersionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
