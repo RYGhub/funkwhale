@@ -14,7 +14,7 @@
 
       <div class="ui hidden divider"></div>
       <div class="ui row">
-        <artist-widget :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+        <artist-widget :key="id" :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id, include_channels: 'false'}">
           <template slot="title">
             <router-link :to="{name: 'library.artists.browse', query: {tag: id}}">
               <translate translate-context="*/*/*/Noun">Artists</translate>
@@ -23,7 +23,13 @@
         </artist-widget>
         <div class="ui hidden divider"></div>
         <div class="ui hidden divider"></div>
-        <album-widget :show-count="true" :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+        <h3 class="ui header">
+          <translate translate-context="*/*/*">Channels</translate>
+        </h3>
+        <channels-widget :key="id" :show-modification-date="true" :filters="{tag: id, ordering: '-creation_date'}"></channels-widget>
+        <div class="ui hidden divider"></div>
+        <div class="ui hidden divider"></div>
+        <album-widget :key="id" :show-count="true" :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
           <template slot="title">
             <router-link :to="{name: 'library.albums.browse', query: {tag: id}}">
               <translate translate-context="*/*/*">Albums</translate>
@@ -32,7 +38,7 @@
         </album-widget>
         <div class="ui hidden divider"></div>
         <div class="ui hidden divider"></div>
-        <track-widget :show-count="true" :limit="12" item-classes="track-item inline" :url="'/tracks/'" :is-activity="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+        <track-widget :key="id" :show-count="true" :limit="12" item-classes="track-item inline" :url="'/tracks/'" :is-activity="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
           <template slot="title">
             <translate translate-context="*/*/*">Tracks</translate>
           </template>
@@ -44,7 +50,7 @@
 </template>
 
 <script>
-
+import ChannelsWidget from "@/components/audio/ChannelsWidget"
 import TrackWidget from "@/components/audio/track/Widget"
 import AlbumWidget from "@/components/audio/album/Widget"
 import ArtistWidget from "@/components/audio/artist/Widget"
@@ -59,6 +65,7 @@ export default {
     AlbumWidget,
     TrackWidget,
     RadioButton,
+    ChannelsWidget,
   },
   computed: {
     labels() {

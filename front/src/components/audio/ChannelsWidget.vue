@@ -15,12 +15,7 @@
       </button>
     </template>
     <template v-if="!isLoading && objects.length === 0">
-      <div class="ui placeholder segment">
-        <div class="ui icon header">
-          <i class="compact disc icon"></i>
-          No results matching your query
-        </div>
-      </div>
+      <empty-state @refresh="fetchData('channels/')" :refresh="true"></empty-state>
     </template>
   </div>
 </template>
