@@ -58,6 +58,10 @@ export default {
       "label": "Italiano"
     },
     {
+      "code": "ja_JP",
+      "label": "日本語"
+    },
+    {
       "code": "kab_DZ",
       "label": "Taqbaylit"
     },
