@@ -26,7 +26,7 @@
         <h3 class="ui header">
           <translate translate-context="*/*/*">Channels</translate>
         </h3>
-        <channels-widget :key="id" :show-modification-date="true" :filters="{tag: id, ordering: '-creation_date'}"></channels-widget>
+        <channels-widget :key="id" :show-modification-date="true" :limit="12" :filters="{tag: id, ordering: '-creation_date'}"></channels-widget>
         <div class="ui hidden divider"></div>
         <div class="ui hidden divider"></div>
         <album-widget :key="id" :show-count="true" :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
