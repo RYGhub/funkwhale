@@ -52,7 +52,11 @@ class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
 
-    @action(methods=["post"], detail=False)
+    @action(
+        methods=["post"],
+        detail=False,
+        content_negotiation_class=renderers.IgnoreClientContentNegotiation,
+    )
     def inbox(self, request, *args, **kwargs):
         if request.method.lower() == "post" and request.actor is None:
             raise exceptions.AuthenticationFailed(
@@ -88,7 +92,11 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
         serializer = self.get_serializer(instance)
         return response.Response(serializer.data)
 
-    @action(methods=["get", "post"], detail=True)
+    @action(
+        methods=["get", "post"],
+        detail=True,
+        content_negotiation_class=renderers.IgnoreClientContentNegotiation,
+    )
     def inbox(self, request, *args, **kwargs):
         inbox_actor = self.get_object()
         if request.method.lower() == "post" and request.actor is None:
@@ -351,6 +359,16 @@ class MusicUploadViewSet(
         if obj.library.get_channel():
             return serializers.ChannelUploadSerializer(obj)
         return super().get_serializer(obj)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        content_negotiation_class=renderers.IgnoreClientContentNegotiation,
+    )
+    def activity(self, request, *args, **kwargs):
+        object = self.get_object()
+        serializer = serializers.ChannelCreateUploadSerializer(object)
+        return response.Response(serializer.data)
 
 
 class MusicArtistViewSet(

@@ -260,9 +260,22 @@ def test_channel_outbox_retrieve_page(factories, api_client):
 def test_channel_upload_retrieve(factories, api_client):
     channel = factories["audio.Channel"](local=True)
     upload = factories["music.Upload"](library=channel.library, playable=True)
-    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid},)
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
 
     expected = serializers.ChannelUploadSerializer(upload).data
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_upload_retrieve_activity(factories, api_client):
+    channel = factories["audio.Channel"](local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse("federation:music:uploads-activity", kwargs={"uuid": upload.uuid})
+
+    expected = serializers.ChannelCreateUploadSerializer(upload).data
 
     response = api_client.get(url)
 

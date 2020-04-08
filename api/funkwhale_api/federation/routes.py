@@ -134,19 +134,19 @@ def outbox_follow(context):
 def outbox_create_audio(context):
     upload = context["upload"]
     channel = upload.library.get_channel()
-    upload_serializer = (
-        serializers.ChannelUploadSerializer if channel else serializers.UploadSerializer
-    )
     followers_target = channel.actor if channel else upload.library
     actor = channel.actor if channel else upload.library.actor
-
-    serializer = serializers.ActivitySerializer(
-        {
-            "type": "Create",
-            "actor": actor.fid,
-            "object": upload_serializer(upload).data,
-        }
-    )
+    if channel:
+        serializer = serializers.ChannelCreateUploadSerializer(upload)
+    else:
+        upload_serializer = serializers.UploadSerializer
+        serializer = serializers.ActivitySerializer(
+            {
+                "type": "Create",
+                "actor": actor.fid,
+                "object": upload_serializer(upload).data,
+            }
+        )
     yield {
         "type": "Create",
         "actor": actor,
@@ -163,7 +163,7 @@ def inbox_create_audio(payload, context):
     is_channel = "library" not in payload["object"]
     if is_channel:
         channel = context["actor"].get_channel()
-        serializer = serializers.ChannelUploadSerializer(
+        serializer = serializers.ChannelCreateUploadSerializer(
             data=payload["object"], context={"channel": channel},
         )
     else:

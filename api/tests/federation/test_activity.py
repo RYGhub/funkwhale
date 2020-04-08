@@ -69,6 +69,28 @@ def test_receive_validates_basic_attributes_and_stores_activity(
     assert serializer_init.call_args[1]["data"] == a
 
 
+def test_receive_uses_follow_object_if_no_audience_provided(
+    mrf_inbox_registry, factories, now, mocker
+):
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
+    mocker.patch("funkwhale_api.common.utils.on_commit")
+    local_to_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    a = {
+        "@context": [],
+        "actor": remote_actor.fid,
+        "type": "Follow",
+        "id": "https://test.activity",
+        "object": local_to_actor.fid,
+    }
+
+    activity.receive(activity=a, on_behalf_of=remote_actor, inbox_actor=None)
+
+    assert models.InboxItem.objects.filter(actor=local_to_actor, type="to").exists()
+
+
 def test_receive_uses_mrf_returned_payload(mrf_inbox_registry, factories, now, mocker):
     mocker.patch.object(
         activity.InboxRouter, "get_matching_handlers", return_value=True

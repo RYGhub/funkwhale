@@ -305,13 +305,7 @@ def test_outbox_create_audio_channel(factories, mocker):
     channel = factories["audio.Channel"]()
     upload = factories["music.Upload"](library=channel.library)
     activity = list(routes.outbox_create_audio({"upload": upload}))[0]
-    serializer = serializers.ActivitySerializer(
-        {
-            "type": "Create",
-            "object": serializers.ChannelUploadSerializer(upload).data,
-            "actor": channel.actor.fid,
-        }
-    )
+    serializer = serializers.ChannelCreateUploadSerializer(upload)
     expected = serializer.data
     expected["to"] = [{"type": "followers", "target": upload.library.channel.actor}]
 
@@ -360,11 +354,11 @@ def test_inbox_create_audio_channel(factories, mocker):
         "@context": jsonld.get_default_context(),
         "type": "Create",
         "actor": channel.actor.fid,
-        "object": serializers.ChannelUploadSerializer(upload).data,
+        "object": serializers.ChannelCreateUploadSerializer(upload).data,
     }
     upload.delete()
-    init = mocker.spy(serializers.ChannelUploadSerializer, "__init__")
-    save = mocker.spy(serializers.ChannelUploadSerializer, "save")
+    init = mocker.spy(serializers.ChannelCreateUploadSerializer, "__init__")
+    save = mocker.spy(serializers.ChannelCreateUploadSerializer, "save")
     result = routes.inbox_create_audio(
         payload,
         context={"actor": channel.actor, "raise_exception": True, "activity": activity},

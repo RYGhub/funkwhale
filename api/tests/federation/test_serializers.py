@@ -3,6 +3,7 @@ import pytest
 import uuid
 
 from django.core.paginator import Paginator
+from django.urls import reverse
 from django.utils import timezone
 
 from funkwhale_api.common import utils as common_utils
@@ -1399,19 +1400,19 @@ def test_activity_serializer_validate_recipients_empty(db):
     s = serializers.BaseActivitySerializer()
 
     with pytest.raises(serializers.serializers.ValidationError):
-        s.validate_recipients({})
+        s.validate_recipients({}, {})
 
     with pytest.raises(serializers.serializers.ValidationError):
-        s.validate_recipients({"to": []})
+        s.validate_recipients({"to": []}, {})
 
     with pytest.raises(serializers.serializers.ValidationError):
-        s.validate_recipients({"cc": []})
+        s.validate_recipients({"cc": []}, {})
 
 
 def test_activity_serializer_validate_recipients_context(db):
     s = serializers.BaseActivitySerializer(context={"recipients": ["dummy"]})
 
-    assert s.validate_recipients({}) is None
+    assert s.validate_recipients({}, {}) is None
 
 
 def test_track_serializer_update_license(factories):
@@ -1879,6 +1880,9 @@ def test_channel_create_upload_serializer(factories):
     expected = {
         "@context": jsonld.get_default_context(),
         "type": "Create",
+        "id": utils.full_url(
+            reverse("federation:music:uploads-activity", kwargs={"uuid": upload.uuid})
+        ),
         "actor": upload.library.channel.actor.fid,
         "object": serializers.ChannelUploadSerializer(
             upload, context={"include_ap_context": False}

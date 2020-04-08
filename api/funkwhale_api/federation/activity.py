@@ -164,14 +164,18 @@ def receive(activity, on_behalf_of, inbox_actor=None):
         )
         return
 
-    local_to_recipients = get_actors_from_audience(activity.get("to", []))
+    local_to_recipients = get_actors_from_audience(
+        serializer.validated_data.get("to", [])
+    )
     local_to_recipients = local_to_recipients.local()
     local_to_recipients = local_to_recipients.values_list("pk", flat=True)
     local_to_recipients = list(local_to_recipients)
     if inbox_actor:
         local_to_recipients.append(inbox_actor.pk)
 
-    local_cc_recipients = get_actors_from_audience(activity.get("cc", []))
+    local_cc_recipients = get_actors_from_audience(
+        serializer.validated_data.get("cc", [])
+    )
     local_cc_recipients = local_cc_recipients.local()
     local_cc_recipients = local_cc_recipients.values_list("pk", flat=True)
 
