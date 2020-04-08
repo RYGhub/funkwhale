@@ -8,14 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-01 15:15+0200\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2020-04-09 06:59+0000\n"
+"Last-Translator: Satsuki Yanagi <u1.liquid@gmail.com>\n"
 "Language-Team: none\n"
-"Language: ja\n"
+"Language: ja_JP\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -35,19 +36,19 @@ msgstr ""
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr ""
+msgstr "%{ app } があなたのFunkwhaleアカウントへのアクセスを要求しています"
 
 #: front/src/components/About.vue:173 src/components/Home.vue:56
 msgctxt "Content/Home/Stat"
 msgid "%{ count } active user"
 msgid_plural "%{ count } active users"
-msgstr[0] ""
+msgstr[0] "%{ count } 人のアクティブユーザー"
 
 #: front/src/components/About.vue:182
 msgctxt "Content/Home/Stat"
 msgid "%{ count } albums"
 msgid_plural "%{ count } albums"
-msgstr[0] ""
+msgstr[0] "%{ count } アルバム"
 
 #: front/src/components/About.vue:152
 msgctxt "*/*/*"
