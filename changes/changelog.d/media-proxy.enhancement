@@ -1,1 +1,0 @@
-Make media and static files serving more reliable when reverse proxy X_FORWARDED_* headers are incorrect (#947)

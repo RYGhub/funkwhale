@@ -10,6 +10,264 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.21-rc1 (2020-04-09)
+---------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html, there are also additional operations you need to execute, listed in the changelog below (search "Manual action").
+
+
+Channels and podcasts
+^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale 0.21 includes a brand new feature: Channels!
+
+Channels can be used as a replacement to public libraries,
+to publish audio content, both musical and non-musical. They federate with other Funkwhale pods, but also other
+fediverse software, in particular Mastodon, Pleroma, Friendica and Reel2Bits, meaning people can subscribe to your channel
+from any of these software. To get started with publication, simply visit your profile and create a channel from there.
+
+Each Funkwhale channel also comes with RSS feed that is compatible with existing podcasting applications, like AntennaPod
+on Android and, within Funkwhale, you can also subscribe to any podcast from its RSS feed!
+
+Many, many thanks to the numerous people who helped with the feature design, development and testing, and in particular
+to the members of the working group who met every week for months in order to get this done, and the members of other third-party
+projects who took the time to work with us to ensure compatibility.
+
+Redesigned navigation, player and queue
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This release includes a full redesign of our navigation, player and queue. Overall, it should provide
+a better, less confusing experience, especially on mobile devices. This redesign was suggested
+14 months ago, and took a while, but thanks to the involvement and feedback of many people, we got it done!
+
+Improved search bar for searching remote objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The search bar now support fetching arbitrary objects using a URL. In particular, you can use this to quickly:
+
+- Subscribe to a remote library via its URL
+- Listen a public track from another pod
+- Subscribe to a channel
+
+Screening for sign-ups and custom sign-up form
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Instance admins can now configure their pod so that registrations required manual approval from a moderator. This
+is especially useful on private or semi-private pods where you don't want to close registrations completely,
+but don't want spam or unwanted users to join your pod.
+
+When this is enabled and a new user register, their request is put in a moderation queue, and moderators
+are notified by email. When the request is approved or refused, the user is also notified by email.
+
+In addition, it's also possible to customize the sign-up form by:
+
+- Providing a custom help text, in markdown format
+- Including additional fields in the form, for instance to ask the user why they want to join. Data collected through these fields is included in the sign-up request and viewable by the mods
+
+Federated reports
+^^^^^^^^^^^^^^^^^
+
+It's now possible to send a copy of a report to the server hosting the reported object, in order to make moderation easier and more distributed.
+
+This feature is inspired by Mastodon's current design, and should work with at least Funkwhale and Mastodon servers.
+
+Improved search performance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Our search engine went through a full rewrite to make it faster. This new engine is enabled
+by default when using the search bar, or when searching for artists, albums and tracks. It leverages
+PostgreSQL full-text search capabilities.
+
+During our tests, we observed huge performance improvements after the switch, by an order of
+magnitude. This should be especially perceptible on pods with large databases, more modest hardware
+or hard drives.
+
+We plan to remove the old engine in an upcoming release. In the meantime, if anything goes wrong,
+you can switch back by setting ``USE_FULL_TEXT_SEARCH=false`` in your ``.env`` file.
+
+Enforced email verification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The brand new ``ACCOUNT_EMAIL_VERIFICATION_ENFORCE`` setting can be used to make email verification
+mandatory for your users. It defaults to ``false``, and doesn't apply to superuser accounts created through
+the CLI.
+
+If you enable this, ensure you have a SMTP server configured too.
+
+User management through the server CLI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We now support user creation (incl. non-admin accounts), update and removal directly
+from the server CLI. Typical use cases include:
+
+- Changing a user password from the command line
+- Creating or updating users from deployments scripts or playbooks
+- Removing or granting permissions or upload quota to multiple users at once
+- Marking multiple users as inactive
+
+All user-related commands are available under the ``python manage.py fw users`` namespace.
+Please refer to the `Admin documentation <https://docs.funkwhale.audio/admin/commands.html#user-management>`_ for
+more information and instructions.
+
+Progressive web app [Manual action suggested, non-docker only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We've made Funkwhale's Web UI a Progressive Web Application (PWA), in order to improve the user experience
+during offline use, and on mobile devices.
+
+In order to fully benefit from this change, if your pod isn't deployed using Docker, ensure
+the following instruction is present in your nginx configuration::
+
+    location /front/ {
+        # Add the following line in the /front/ location
+        add_header Service-Worker-Allowed "/";
+    }
+
+Postgres docker changed environment variable [manual action required, docker multi-container only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you're running with docker and our multi-container setup, there was a breaking change starting in the 11.7 postgres image (https://github.com/docker-library/postgres/pull/658)
+
+You need to add this to your .env file: ``POSTGRES_HOST_AUTH_METHOD=trust``
+
+Newer deployments aren't affected.
+
+Upgrade from Postgres 10 to 11 [manual action required, docker all-in-one only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With our upgrade to Alpine 3.10, the ``funkwhale/all-in-one`` image now includes PostgreSQL 11.
+
+In order to update to Funkwhale 0.21, you will first need to uprade Funkwhale's PostgreSQL database, following the steps below::
+
+    # open a shell as the Funkwhale user
+    sudo -u funkwhale -H bash
+
+    # move to the funkwhale data directory
+    # (replace this with your own if you used a different path)
+    cd /srv/funkwhale/data
+
+    # stop the funkwhale container
+    docker stop funkwhale
+
+    # backup the database files
+    cp -r data/ ../postgres.bak
+
+    # Upgrade the database
+    docker run --rm \
+        -v $(pwd)/data:/var/lib/postgresql/10/data \
+        -v $(pwd)/upgraded-postgresql:/var/lib/postgresql/11/data \
+        -e PGUSER=funkwhale \
+        -e POSTGRES_INITDB_ARGS="-U funkwhale --locale C --encoding UTF8" \
+        tianon/postgres-upgrade:10-to-11
+
+    # replace the Postgres 10 files with Postgres 11 files
+    mv data/ postgres-10
+    mv upgraded-postgresql/ data
+
+Once you have completed the Funkwhale upgrade with our regular instructions and everything works properly,
+you can remove the backups/old files::
+
+    sudo -u funkwhale -H bash
+    cd /srv/funkwhale/data
+    rm -rf ../postgres.bak
+    rm -rf postgres-10
+
+
+Features:
+
+- Support for publishing and subscribing to podcasts (#170)
+- Brand new navigation, queue and player redesign (#594)
+- Can now browse a library content through the UI (#926)
+- Federated reports (#1038)
+- Screening for sign-ups (#1040)
+- Make it possible to enforce email verification (#1039)
+- Added a new radio based on another user listenings (#1060)
+- User management through the server CLI
+
+
+Enhancements:
+
+- Added ability to reject library follows from notifications screen (#859)
+- Added periodic background task and CLI command to associate genre tags to artists and albums based on identical tags found on corresponding tracks (#988)
+- Added support for CELERYD_CONCURRENCY env var to control the number of worker processes (#997)
+- Added the ability to sort albums by release date (#1013)
+- Added two new radios to play your own content or a given library tracks
+- Advertise list of known nodes on /api/v1/federation/domains and in nodeinfo if stats sharing is enabled
+- Changed footer to use instance name if available, and append ellipses if instance URL/Name is too long (#1012)
+- Favor local uploads when playing a track with multiple uploads (#1036)
+- Include only local content in nodeinfo stats, added downloads count
+- Make media and static files serving more reliable when reverse proxy X_FORWARDED_* headers are incorrect (#947)
+- Order the playlist columns by modification date in the Browse tab (#775)
+- Reduced size of funkwhale/funkwhale docker images thanks to multi-stage builds (!1042)
+- Remember display settings in Album, Artist, Radio and Playlist views (#391)
+- Removed unnecessary "Federation music needs approval" setting (#959)
+- Replaced our slow research logic by PostgreSQL full-text search (#994)
+- Support autoplay when loading embed frame from Mastodon and third-party websites (#1041)
+- Support filtering playlist by name and several additional UX improvements in playlists modal (#974)
+- Support modifying album cover art through the web UI (#588)
+- Use a dedicated scope for throttling subsonic to avoid intrusive rate-limiting
+- Use same markdown widget for all content fields (rules, description, reports, notes, etc.)
+
+
+Bugfixes:
+
+- Added missing manuallyApprovesFollowers entry in JSON-LD contexts (#961)
+- Fix issue with browser shortcuts such as search and focus URL not being recognised (#340, #985)
+- Fixed admin dropdown not showing after login (#1042)
+- Fixed an issue with celerybeat container failing to restart (#1004)
+- Fixed invalid displayed number of tracks in playlist (#986)
+- Fixed issue with recent results not being loaded from the API (#948)
+- Fixed issue with sorting by album name not working (#960)
+- Fixed short audio glitch when switching switching to another track with player paused (#970)
+- Improved deduplication logic to prevent skipped files during import (#348, #474, #557, #740, #928)
+- More resilient tag parsing with empty release date or album artist (#1037)
+- More robust importer against malformed dates (#966)
+- Removed "nodeinfo disabled" setting, as nodeinfo is required for the UI to work (#982)
+- Replaced PDF icon by List icon in playlist placeholder (#943)
+- Resolve an issue where disc numbers were not taken into consideration when playing an album from the album card (#1006)
+- Set correct size for album covers in playlist cards (#680)
+
+Contributors to this release (translation, development, documentation, reviews, design, testing, third-party projects):
+
+- annando
+- Anton Strömkvist
+- Audrey
+- ButterflyOfFire
+- Ciarán Ainsworth
+- dashie
+- Eliot Berriot
+- Eloisa
+- eorn
+- Francesc Galí
+- GinnyMcQueen
+- guillermau
+- Haelwenn
+- jinxx
+- Jonathan Aylard
+- Keunes
+- M.G
+- marzzzello
+- Mathé Grievink
+- Mélanie Chauvel
+- Mjourdan
+- Morgan Kesler
+- Noureddine HADDAG
+- Noe Gaumont
+- Ollie
+- Peter Wickenberg
+- Renon
+- Satsuki Yanagi
+- Shlee
+- techknowlogick
+- ThibG
+- Tony Wasserka
+- unklebonehead
+- wakest
+- wxcafé
+- Xosé M
+
+
 0.20.1 (2019-10-28)
 -------------------
 

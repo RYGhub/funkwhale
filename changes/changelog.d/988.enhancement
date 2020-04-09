@@ -1,1 +1,0 @@
-Added periodic background task and CLI command to associate genre tags to artists and albums based on identical tags found on corresponding tracks (#988)

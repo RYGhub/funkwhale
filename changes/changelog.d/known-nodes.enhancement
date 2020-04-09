@@ -1,1 +1,0 @@
-Advertise list of known nodes on /api/v1/federation/domains and in nodeinfo if stats sharing is enabled

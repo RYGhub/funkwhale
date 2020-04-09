@@ -1,1 +1,0 @@
-Removed "nodeinfo disabled" setting, as nodeinfo is required for the UI to work (#982)

@@ -1,1 +1,0 @@
-Changed footer to use instance name if available, and append ellipses if instance URL/Name is too long (#1012)

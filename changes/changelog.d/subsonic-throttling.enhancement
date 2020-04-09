@@ -1,1 +1,0 @@
-Use a dedicated scope for throttling subsonic to avoid intrusive rate-limiting
