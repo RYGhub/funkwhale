@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-09 22:35+0000\n"
-"Last-Translator: Xaloc <xaloc@tutanota.com>\n"
+"PO-Revision-Date: 2020-04-10 03:50+0000\n"
+"Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -461,7 +461,7 @@ msgstr "Afegir"
 #: front/src/components/library/AlbumBase.vue:113
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Add a description…"
-msgstr "Afegeix una descripció…"
+msgstr "Afegeix una descripció …"
 
 #: front/src/views/admin/moderation/DomainsList.vue:13
 msgctxt "Content/Moderation/Form.Label/Verb"
@@ -1004,7 +1004,7 @@ msgstr "Navegueu per la biblioteca"
 #: front/src/components/channels/UploadForm.vue:134
 msgctxt "*/*/*"
 msgid "Browse…"
-msgstr "Navega…"
+msgstr "Navega …"
 
 #: front/src/components/library/Albums.vue:4
 msgctxt "Content/Album/Title"
@@ -1174,7 +1174,7 @@ msgstr "Ubicació del canal"
 #: front/src/components/audio/ChannelForm.vue:54
 msgctxt "Content/Channel/*"
 msgid "Channel Picture"
-msgstr "Fotografia del canal"
+msgstr "Imatge del canal"
 
 #: front/src/components/Sidebar.vue:137 src/components/library/TagDetail.vue:26
 #: front/src/views/admin/ChannelsList.vue:24 src/views/admin/Settings.vue:84
@@ -1699,7 +1699,7 @@ msgstr "Suprimir aquest enviament?"
 #: front/src/views/channels/DetailBase.vue:104
 msgctxt "*/*/*/Verb"
 msgid "Delete…"
-msgstr "Suprimir…"
+msgstr "Suprimir …"
 
 #: front/src/components/favorites/List.vue:35
 #: src/components/library/Albums.vue:30
