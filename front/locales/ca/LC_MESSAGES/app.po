@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2019-12-04 08:50+0000\n"
+"PO-Revision-Date: 2020-04-09 22:35+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9\n"
+"X-Generator: Weblate 3.11.3\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:6
 msgctxt "Popup/Playlist/Paragraph"
@@ -30,7 +30,7 @@ msgstr ""
 #: front/src/components/RemoteSearchForm.vue:71
 msgctxt "Head/Fetch/Field.Placeholder"
 msgid "@channel@pod.example or https://website.example/rss.xml"
-msgstr ""
+msgstr "@channel@pod.example o https://website.example/rss.xml"
 
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
@@ -70,12 +70,11 @@ msgstr[1] "%{ count } artistes"
 #: front/src/components/library/AlbumBase.vue:25
 #: front/src/components/library/AlbumBase.vue:67
 #: src/views/channels/DetailBase.vue:19
-#, fuzzy
 msgctxt "Content/Channel/Paragraph"
 msgid "%{ count } episode"
 msgid_plural "%{ count } episodes"
-msgstr[0] "%{ count } artista"
-msgstr[1] "%{ count } artistes"
+msgstr[0] "%{ count } episodi"
+msgstr[1] "%{ count } episodis"
 
 #: front/src/components/favorites/List.vue:10
 msgctxt "Content/Favorites/Title"
@@ -106,12 +105,11 @@ msgstr[0] "%{ count } de %{ total } seleccionat"
 msgstr[1] "%{ count } de %{ total } seleccionats"
 
 #: front/src/views/channels/DetailBase.vue:27
-#, fuzzy
 msgctxt "Content/Channel/Paragraph"
 msgid "%{ count } subscriber"
 msgid_plural "%{ count } subscribers"
-msgstr[0] "%{ count } favorit"
-msgstr[1] "%{ count } favorits"
+msgstr[0] "%{ count } subscriptor"
+msgstr[1] "%{ count } subscriptors"
 
 #: front/src/components/audio/ChannelCard.vue:22
 #: front/src/components/audio/album/Card.vue:22
@@ -162,10 +160,9 @@ msgstr "%{ hours } h %{ minutes } min"
 
 #: front/src/components/audio/Player.vue:160
 #: src/components/audio/Player.vue:166
-#, fuzzy
 msgctxt "Sidebar/Queue/Text"
 msgid "%{ index } of %{ length }"
-msgstr "(%{ index } de %{ length })"
+msgstr "%{ index } de %{ length }"
 
 #: front/src/components/common/Duration.vue:5
 msgctxt "Content/*/Paragraph"
@@ -221,7 +218,7 @@ msgstr "S'ha produït un error de xarxa mentre es pujava aquest fitxer"
 #: front/src/App.vue:414
 msgctxt "App/Message/Paragraph"
 msgid "A new version of the app is available."
-msgstr ""
+msgstr "Una nova versió de l'aplicació està disponible."
 
 #: front/src/components/library/EditForm.vue:180
 msgctxt "*/*/Placeholder"
@@ -229,10 +226,9 @@ msgid "A short summary describing your changes."
 msgstr "Una breu resum descrivint els teus canvis."
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About %{ podName }!"
-msgstr "Quant a %{ instance }"
+msgstr "Quant a %{ podName }!"
 
 #: front/src/components/Footer.vue:6
 msgctxt "Footer/About/Title"
@@ -240,10 +236,9 @@ msgid "About %{instanceName}"
 msgstr "Quant a %{instanceName}"
 
 #: front/src/components/Footer.vue:9
-#, fuzzy
 msgctxt "Footer/About/Title"
 msgid "About %{instanceUrl}"
-msgstr "Quant a %{instanceName}"
+msgstr "Quant a %{instanceUrl}"
 
 #: front/src/components/Footer.vue:56 src/components/Home.vue:87
 msgctxt "Footer/*/Title/Short"
@@ -2329,7 +2324,6 @@ msgid "Error while updating description"
 msgstr "Error aplicant l’acció"
 
 #: front/src/components/channels/UploadForm.vue:84
-#, fuzzy
 msgctxt "Channels/*/*"
 msgid "Errored"
 msgstr "Per error"
@@ -4695,7 +4689,7 @@ msgstr "Demanar una contrasenya"
 #: front/src/components/admin/SignupFormBuilder.vue:49
 msgctxt "*/*/Form-builder,Help"
 msgid "Required"
-msgstr ""
+msgstr "Obligatori"
 
 #: front/src/components/library/EditForm.vue:110
 msgctxt "Content/Library/Button.Label"
@@ -6518,10 +6512,9 @@ msgid "Version %{version}"
 msgstr "Versió %{version}"
 
 #: front/src/views/channels/DetailOverview.vue:27
-#, fuzzy
 msgctxt "Content/Channel/Button"
 msgid "View errored uploads"
-msgstr "Biblioteques i càrregues"
+msgstr "Mostra les càrregues errònies"
 
 #: front/src/views/content/libraries/Quota.vue:29
 #: front/src/views/content/libraries/Quota.vue:55
