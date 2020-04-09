@@ -4,15 +4,17 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-02-17 22:23+0000\n"
+"PO-Revision-Date: 2020-04-10 03:50+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
+"funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 3.9\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 3.11.3\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:6
 msgctxt "Popup/Playlist/Paragraph"
@@ -3593,7 +3595,7 @@ msgstr "ألبوم واحد"
 #: front/src/components/library/Home.vue:30
 msgctxt "*/*/*"
 msgid "New channels"
-msgstr ""
+msgstr "القنوات الجديدة"
 
 #: front/src/components/auth/Settings.vue:79
 #: front/src/views/auth/PasswordResetConfirm.vue:14
@@ -3614,7 +3616,7 @@ msgstr "سوف يتم إضافة المَقاطِع الجديدة هنا آلي
 #: front/src/components/library/EditCard.vue:47
 msgctxt "Content/Library/Card.Table.Header/Short"
 msgid "New value"
-msgstr ""
+msgstr "القيمة الجديدة"
 
 #: front/src/components/channels/UploadModal.vue:34
 #: front/src/views/auth/ProfileOverview.vue:63
@@ -3648,12 +3650,12 @@ msgstr "لم نتمكّن مِن العثور على أي فنان يناسب ط
 #: front/src/components/common/RenderedDescription.vue:16
 msgctxt "*/*/Placeholder"
 msgid "No description available"
-msgstr ""
+msgstr "الوصف غير متوفر"
 
 #: front/src/components/About.vue:27 src/components/Home.vue:27
 msgctxt "Content/Home/Paragraph"
 msgid "No description available."
-msgstr ""
+msgstr "الوصف غير متوفر."
 
 #: front/src/components/manage/moderation/DomainsTable.vue:95
 msgctxt "Content/Home/Placeholder"
@@ -3720,12 +3722,12 @@ msgstr "لم يتم العثور على أية نتيجة."
 #: front/src/components/About.vue:34
 msgctxt "Content/Home/Paragraph"
 msgid "No rules available."
-msgstr ""
+msgstr "ليس هناك أية قاعدة متوفرة."
 
 #: front/src/components/About.vue:41
 msgctxt "Content/Home/Paragraph"
 msgid "No terms available."
-msgstr ""
+msgstr "الشروط غير متوفرة."
 
 #: front/src/views/content/libraries/FilesTable.vue:81
 #, fuzzy
@@ -3770,7 +3772,7 @@ msgstr "غير مستعمَل"
 #: front/src/components/audio/track/Widget.vue:53
 msgctxt "Content/Home/Placeholder"
 msgid "Nothing found"
-msgstr ""
+msgstr "لاشيء موجود"
 
 #: front/src/components/common/ContentForm.vue:22
 #, fuzzy
@@ -3806,7 +3808,7 @@ msgstr "الكلمة السرية القديمة"
 #: front/src/components/library/EditCard.vue:46
 msgctxt "Content/Library/Card.Table.Header/Short"
 msgid "Old value"
-msgstr ""
+msgstr "القيمة القديمة"
 
 #: front/src/components/About.vue:92
 #, fuzzy
@@ -3933,13 +3935,13 @@ msgstr "اتجاه الترتيب"
 #: front/src/components/mixins/Translations.vue:64
 msgctxt "*/*/*"
 msgid "Other"
-msgstr ""
+msgstr "أخرى"
 
 #: front/src/components/mixins/Translations.vue:52
 #: front/src/components/mixins/Translations.vue:53
 msgctxt "Content/Moderation/Dropdown"
 msgid "Other"
-msgstr ""
+msgstr "أخرى"
 
 #: front/src/views/channels/DetailBase.vue:205
 #, fuzzy
@@ -4269,13 +4271,13 @@ msgstr "المَقطَع السابق"
 #: front/src/views/library/DetailBase.vue:169
 msgctxt "Content/Library/Card.Help text"
 msgid "Private"
-msgstr ""
+msgstr "خاص"
 
 #: front/src/components/mixins/Translations.vue:15
 #: front/src/components/mixins/Translations.vue:16
 msgctxt "Content/Settings/Dropdown/Short"
 msgid "Private"
-msgstr ""
+msgstr "خاص"
 
 #: front/src/views/content/remote/Card.vue:58
 msgctxt "Content/Library/Card.List item"
@@ -4326,7 +4328,7 @@ msgstr "افتح الصفحة الشخصية"
 #: front/src/views/library/DetailBase.vue:171
 msgctxt "Content/Library/Card.Help text"
 msgid "Public"
-msgstr ""
+msgstr "للعامة"
 
 #: front/src/components/auth/SignupForm.vue:18
 #, fuzzy
@@ -4337,7 +4339,7 @@ msgstr "إنّ التسجيلات مُغلَقة حاليًا على هذا ال
 #: front/src/components/channels/UploadModal.vue:42
 msgctxt "*/Channels/Button.Label"
 msgid "Publish"
-msgstr ""
+msgstr "نشر"
 
 #: front/src/components/channels/UploadModal.vue:3
 msgctxt "Popup/Channels/Title/Verb"
@@ -4352,7 +4354,7 @@ msgstr ""
 #: front/src/views/content/Home.vue:10
 msgctxt "Content/Library/Title/Verb"
 msgid "Publish your work in a channel"
-msgstr ""
+msgstr "انشر مؤلفاتك في قناة"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
 #: front/src/components/manage/moderation/DomainsTable.vue:192
@@ -4428,7 +4430,7 @@ msgstr "الإذاعات"
 #: front/src/components/auth/ApplicationForm.vue:151
 msgctxt "Content/OAuth Scopes/Label/Verb"
 msgid "Read"
-msgstr ""
+msgstr "قراءة"
 
 #: front/src/components/library/ImportStatusModal.vue:51
 msgctxt "Popup/Import/Table.Label/Value"
