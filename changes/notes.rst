@@ -6,12 +6,37 @@ Next release notes
     Those release notes refer to the current development branch and are reset
     after each release.
 
+Channels and podcasts
+^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale 0.21 includes a brand new feature: Channels!
+
+Channels can be used as a replacement to public libraries,
+to publish audio content, both musical and non-musical. They federate with other Funkwhale pods, but also other
+fediverse software, in particular Mastodon, Pleroma, Friendica and Reel2Bits, meaning people can subscribe to your channel
+from any of these software. To get started with publication, simply visit your profile and create a channel from there.
+
+Each Funkwhale channel also comes with RSS feed that is compatible with existing podcasting applications, like AntennaPod
+on Android and, within Funkwhale, you can also subscribe to any podcast from its RSS feed!
+
+Many, many thanks to the numerous people who helped with the feature design, development and testing, and in particular
+to the members of the working group who met every week for months in order to get this done.
+
 Redesigned navigation, player and queue
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This release includes a full redesign of our navigation, player and queue. Overall, it should provide
 a better, less confusing experience, especially on mobile devices. This redesign was suggested
 14 months ago, and took a while, but thanks to the involvement and feedback of many people, we got it done!
+
+Improved search bar for searching remote objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The search bar now support fetching arbitrary objects using a URL. In particular, you can use this to quickly:
+
+- Subscribe to a remote library via its URL
+- Listen a public track from another pod
+- Subscribe to a channel
 
 Screening for sign-ups and custom sign-up form
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
