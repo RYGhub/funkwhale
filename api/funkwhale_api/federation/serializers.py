@@ -1896,7 +1896,7 @@ class ChannelUploadSerializer(jsonld.JsonLdSerializer):
         include_image(data, upload.track.attachment_cover)
         tags = [item.tag.name for item in upload.get_all_tagged_items()]
         if tags:
-            data["tag"] = [repr_tag(name) for name in tags]
+            data["tag"] = [repr_tag(name) for name in sorted(set(tags))]
             data["summary"] = " ".join(["#{}".format(name) for name in tags])
 
         if self.context.get("include_ap_context", True):
