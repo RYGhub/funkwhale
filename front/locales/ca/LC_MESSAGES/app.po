@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-10 03:50+0000\n"
+"PO-Revision-Date: 2020-04-11 04:15+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2011,7 +2011,7 @@ msgstr "Edita aquesta pista"
 #: front/src/views/channels/DetailBase.vue:98
 msgctxt "*/*/*/Verb"
 msgid "Edit…"
-msgstr "Editar…"
+msgstr "Editar …"
 
 #: front/src/components/mixins/Translations.vue:131
 #: front/src/views/admin/ChannelDetail.vue:216
@@ -4913,7 +4913,7 @@ msgstr "Cercar a la Viquipèdia"
 #: front/src/components/common/InlineSearchBar.vue:24
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search…"
-msgstr "Buscar…"
+msgstr "Buscar …"
 
 #: front/src/components/library/Library.vue:18
 #: src/views/admin/library/Base.vue:38
@@ -6147,7 +6147,7 @@ msgstr "Pujada denegada, assegurat que el fitxer no sigui massa gran i que no ha
 #: front/src/components/channels/UploadModal.vue:5
 msgctxt "Popup/Channels/Title"
 msgid "Upload details"
-msgstr "Dades de la pujada"
+msgstr "Detalls de la pujada"
 
 #: front/src/components/library/ImportStatusModal.vue:8
 msgctxt "Popup/Import/Message"
@@ -6157,7 +6157,7 @@ msgstr "La càrrega encara està pendent i aviat serà processada pel servidor."
 #: front/src/components/common/AttachmentInput.vue:21
 msgctxt "*/*/*"
 msgid "Upload New Picture…"
-msgstr "Carregar una imatge nova…"
+msgstr "Carregar una imatge nova …"
 
 #: front/src/components/library/FileUpload.vue:30
 msgctxt "Content/Library/Title/Verb"
@@ -6230,7 +6230,7 @@ msgstr "Carregant"
 #: front/src/components/common/AttachmentInput.vue:32
 msgctxt "Content/*/*/Noun"
 msgid "Uploading file…"
-msgstr "Carregant el fitxer…"
+msgstr "Carregant el fitxer …"
 
 #: front/src/components/library/FileUpload.vue:123
 msgctxt "Content/Library/Table"
@@ -6374,7 +6374,7 @@ msgstr "Ràdios dels usuaris"
 #: front/src/views/admin/moderation/RequestsList.vue:143
 msgctxt "*/Moderation/*/Noun"
 msgid "User Requests"
-msgstr "Peticion de l'usuari"
+msgstr "Peticions de l'usuari"
 
 #: front/src/components/auth/SignupForm.vue:34
 #: front/src/components/manage/users/UsersTable.vue:37
