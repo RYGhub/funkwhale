@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-12 13:16+0000\n"
+"PO-Revision-Date: 2020-04-12 21:01+0000\n"
 "Last-Translator: marzzzello <anmeldezeugs@top-email.net>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -3200,7 +3200,7 @@ msgstr "Abmelden"
 #: front/src/components/admin/SignupFormBuilder.vue:65
 msgctxt "*/*/Form-builder"
 msgid "Long text"
-msgstr ""
+msgstr "Langer Text"
 
 #: front/src/views/content/libraries/Home.vue:9
 msgctxt "Content/Library/Paragraph"
@@ -4781,12 +4781,12 @@ msgstr ""
 #: front/src/components/channels/UploadForm.vue:94
 msgctxt "*/*/*"
 msgid "Retry"
-msgstr ""
+msgstr "Erneut versuchen"
 
 #: front/src/components/library/FileUpload.vue:301
 msgctxt "*/*/*/Verb"
 msgid "Retry"
-msgstr ""
+msgstr "Erneut versuchen"
 
 #: front/src/components/library/FileUpload.vue:104
 #, fuzzy
@@ -4822,7 +4822,7 @@ msgstr "Zugriff für Anwendung \"%{ application }\" widerrufen?"
 #: front/src/views/admin/ChannelDetail.vue:143
 msgctxt "'*/*/*"
 msgid "RSS Feed"
-msgstr ""
+msgstr "RSS Feed"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:16
 msgctxt "Content/Moderation/Card.Title/Noun"
@@ -5047,7 +5047,7 @@ msgstr "Abschnitte"
 #: front/src/views/admin/Settings.vue:82
 msgctxt "*/*/*/Noun"
 msgid "Security"
-msgstr ""
+msgstr "Sicherheit"
 
 #: front/src/components/ShortcutsModal.vue:107
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -5134,6 +5134,8 @@ msgstr "Teile diesen Link mit anderen Nutzenden, damit diese Zugriff auf deine M
 msgctxt "Content/Library/Paragraph"
 msgid "Share your work publicly and get subscribers on Funkwhale, the Fediverse or any podcasting application."
 msgstr ""
+"Veröffentliche deine Arbeit und erhalte Abonnenten von Funkwhale, dem "
+"Fediverse oder einer beliebigen Podcast-App."
 
 #: front/src/views/content/remote/Card.vue:92
 #: src/views/library/DetailBase.vue:78
@@ -5149,7 +5151,7 @@ msgstr "Die Freigabe funktioniert nicht, da dieser Pod anonymen Benutzern keinen
 #: front/src/components/admin/SignupFormBuilder.vue:62
 msgctxt "*/*/Form-builder"
 msgid "Short text"
-msgstr ""
+msgstr "Kurzer Text"
 
 #: front/src/components/About.vue:158
 msgctxt "*/*/*/Verb"
@@ -5305,7 +5307,7 @@ msgstr "Einige Titel in deiner Warteschlange befinden sich bereits in dieser Pla
 #: front/src/views/channels/DetailOverview.vue:14
 msgctxt "Content/Channel/Header"
 msgid "Some uploads couldn't be published"
-msgstr ""
+msgstr "Einige Uploads konnten nicht veröffentlicht werden"
 
 #: front/src/components/PageNotFound.vue:10
 msgctxt "Content/*/Paragraph"
@@ -5315,7 +5317,7 @@ msgstr "Entschuldigung, die aufgerufene Seite existiert nicht:"
 #: front/src/components/audio/SearchBar.vue:56
 msgctxt "Sidebar/Search/Error.Label"
 msgid "Sorry, there are no results for this search"
-msgstr ""
+msgstr "Leider gibt es keine Ergebnisse für diese Suche"
 
 #: front/src/components/Footer.vue:60
 msgctxt "Footer/*/List item.Link"
@@ -5426,17 +5428,17 @@ msgstr "Eingereicht von"
 #: front/src/views/channels/SubscriptionsList.vue:30
 msgctxt "*/*/*/Verb"
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonnieren"
 
 #: front/src/components/channels/SubscribeButton.vue:17
 msgctxt "Content/Channel/Button/Verb"
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonnieren"
 
 #: front/src/components/channels/SubscribeButton.vue:4
 msgctxt "Content/Track/*/Verb"
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonnieren"
 
 #: front/src/views/channels/DetailBase.vue:43
 #, fuzzy
@@ -5447,12 +5449,12 @@ msgstr "Funkwhale nutzen"
 #: front/src/views/channels/DetailBase.vue:58
 msgctxt "Content/Channels/Header"
 msgid "Subscribe on the Fediverse"
-msgstr ""
+msgstr "Im Fediverse Abonnieren"
 
 #: front/src/components/RemoteSearchForm.vue:68 src/views/Search.vue:27
 msgctxt "Head/Fetch/Title"
 msgid "Subscribe to a podcast RSS feed"
-msgstr ""
+msgstr "Abonniere einen Podcast via RSS-Feed"
 
 #: front/src/components/audio/SearchBar.vue:177
 msgctxt "Search/*/*"
