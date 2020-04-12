@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
 "PO-Revision-Date: 2020-04-13 17:53+0000\n"
-"Last-Translator: Xaloc <xaloc@tutanota.com>\n"
+"Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -514,7 +514,7 @@ msgstr "Afegir filtre"
 #: front/src/components/library/radios/Builder.vue:41
 msgctxt "Content/Radio/Paragraph"
 msgid "Add filters to customize your radio"
-msgstr "Afegir filtres per personalitzar la teva radio"
+msgstr "Afegir filtres per personalitzar la teva ràdio"
 
 #: front/src/views/auth/ProfileOverview.vue:17
 #: src/views/auth/ProfileOverview.vue:27
@@ -2101,7 +2101,7 @@ msgstr "Introduir la URL de la biblioteca"
 #: front/src/components/library/Radios.vue:154
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter a radio name…"
-msgstr "Introdueix un nom per la radio …"
+msgstr "Introdueix un nom per la ràdio …"
 
 #: front/src/components/library/Albums.vue:138
 msgctxt "Content/Search/Input.Placeholder"
@@ -3565,7 +3565,7 @@ msgstr "Encara no s'ha afegit cap pista a aquesta biblioteca"
 #: front/src/views/radios/Detail.vue:49
 msgctxt "Content/Radios/Placeholder"
 msgid "No tracks have been added to this radio yet"
-msgstr "Encara no s'ha afegit cap pista a aquesta radio"
+msgstr "Encara no s'ha afegit cap pista a aquesta ràdio"
 
 #: front/src/components/favorites/List.vue:62
 msgctxt "Content/Home/Placeholder"
