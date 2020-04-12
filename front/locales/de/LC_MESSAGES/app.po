@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-11 19:53+0000\n"
+"PO-Revision-Date: 2020-04-12 13:16+0000\n"
 "Last-Translator: marzzzello <anmeldezeugs@top-email.net>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -2584,7 +2584,7 @@ msgstr ""
 #: front/src/components/moderation/ReportModal.vue:53
 msgctxt "*/*/Field.Label/Verb"
 msgid "Forward to %{ domain}"
-msgstr ""
+msgstr "Weiterleiten an %{ domain}"
 
 #: front/src/components/auth/Authorize.vue:28
 msgctxt "Content/Auth/Label/Noun"
@@ -2647,7 +2647,7 @@ msgstr "Verstanden!"
 #: front/src/components/admin/SignupFormBuilder.vue:21
 msgctxt "*/*/Label"
 msgid "Help text"
-msgstr ""
+msgstr "Hilfetext"
 
 #: front/src/components/auth/Settings.vue:118
 msgctxt "Content/Settings/Title"
@@ -2714,16 +2714,21 @@ msgstr "Wenn Sie Anwendungen von Drittanbietern für den Zugriff auf Ihre Daten 
 msgctxt "Content/Login/Error message.List item/Call to action"
 msgid "If you signed-up recently, you may need to wait before our moderation team review your account, or verify your email."
 msgstr ""
+"Wenn du dich vor kurzem angemeldet hast, musst du möglicherweise warten, bis "
+"unser Moderatorenteam dein Konto überprüft hat oder du musst deine E-Mail "
+"bestätigen."
 
 #: front/src/views/channels/DetailBase.vue:60
 msgctxt "Content/Channels/Label"
 msgid "If you're using Mastodon or other fediverse applications, you can subscribe to this account:"
 msgstr ""
+"Wenn du Mastodon oder andere Fediverse-Anwendungen verwendest, kannst du "
+"dieses Konto abonnieren:"
 
 #: front/src/components/channels/UploadForm.vue:43
 msgctxt "*/*/*"
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorieren"
 
 #: front/src/components/mixins/Translations.vue:50
 #: front/src/components/mixins/Translations.vue:51
@@ -2948,12 +2953,12 @@ msgstr "Letzte Aktualisierung:"
 #: front/src/App.vue:428
 msgctxt "App/Message/Paragraph"
 msgid "Later"
-msgstr ""
+msgstr "Später"
 
 #: front/src/views/channels/DetailOverview.vue:53
 msgctxt "Content/Channel/Paragraph"
 msgid "Latest episodes"
-msgstr ""
+msgstr "Neueste Episoden"
 
 #: front/src/views/channels/DetailOverview.vue:54
 #, fuzzy
@@ -3268,7 +3273,7 @@ msgstr "Als ungelesen markieren"
 #: front/src/components/common/ContentForm.vue:45
 msgctxt "*/Form/Paragraph"
 msgid "Markdown syntax is supported."
-msgstr ""
+msgstr "Markdown-Syntax wird unterstützt."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:331
 msgctxt "Content/*/*/Unit"
@@ -3290,7 +3295,7 @@ msgstr "Nachricht"
 #: front/src/views/channels/DetailBase.vue:133
 msgctxt "Content/Channel/Paragraph"
 msgid "Mirrored from %{ domain }"
-msgstr ""
+msgstr "Von %{ domain } gespiegelt"
 
 #: front/src/components/Footer.vue:35
 msgctxt "Footer/*/List item.Link"
@@ -3350,12 +3355,12 @@ msgstr "Mehr…"
 #: front/src/components/admin/SignupFormBuilder.vue:146
 msgctxt "*/*/*"
 msgid "Move down"
-msgstr ""
+msgstr "Nach unten verschieben"
 
 #: front/src/components/admin/SignupFormBuilder.vue:145
 msgctxt "*/*/*"
 msgid "Move up"
-msgstr ""
+msgstr "nach oben verschieben"
 
 #: front/src/components/mixins/Translations.vue:62
 #: front/src/components/mixins/Translations.vue:63
@@ -3495,7 +3500,7 @@ msgstr "Neuer Wert"
 #: front/src/components/library/Home.vue:30
 msgctxt "*/*/*"
 msgid "New channels"
-msgstr ""
+msgstr "Neue Kanäle"
 
 #: front/src/components/auth/Settings.vue:79
 #: front/src/views/auth/PasswordResetConfirm.vue:14
@@ -3506,7 +3511,7 @@ msgstr "Neues Kennwort"
 #: front/src/components/channels/AlbumModal.vue:3
 msgctxt "Popup/Channels/Title/Verb"
 msgid "New serie"
-msgstr ""
+msgstr "Neue Serie"
 
 #: front/src/components/Queue.vue:193
 msgctxt "Sidebar/Player/Paragraph"
@@ -3561,12 +3566,12 @@ msgstr "Keine Beschreibung verfügbar."
 #: front/src/components/manage/moderation/DomainsTable.vue:95
 msgctxt "Content/Home/Placeholder"
 msgid "No interactions with other pods yet"
-msgstr ""
+msgstr "Noch keine Interaktionen mit anderen Pods"
 
 #: front/src/components/audio/SearchBar.vue:55
 msgctxt "Sidebar/Search/Error"
 msgid "No matches found"
-msgstr ""
+msgstr "Keine Treffer gefunden"
 
 #: front/src/components/federation/LibraryWidget.vue:6
 msgctxt "Content/Federation/Paragraph"
@@ -3663,7 +3668,7 @@ msgstr "Niemand folgt dieser Mediathek"
 #: front/src/components/channels/LicenseSelect.vue:7
 msgctxt "*/*/*"
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgctxt "Content/Admin/Table"
@@ -3673,7 +3678,7 @@ msgstr "Nicht verwendet"
 #: front/src/components/audio/track/Widget.vue:53
 msgctxt "Content/Home/Placeholder"
 msgid "Nothing found"
-msgstr ""
+msgstr "Nichts gefunden"
 
 #: front/src/components/common/ContentForm.vue:22
 #, fuzzy
@@ -3903,6 +3908,8 @@ msgstr "Kennwort erfolgreich aktualisiert"
 msgctxt "Content/Fetch/Paragraph"
 msgid "Paste here the RSS url or the fediverse address to subscribe to its feed."
 msgstr ""
+"Füge hier die RSS-URL oder die Fediverse-Adresse ein, um den Feed zu "
+"abonnieren."
 
 #: front/src/App.vue:310 src/components/audio/Player.vue:661
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
@@ -4081,6 +4088,8 @@ msgstr "Wiedergabelisten"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
+"Bitte kontaktiere deine Administratoren und bitte sie, die entsprechende "
+"Einstellung zu aktualisieren."
 
 #: front/src/components/auth/Settings.vue:70
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -4097,6 +4106,8 @@ msgstr "Bitte prüfe genau, ob deine Benutzernamen- und Kennwortkombination stim
 msgctxt "Content/*/Paragraph"
 msgid "PNG or JPG. Dimensions should be between 1400x1400px and 3000x3000px. Maximum file size allowed is 5MB."
 msgstr ""
+"PNG oder JPG. Die Abmessungen sollten zwischen 1400x1400px und 3000x3000px "
+"liegen. Die maximal zulässige Dateigröße beträgt 5MB."
 
 #: front/src/components/About.vue:74
 msgctxt "Content/About/Header/Name"
@@ -4107,20 +4118,20 @@ msgstr "Pod-Konfiguration"
 #: front/src/components/mixins/Translations.vue:62
 msgctxt "Content/*/Dropdown"
 msgid "Podcast"
-msgstr ""
+msgstr "Podcast"
 
 #: front/src/views/auth/ProfileOverview.vue:40
 #: src/views/channels/DetailBase.vue:171
 msgctxt "Content/Channel/*"
 msgid "Podcast channel"
-msgstr ""
+msgstr "Podcast-Kanal"
 
 #: front/src/components/audio/ChannelForm.vue:192
 #: front/src/components/audio/SearchBar.vue:87
 #: src/components/audio/SearchBar.vue:179
 msgctxt "*/*/*"
 msgid "Podcasts"
-msgstr ""
+msgstr "Podcasts"
 
 #: front/src/components/channels/UploadMetadataForm.vue:27
 #: front/src/views/admin/library/TrackDetail.vue:144 src/edits.js:101
@@ -4223,7 +4234,7 @@ msgstr "Profil öffnen"
 #: front/src/views/library/DetailBase.vue:171
 msgctxt "Content/Library/Card.Help text"
 msgid "Public"
-msgstr ""
+msgstr "Öffentlich"
 
 #: front/src/components/auth/SignupForm.vue:18
 msgctxt "Content/Signup/Form/Paragraph"
@@ -4233,22 +4244,24 @@ msgstr "Öffentliche Registrierungen auf dieser Instanz sind nicht möglich. Du 
 #: front/src/components/channels/UploadModal.vue:42
 msgctxt "*/Channels/Button.Label"
 msgid "Publish"
-msgstr ""
+msgstr "Veröffentlichen"
 
 #: front/src/components/channels/UploadModal.vue:3
 msgctxt "Popup/Channels/Title/Verb"
 msgid "Publish audio"
-msgstr ""
+msgstr "Audio veröffentlichen"
 
 #: front/src/components/audio/ChannelForm.vue:198
 msgctxt "Content/Channels/Help"
 msgid "Publish music  you make as a nice discography of albums and singles."
 msgstr ""
+"Veröffentliche die Musik, die du machst, als schöne Diskographie von Alben "
+"und Singles."
 
 #: front/src/views/content/Home.vue:10
 msgctxt "Content/Library/Title/Verb"
 msgid "Publish your work in a channel"
-msgstr ""
+msgstr "Veröffentliche deine Arbeit in einem Kanal"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
 #: front/src/components/manage/moderation/DomainsTable.vue:192
@@ -4394,7 +4407,7 @@ msgstr "Kürzlich angehört"
 #: front/src/components/auth/ApplicationForm.vue:13
 msgctxt "Content/Applications/Input.Label/Noun"
 msgid "Redirect URI"
-msgstr ""
+msgstr "Weiterleitung-URI"
 
 #: front/src/components/auth/Settings.vue:115
 #: src/components/auth/Settings.vue:160
@@ -4415,7 +4428,7 @@ msgstr "Aktualisieren"
 #: front/src/views/admin/library/TrackDetail.vue:56
 msgctxt "Content/Moderation/Button/Verb"
 msgid "Refresh from remote server"
-msgstr ""
+msgstr "Vom Remote-Server aktualisieren"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:164
 msgctxt "Content/Moderation/Button.Label/Verb"
@@ -4455,7 +4468,7 @@ msgstr "Objekt aus der Ferne wird aktualisiert …"
 #: front/src/components/manage/moderation/UserRequestCard.vue:128
 msgctxt "Content/*/Button.Label"
 msgid "Refuse"
-msgstr ""
+msgstr "Ablehnen"
 
 #: front/src/components/manage/moderation/UserRequestCard.vue:48
 #: front/src/views/admin/moderation/RequestsList.vue:26
@@ -4473,6 +4486,8 @@ msgstr "Registrierungen"
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Registrations on this pod are open, but reviewed by moderators before approval."
 msgstr ""
+"Registrierungen für diesen Pod sind offen, werden aber vor der Freigabe von "
+"Moderatoren überprüft."
 
 #: front/src/components/manage/users/UsersTable.vue:72
 msgctxt "Content/Admin/Table, User role"
@@ -4703,7 +4718,7 @@ msgstr "Kennwort beantragen"
 #: front/src/components/admin/SignupFormBuilder.vue:49
 msgctxt "*/*/Form-builder,Help"
 msgid "Required"
-msgstr ""
+msgstr "Erforderlich"
 
 #: front/src/components/library/EditForm.vue:110
 msgctxt "Content/Library/Button.Label"
