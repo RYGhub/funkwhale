@@ -195,7 +195,7 @@ export default {
         {
           value: "music",
           label: this.$pgettext('*/*/*', "Artist discography"),
-          helpText: this.$pgettext('Content/Channels/Help', "Publish music  you make as a nice discography of albums and singles."),
+          helpText: this.$pgettext('Content/Channels/Help', "Publish music you make as a nice discography of albums and singles."),
         }
       ]
     },
