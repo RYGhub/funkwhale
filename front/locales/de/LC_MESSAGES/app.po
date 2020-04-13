@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-12 21:01+0000\n"
+"PO-Revision-Date: 2020-04-13 17:53+0000\n"
 "Last-Translator: marzzzello <anmeldezeugs@top-email.net>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -41,8 +41,8 @@ msgstr "%{ app } möchte auf dein Funkwhale-Konto zugreifen"
 msgctxt "Content/Home/Stat"
 msgid "%{ count } active user"
 msgid_plural "%{ count } active users"
-msgstr[0] "%{ count } aktiver Nutzer"
-msgstr[1] "%{ count } aktive Nutzer"
+msgstr[0] "%{ count } aktiv nutzende Person"
+msgstr[1] "%{ count } aktiv nutzende Personenen"
 
 #: front/src/components/About.vue:184
 msgctxt "Content/Home/Stat"
@@ -333,7 +333,7 @@ msgstr "Zugang zu Abonnements"
 #: front/src/components/mixins/Translations.vue:109
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to listening history"
-msgstr "In den Favoriten- oder Abspiellisten anderer Nutzer"
+msgstr "Zugang zum Hörverlauf"
 
 #: front/src/components/mixins/Translations.vue:128
 #: front/src/components/mixins/Translations.vue:129
@@ -2410,7 +2410,12 @@ msgstr "Abgelaufen bzw. benutzt"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:110
 msgctxt "Content/Moderation/Help text"
 msgid "Explain why you're applying this policy. Depending on your instance configuration, this will help you remember why you acted on this account or domain, and may be displayed publicly to help users understand what moderation rules are in place."
-msgstr "Erkläre, warum Du die Regel festlegst. Abhängig von Deiner Instanzkonfiguration hilft Dir das, Dich daran zu erinnern, warum Du bzgl. des Kontos oder dieser Domäne so gehandelt hast. Dies kann öffentlich eingesehen werden damit die Benutzer verstehen, welche Moderationsregeln gelten."
+msgstr ""
+"Erkläre, warum Du die Regel festlegst. Abhängig von Deiner "
+"Instanzkonfiguration hilft Dir das, Dich daran zu erinnern, warum Du bzgl. "
+"des Kontos oder dieser Domäne so gehandelt hast. Dies kann öffentlich "
+"eingesehen werden damit die Nutzenden verstehen, welche Moderationsregeln "
+"gelten."
 
 #: front/src/components/Sidebar.vue:111
 msgctxt "*/*/*/Verb"
@@ -2784,7 +2789,7 @@ msgstr "In den Favoriten"
 #: front/src/components/moderation/FilterModal.vue:25
 msgctxt "Popup/Moderation/List item"
 msgid "In other users favorites and listening history"
-msgstr "In den Favoriten- oder Abspiellisten anderer Nutzer"
+msgstr "In den Favoriten- oder Abspiellisten anderer Nutzenden"
 
 #: front/src/components/moderation/FilterModal.vue:28
 msgctxt "Popup/Moderation/List item"
@@ -4567,7 +4572,10 @@ msgstr "Fernmediatheken"
 #: front/src/views/content/remote/Home.vue:7
 msgctxt "Content/Library/Paragraph"
 msgid "Remote libraries are owned by other users on the network. You can access them as long as they are public or you are granted access."
-msgstr "Entfernte Mediatheken sind im Besitz anderer Nutzer des Netzwerks. Du kannst darauf zugreifen, wenn diese öffentlich sind, oder du die Erlaubnis hast."
+msgstr ""
+"Entfernte Mediatheken sind im Besitz anderer Personen des Netzwerks. Du "
+"kannst darauf zugreifen, wenn diese öffentlich sind, oder du die Erlaubnis "
+"hast."
 
 #: front/src/components/channels/UploadForm.vue:90
 #: front/src/components/common/AttachmentInput.vue:28
@@ -4978,7 +4986,7 @@ msgstr "Nach Titel, Künstler·in und Album suchen…"
 #: front/src/components/manage/users/InvitationsTable.vue:153
 msgctxt "Content/Admin/Input.Placeholder/Verb"
 msgid "Search by username, e-mail address, code…"
-msgstr "Benutzernamen, E-Mail-Adresse, Kode suchen…"
+msgstr "Benutzernamen, E-Mail-Adresse, Code suchen…"
 
 #: front/src/components/manage/users/UsersTable.vue:164
 msgctxt "Content/Search/Input.Placeholder"
@@ -5146,7 +5154,9 @@ msgstr "Freigabe-Link"
 #: front/src/components/audio/EmbedWizard.vue:5
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
-msgstr "Die Freigabe funktioniert nicht, da dieser Pod anonymen Benutzern keinen Zugriff auf Inhalte ermöglicht."
+msgstr ""
+"Die Freigabe funktioniert nicht, da dieser Pod anonymen Benutzenden keinen "
+"Zugriff auf Inhalte ermöglicht."
 
 #: front/src/components/admin/SignupFormBuilder.vue:62
 msgctxt "*/*/Form-builder"
@@ -5720,6 +5730,9 @@ msgstr "Der Vorschlag wird entgültig gelöscht. Das kann nicht rückgängig gem
 msgctxt "Popup/*/Paragraph"
 msgid "The selected tracks will be removed, as well as associated uploads, favorites and listening history. This action is irreversible."
 msgstr ""
+"Die ausgewählten Titel werden entfernt, ebenso wie die zugehörigen Uploads, "
+"Favoriten und der zugehörige Hörverlauf. Das kann nicht rückgängig gemacht "
+"werden."
 
 #: front/src/components/manage/library/UploadsTable.vue:256
 msgctxt "Popup/*/Paragraph"
@@ -5767,6 +5780,8 @@ msgstr "Die Bibliothek wird zusammen mit den zugehörigen Uploads und Abonnement
 msgctxt "Content/Moderation/Paragraph"
 msgid "The track will be removed, as well as associated uploads, favorites and listening history. This action is irreversible."
 msgstr ""
+"Der Titel wird entfernt, ebenso wie die zugehörigen Uploads, Favoriten und "
+"der zugehörige Hörverlauf. Das kann nicht rückgängig gemacht werden."
 
 #: front/src/views/admin/library/UploadDetail.vue:68
 msgctxt "Content/Moderation/Paragraph"
@@ -5826,6 +5841,8 @@ msgstr "Diese Instanz bietet den Nutzenden bis zu %{quota} Speicherplatz."
 msgctxt "Popup/Settings/Paragraph"
 msgid "This is irreversible and will permanently remove your data from our servers. You will we immediatly logged out."
 msgstr ""
+"Dies ist irreversibel und wird entfernt deine Daten dauerhaft von unseren "
+"Servern. Du wirst sofort ausgeloggt."
 
 #: front/src/components/auth/Settings.vue:155
 msgctxt "Content/Settings/Paragraph"
@@ -5835,7 +5852,7 @@ msgstr ""
 #: front/src/components/auth/Settings.vue:208
 msgctxt "Content/Settings/Paragraph"
 msgid "This is the list of applications that you have created."
-msgstr ""
+msgstr "Dies ist die Liste der Anwendungen, die du erstellt hast."
 
 #: front/src/views/auth/ProfileBase.vue:41
 msgctxt "Content/Profile/Button.Paragraph"
@@ -5843,9 +5860,10 @@ msgid "This is you!"
 msgstr "Das bist du!"
 
 #: front/src/components/RemoteSearchForm.vue:26
+#, fuzzy
 msgctxt "Content/*/Error message.Title"
 msgid "This kind of object isn't supported yet"
-msgstr ""
+msgstr "Diese Art von Objekt wird noch nicht unterstützt"
 
 #: front/src/views/content/libraries/Form.vue:73
 msgctxt "Content/Library/Input.Placeholder"
@@ -5857,7 +5875,7 @@ msgstr "Diese Mediathek enthält meine persönliche Musik. Ich hoffe sie gefäll
 #: src/views/library/DetailTracks.vue:9
 msgctxt "*/*/*"
 msgid "This library is empty, you should upload something in it!"
-msgstr ""
+msgstr "Diese Bibliothek ist leer, du solltest etwas hochladen!"
 
 #: front/src/views/content/remote/Card.vue:173
 #: src/views/library/DetailBase.vue:174
@@ -5874,7 +5892,7 @@ msgstr "Diese Mediathek ist öffentlich. Du kannst auf den Inhalt ohne Einschrä
 #: front/src/views/library/DetailBase.vue:175
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is restricted to users on this pod only"
-msgstr ""
+msgstr "Diese Bibliothek ist nur für Nutzende dieses Pods zugänglich"
 
 #: front/src/components/common/ActionTable.vue:46
 msgctxt "Modal/*/Paragraph"
@@ -5893,6 +5911,8 @@ msgstr "Dein Avatar kann nicht erstellt werden."
 msgctxt "Content/*/Message"
 msgid "This object is managed by another server, you cannot edit it."
 msgstr ""
+"Dieses Objekt wird von einem anderen Server verwaltet. Du kannst es nicht "
+"bearbeiten."
 
 #: front/src/components/Home.vue:89
 msgctxt "Content/Home/Paragraph"
@@ -5948,7 +5968,7 @@ msgstr "Dieses Album ist in den folgenden Mediatheken enthalten:"
 #: front/src/components/manage/moderation/UserRequestCard.vue:98
 msgctxt "Content/Moderation/Paragraph"
 msgid "This user wants to sign-up on your pod."
-msgstr ""
+msgstr "Diese Person möchte sich bei deinem Pod anmelden."
 
 #: front/src/views/playlists/Detail.vue:46
 msgctxt "Popup/Playlist/Paragraph"
@@ -5984,6 +6004,8 @@ msgstr "Die Wiedergabeliste wird dauerhaft gelöscht und kann nicht zurückerste
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will prevent this application from accessing the service on your behalf."
 msgstr ""
+"Dies verhindert, dass diese Anwendung in deinem Namen auf den Dienst "
+"zugreifen kann."
 
 #: front/src/components/playlists/Editor.vue:54
 msgctxt "Popup/Playlist/Paragraph"
@@ -6016,7 +6038,7 @@ msgstr "Zu Favoriten hinzufügen/entfernen"
 #: front/src/components/ShortcutsModal.vue:131
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle mute"
-msgstr ""
+msgstr "Ton ein/aus"
 
 #: front/src/components/ShortcutsModal.vue:139
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -6057,7 +6079,7 @@ msgstr "Track"
 #: front/src/components/library/EditCard.vue:13
 msgctxt "Content/Library/Card/Short"
 msgid "Track #%{ id } - %{ name }"
-msgstr ""
+msgstr "Titel #%{ id } - %{ name }"
 
 #: front/src/components/Queue.vue:138
 #, fuzzy
@@ -6137,7 +6159,7 @@ msgstr "Unterliegt einer Moderationsregel"
 #: front/src/components/ShortcutsModal.vue:67
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Unfocus searchbar"
-msgstr ""
+msgstr "Suchleiste defokussieren"
 
 #: front/src/views/content/remote/Card.vue:121
 #: src/views/content/remote/Card.vue:126
@@ -6161,7 +6183,7 @@ msgstr "Das Abonnement an dieser Mediathek beenden?"
 #: front/src/components/library/ImportStatusModal.vue:144
 msgctxt "*/*/Error"
 msgid "Unknown error"
-msgstr ""
+msgstr "Unbekannter Fehler"
 
 #: front/src/components/audio/Player.vue:663
 #: front/src/components/audio/VolumeControl.vue:58
