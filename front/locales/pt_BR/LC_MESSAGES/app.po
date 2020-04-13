@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2019-10-18 08:59+0000\n"
+"PO-Revision-Date: 2020-04-14 07:58+0000\n"
 "Last-Translator: Daniele Lira Mereb <danielelmereb@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_BR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 3.9\n"
+"X-Generator: Weblate 3.11.3\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:6
 msgctxt "Popup/Playlist/Paragraph"
@@ -468,10 +468,9 @@ msgstr "Adicionar"
 
 #: front/src/components/library/AlbumBase.vue:101
 #: front/src/components/library/AlbumBase.vue:113
-#, fuzzy
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Add a description…"
-msgstr "Minha incrível descrição"
+msgstr "Adicionar descrição…"
 
 #: front/src/views/admin/moderation/DomainsList.vue:13
 msgctxt "Content/Moderation/Form.Label/Verb"
@@ -564,10 +563,9 @@ msgid "Add to favorites"
 msgstr "Favoritar"
 
 #: front/src/components/playlists/PlaylistModal.vue:5
-#, fuzzy
 msgctxt "Popup/Playlist/Title/Verb"
 msgid "Add to playlist"
-msgstr "Adicionar à lista…"
+msgstr "Adicionar à lista"
 
 #: front/src/components/playlists/TrackPlaylistIcon.vue:6
 #: front/src/components/playlists/TrackPlaylistIcon.vue:35
@@ -1018,10 +1016,9 @@ msgid "Browse the library"
 msgstr "Explorar biblioteca"
 
 #: front/src/components/channels/UploadForm.vue:134
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Browse…"
-msgstr "Explorar"
+msgstr "Explorar…"
 
 #: front/src/components/library/Albums.vue:4
 msgctxt "Content/Album/Title"
@@ -1732,10 +1729,9 @@ msgstr "Excluir este envio?"
 #: front/src/components/library/AlbumDropdown.vue:50
 #: front/src/components/library/TrackBase.vue:74
 #: front/src/views/channels/DetailBase.vue:104
-#, fuzzy
 msgctxt "*/*/*/Verb"
 msgid "Delete…"
-msgstr "Excluir"
+msgstr "Excluir…"
 
 #: front/src/components/favorites/List.vue:35
 #: src/components/library/Albums.vue:30
@@ -2050,10 +2046,9 @@ msgid "Edit this track"
 msgstr "Editar faixa"
 
 #: front/src/views/channels/DetailBase.vue:98
-#, fuzzy
 msgctxt "*/*/*/Verb"
 msgid "Edit…"
-msgstr "Editar"
+msgstr "Editar…"
 
 #: front/src/components/mixins/Translations.vue:131
 #: front/src/views/admin/ChannelDetail.vue:216
@@ -2156,10 +2151,9 @@ msgid "Enter artist name…"
 msgstr "Insira o nome do(a) artista…"
 
 #: front/src/components/playlists/PlaylistModal.vue:176
-#, fuzzy
 msgctxt "Popup/Playlist/Form/Placeholder"
 msgid "Enter playlist name"
-msgstr "Insira o nome da lista…"
+msgstr "Insira o nome da lista"
 
 #: front/src/views/playlists/List.vue:119
 msgctxt "Content/Playlist/Placeholder/Call to action"
@@ -2478,10 +2472,9 @@ msgid "Filter"
 msgstr "Nome do filtro"
 
 #: front/src/views/channels/SubscriptionsList.vue:82
-#, fuzzy
 msgctxt "Content/Subscriptions/Form.Placeholder"
 msgid "Filter by name…"
-msgstr "Nome do filtro"
+msgstr "Filtrar por nome…"
 
 #: front/src/components/library/radios/Builder.vue:61
 msgctxt "Content/Radio/Table.Label/Noun"
@@ -3327,10 +3320,9 @@ msgid "Modification date"
 msgstr "Data de modificação"
 
 #: front/src/components/Sidebar.vue:141
-#, fuzzy
 msgctxt "Footer/About/List item.Link"
 msgid "More"
-msgstr "Mais…"
+msgstr "Mais"
 
 #: front/src/components/audio/PlayButton.vue:94
 #: front/src/components/library/AlbumDropdown.vue:113
@@ -3849,10 +3841,9 @@ msgid "Overview"
 msgstr "Prévia"
 
 #: front/src/views/library/DetailBase.vue:33
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Owned by %{ username }"
-msgstr "Entrou como  %{ username }"
+msgstr "Propriedade de %{ username }"
 
 #: front/src/components/manage/moderation/ReportCard.vue:143
 #: front/src/components/manage/users/InvitationsTable.vue:38
@@ -5003,10 +4994,9 @@ msgid "Search on Wikipedia"
 msgstr "Pesquisar no Wikipedia"
 
 #: front/src/components/common/InlineSearchBar.vue:24
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search…"
-msgstr "Pesquisar"
+msgstr "Pesquisar…"
 
 #: front/src/components/library/Library.vue:18
 #: src/views/admin/library/Base.vue:38
@@ -6260,10 +6250,9 @@ msgid "Upload is still pending and will soon be processed by the server."
 msgstr "O envio ainda está pendente e logo será processado pelo servidor."
 
 #: front/src/components/common/AttachmentInput.vue:21
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Upload New Picture…"
-msgstr "Enviar novas faixas"
+msgstr "Enviar nova imagem…"
 
 #: front/src/components/library/FileUpload.vue:30
 msgctxt "Content/Library/Title/Verb"
