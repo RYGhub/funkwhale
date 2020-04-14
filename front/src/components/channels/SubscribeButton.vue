@@ -16,7 +16,7 @@ export default {
       if (this.isSubscribed) {
         return this.$pgettext('Content/Channel/Button/Verb', 'Subscribe')
       } else {
-        return this.$pgettext('Content/Channel/Button/Verb', 'Unubscribe')
+        return this.$pgettext('Content/Channel/Button/Verb', 'Unsubscribe')
       }
     },
     isSubscribed () {
