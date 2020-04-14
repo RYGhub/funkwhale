@@ -276,7 +276,7 @@ export default {
           prettyDate: escapeHtml(momentFormat(this.track.creation_date, 'LL')),
         })
       } else {
-        msg = this.$pgettext('Content/Track/Paragraph', 'Uploaded by on <time title="%{ date }" datetime="%{ date }">%{ prettyDate }</time>')
+        msg = this.$pgettext('Content/Track/Paragraph', 'Uploaded on <time title="%{ date }" datetime="%{ date }">%{ prettyDate }</time>')
         return this.$gettextInterpolate(msg, {
           date: escapeHtml(this.track.creation_date),
           prettyDate: escapeHtml(momentFormat(this.track.creation_date, 'LL')),
