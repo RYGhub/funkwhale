@@ -1,13 +1,40 @@
-import glob
+import itertools
 import os
 import urllib.parse
+import time
 
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
-from funkwhale_api.music import models, tasks
+from funkwhale_api.music import models, tasks, utils
+
+
+def crawl_dir(dir, extensions, recursive=True):
+    if os.path.isfile(dir):
+        yield dir
+        return
+    with os.scandir(dir) as scanner:
+        for entry in scanner:
+            if entry.is_file():
+                for e in extensions:
+                    if entry.name.lower().endswith(".{}".format(e.lower())):
+                        yield entry.path
+            elif recursive and entry.is_dir():
+                yield from crawl_dir(entry, extensions, recursive=recursive)
+
+
+def batch(iterable, n=1):
+    has_entries = True
+    while has_entries:
+        current = []
+        for i in range(0, n):
+            try:
+                current.append(next(iterable))
+            except StopIteration:
+                has_entries = False
+        yield current
 
 
 class Command(BaseCommand):
@@ -89,6 +116,7 @@ class Command(BaseCommand):
                 "of overhead on your server and on servers you are federating with."
             ),
         )
+        parser.add_argument("-e", "--extension", nargs="+")
 
         parser.add_argument(
             "--broadcast",
@@ -119,10 +147,17 @@ class Command(BaseCommand):
             help="Do NOT prompt the user for input of any kind.",
         )
 
-    def handle(self, *args, **options):
-        glob_kwargs = {}
-        matching = []
+        parser.add_argument(
+            "--batch-size",
+            "-s",
+            dest="batch_size",
+            default=1000,
+            type=int,
+            help="Size of each batch, only used when crawling large collections",
+        )
 
+    def handle(self, *args, **options):
+        self.is_confirmed = False
         try:
             library = models.Library.objects.select_related("actor__user").get(
                 uuid__startswith=options["library_id"]
@@ -133,14 +168,100 @@ class Command(BaseCommand):
         if not library.actor.get_user():
             raise CommandError("Library {} is not a local library".format(library.uuid))
 
-        if options["recursive"]:
-            glob_kwargs["recursive"] = True
-        for import_path in options["path"]:
-            matching += glob.glob(import_path, **glob_kwargs)
-        raw_matching = sorted(list(set(matching)))
+        if options["in_place"]:
+            self.stdout.write(
+                "Checking imported paths against settings.MUSIC_DIRECTORY_PATH"
+            )
 
+            for import_path in options["path"]:
+                p = settings.MUSIC_DIRECTORY_PATH
+                if not p:
+                    raise CommandError(
+                        "Importing in-place requires setting the "
+                        "MUSIC_DIRECTORY_PATH variable"
+                    )
+                if p and not import_path.startswith(p):
+                    raise CommandError(
+                        "Importing in-place only works if importing"
+                        "from {} (MUSIC_DIRECTORY_PATH), as this directory"
+                        "needs to be accessible by the webserver."
+                        "Culprit: {}".format(p, import_path)
+                    )
+
+        extensions = options.get("extension") or utils.SUPPORTED_EXTENSIONS
+        crawler = itertools.chain(
+            *[
+                crawl_dir(p, extensions=extensions, recursive=options["recursive"])
+                for p in options["path"]
+            ]
+        )
+        errors = []
+        total = 0
+        start_time = time.time()
+        reference = options["reference"] or "cli-{}".format(timezone.now().isoformat())
+
+        import_url = "{}://{}/content/libraries/{}/upload?{}"
+        import_url = import_url.format(
+            settings.FUNKWHALE_PROTOCOL,
+            settings.FUNKWHALE_HOSTNAME,
+            str(library.uuid),
+            urllib.parse.urlencode([("import", reference)]),
+        )
+        self.stdout.write(
+            "For details, please refer to import reference '{}' or URL {}".format(
+                reference, import_url
+            )
+        )
+        batch_start = None
+        batch_duration = None
+        for i, entries in enumerate(batch(crawler, options["batch_size"])):
+            total += len(entries)
+            batch_start = time.time()
+            time_stats = ""
+            if i > 0:
+                time_stats = " - running for {}s, previous batch took {}s".format(
+                    int(time.time() - start_time), int(batch_duration),
+                )
+            if entries:
+                self.stdout.write(
+                    "Handling batch {} ({} items){}".format(
+                        i + 1, options["batch_size"], time_stats,
+                    )
+                )
+                batch_errors = self.handle_batch(
+                    library=library,
+                    paths=entries,
+                    batch=i + 1,
+                    reference=reference,
+                    options=options,
+                )
+                if batch_errors:
+                    errors += batch_errors
+
+            batch_duration = time.time() - batch_start
+
+        message = "Successfully imported {} tracks in {}s"
+        if options["async_"]:
+            message = "Successfully launched import for {} tracks in {}s"
+
+        self.stdout.write(
+            message.format(total - len(errors), int(time.time() - start_time))
+        )
+        if len(errors) > 0:
+            self.stderr.write("{} tracks could not be imported:".format(len(errors)))
+
+            for path, error in errors:
+                self.stderr.write("- {}: {}".format(path, error))
+
+        self.stdout.write(
+            "For details, please refer to import reference '{}' or URL {}".format(
+                reference, import_url
+            )
+        )
+
+    def handle_batch(self, library, paths, batch, reference, options):
         matching = []
-        for m in raw_matching:
+        for m in paths:
             # In some situations, the path is encoded incorrectly on the filesystem
             # so we filter out faulty paths and display a warning to the user.
             # see https://dev.funkwhale.audio/funkwhale/funkwhale/issues/138
@@ -160,96 +281,57 @@ class Command(BaseCommand):
                     )
                 )
 
-        if options["in_place"]:
-            self.stdout.write(
-                "Checking imported paths against settings.MUSIC_DIRECTORY_PATH"
-            )
-            p = settings.MUSIC_DIRECTORY_PATH
-            if not p:
-                raise CommandError(
-                    "Importing in-place requires setting the "
-                    "MUSIC_DIRECTORY_PATH variable"
-                )
-            for m in matching:
-                if not m.startswith(p):
-                    raise CommandError(
-                        "Importing in-place only works if importing"
-                        "from {} (MUSIC_DIRECTORY_PATH), as this directory"
-                        "needs to be accessible by the webserver."
-                        "Culprit: {}".format(p, m)
-                    )
         if not matching:
             raise CommandError("No file matching pattern, aborting")
 
         if options["replace"]:
             filtered = {"initial": matching, "skipped": [], "new": matching}
-            message = "- {} files to be replaced"
+            message = "  - {} files to be replaced"
             import_paths = matching
         else:
             filtered = self.filter_matching(matching, library)
-            message = "- {} files already found in database"
+            message = "  - {} files already found in database"
             import_paths = filtered["new"]
 
-        self.stdout.write("Import summary:")
+        self.stdout.write("  Import summary:")
         self.stdout.write(
-            "- {} files found matching this pattern: {}".format(
+            "  - {} files found matching this pattern: {}".format(
                 len(matching), options["path"]
             )
         )
         self.stdout.write(message.format(len(filtered["skipped"])))
 
-        self.stdout.write("- {} new files".format(len(filtered["new"])))
+        self.stdout.write("  - {} new files".format(len(filtered["new"])))
 
-        self.stdout.write(
-            "Selected options: {}".format(
-                ", ".join(["in place" if options["in_place"] else "copy music files"])
+        if batch == 1:
+            self.stdout.write(
+                "  Selected options: {}".format(
+                    ", ".join(
+                        ["in place" if options["in_place"] else "copy music files"]
+                    )
+                )
             )
-        )
         if len(filtered["new"]) == 0:
-            self.stdout.write("Nothing new to import, exiting")
+            self.stdout.write("  Nothing new to import, exiting")
             return
 
-        if options["interactive"]:
+        if options["interactive"] and not self.is_confirmed:
             message = (
                 "Are you sure you want to do this?\n\n"
                 "Type 'yes' to continue, or 'no' to cancel: "
             )
             if input("".join(message)) != "yes":
                 raise CommandError("Import cancelled.")
-        reference = options["reference"] or "cli-{}".format(timezone.now().isoformat())
-
-        import_url = "{}://{}/content/libraries/{}/upload?{}"
-        import_url = import_url.format(
-            settings.FUNKWHALE_PROTOCOL,
-            settings.FUNKWHALE_HOSTNAME,
-            str(library.uuid),
-            urllib.parse.urlencode([("import", reference)]),
-        )
-        self.stdout.write(
-            "For details, please refer to import reference '{}' or URL {}".format(
-                reference, import_url
-            )
-        )
+            self.is_confirmed = True
 
         errors = self.do_import(
-            import_paths, library=library, reference=reference, options=options
+            import_paths,
+            library=library,
+            reference=reference,
+            batch=batch,
+            options=options,
         )
-        message = "Successfully imported {} tracks"
-        if options["async_"]:
-            message = "Successfully launched import for {} tracks"
-
-        self.stdout.write(message.format(len(import_paths)))
-        if len(errors) > 0:
-            self.stderr.write("{} tracks could not be imported:".format(len(errors)))
-
-            for path, error in errors:
-                self.stderr.write("- {}: {}".format(path, error))
-
-        self.stdout.write(
-            "For details, please refer to import reference '{}' or URL {}".format(
-                reference, import_url
-            )
-        )
+        return errors
 
     def filter_matching(self, matching, library):
         sources = ["file://{}".format(p) for p in matching]
@@ -266,17 +348,20 @@ class Command(BaseCommand):
         }
         return result
 
-    def do_import(self, paths, library, reference, options):
-        message = "{i}/{total} Importing {path}..."
+    def do_import(self, paths, library, reference, batch, options):
+        message = "[batch {batch}] {i}/{total} Importing {path}..."
         if options["async_"]:
-            message = "{i}/{total} Launching import for {path}..."
+            message = "[batch {batch}] {i}/{total} Launching import for {path}..."
 
         # we create an upload binded to the library
         async_ = options["async_"]
         errors = []
         for i, path in list(enumerate(paths)):
+            if options["verbosity"] > 1:
+                self.stdout.write(
+                    message.format(batch=batch, path=path, i=i + 1, total=len(paths))
+                )
             try:
-                self.stdout.write(message.format(path=path, i=i + 1, total=len(paths)))
                 self.create_upload(
                     path,
                     reference,

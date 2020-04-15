@@ -47,7 +47,7 @@ class Command(BaseCommand):
         self.stdout.write("Checking {} in-place imported files…".format(total))
 
         missing = []
-        for i, row in enumerate(candidates.values("id", "source")):
+        for i, row in enumerate(candidates.values("id", "source").iterator()):
             path = row["source"].replace("file://", "")
             progress(self.stdout, i + 1, total)
             if not os.path.exists(path):
