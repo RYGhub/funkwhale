@@ -256,14 +256,14 @@ class Attachment(models.Model):
     @property
     def download_url_original(self):
         if self.file:
-            return federation_utils.full_url(self.file.url)
+            return utils.media_url(self.file.url)
         proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": self.uuid})
         return federation_utils.full_url(proxy_url + "?next=original")
 
     @property
     def download_url_medium_square_crop(self):
         if self.file:
-            return federation_utils.full_url(self.file.crop["200x200"].url)
+            return utils.media_url(self.file.crop["200x200"].url)
         proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": self.uuid})
         return federation_utils.full_url(proxy_url + "?next=medium_square_crop")
 

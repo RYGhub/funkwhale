@@ -134,6 +134,17 @@ def join_url(start, end):
     return start + end
 
 
+def media_url(path):
+    if settings.MEDIA_URL.startswith("http://") or settings.MEDIA_URL.startswith(
+        "https://"
+    ):
+        return join_url(settings.MEDIA_URL, path)
+
+    from funkwhale_api.federation import utils as federation_utils
+
+    return federation_utils.full_url(path)
+
+
 def spa_reverse(name, args=[], kwargs={}):
     return urls.reverse(name, urlconf=settings.SPA_URLCONF, args=args, kwargs=kwargs)
 
