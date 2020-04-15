@@ -185,18 +185,17 @@ def test_get_channels_groups(factories):
     ]
 
 
-def test_user_quota_default_to_preference(factories, preferences):
-    preferences["users__upload_quota"] = 42
+@pytest.mark.parametrize(
+    "default_quota, user_quota, expected",
+    [(1000, None, 1000), (1000, 42, 42), (1000, 0, 0)],
+)
+def test_user_quota_set_on_user(
+    default_quota, user_quota, expected, factories, preferences
+):
+    preferences["users__upload_quota"] = default_quota
 
-    user = factories["users.User"]()
-    assert user.get_upload_quota() == 42
-
-
-def test_user_quota_set_on_user(factories, preferences):
-    preferences["users__upload_quota"] = 42
-
-    user = factories["users.User"](upload_quota=66)
-    assert user.get_upload_quota() == 66
+    user = factories["users.User"](upload_quota=user_quota)
+    assert user.get_upload_quota() == expected
 
 
 def test_user_get_quota_status(factories, preferences, mocker):

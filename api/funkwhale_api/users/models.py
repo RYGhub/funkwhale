@@ -258,7 +258,11 @@ class User(AbstractUser):
         return self.actor
 
     def get_upload_quota(self):
-        return self.upload_quota or preferences.get("users__upload_quota")
+        return (
+            self.upload_quota
+            if self.upload_quota is not None
+            else preferences.get("users__upload_quota")
+        )
 
     def get_quota_status(self):
         data = self.actor.get_current_usage()
