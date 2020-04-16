@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-04-15 22:09+0000\n"
+"PO-Revision-Date: 2020-04-16 17:53+0000\n"
 "Last-Translator: marzzzello <anmeldezeugs@top-email.net>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -3430,7 +3430,6 @@ msgid "Name"
 msgstr "Name"
 
 #: front/src/components/audio/ChannelForm.vue:29
-#, fuzzy
 msgctxt "Content/Channel/*"
 msgid "Name"
 msgstr "Name"
@@ -3441,10 +3440,9 @@ msgid "Never"
 msgstr "Nie"
 
 #: front/src/components/channels/AlbumModal.vue:4
-#, fuzzy
 msgctxt "Popup/Channels/Title"
 msgid "New album"
-msgstr "Neuer Wert"
+msgstr "Neues Album"
 
 #: front/src/components/library/Home.vue:30
 msgctxt "*/*/*"
@@ -3474,10 +3472,9 @@ msgstr "Neuer Wert"
 
 #: front/src/components/channels/UploadModal.vue:34
 #: front/src/views/auth/ProfileOverview.vue:63
-#, fuzzy
 msgctxt "*/*/Button.Label"
 msgid "Next step"
-msgstr "Nächster Track"
+msgstr "Nächster Schritt"
 
 #: front/src/App.vue:311 src/components/audio/Player.vue:662
 msgctxt "Sidebar/Player/Icon.Tooltip"
@@ -3502,10 +3499,9 @@ msgid "No artist matched your query"
 msgstr "Keinen passende Kunstschaffende Person gefunden"
 
 #: front/src/components/common/RenderedDescription.vue:16
-#, fuzzy
 msgctxt "*/*/Placeholder"
 msgid "No description available"
-msgstr "Keine Beschreibung verfügbar."
+msgstr "Keine Beschreibung verfügbar"
 
 #: front/src/components/About.vue:27 src/components/Home.vue:27
 msgctxt "Content/Home/Paragraph"
@@ -3534,28 +3530,24 @@ msgstr "Keine Benachrichtigungen zum Anzeigen."
 
 #: front/src/components/playlists/PlaylistModal.vue:94
 #: front/src/components/playlists/Widget.vue:14
-#, fuzzy
 msgctxt "Content/Home/Placeholder"
 msgid "No playlists have been created yet"
-msgstr "Die Wiedergabeliste konnte nicht erstellt werden"
+msgstr "Es wurden noch keine Wiedergabelisten erstellt"
 
 #: front/src/components/playlists/PlaylistModal.vue:85
-#, fuzzy
 msgctxt "Popup/Playlist/EmptyState"
 msgid "No results matching your filter"
-msgstr "Titel Auswahl Filter"
+msgstr "Keine Ergebnisse für diesen Filter"
 
 #: front/src/components/library/Albums.vue:62
-#, fuzzy
 msgctxt "Content/Albums/Placeholder"
 msgid "No results matching your query"
-msgstr "Keinen passende Kunstschaffende Person gefunden"
+msgstr "Keine Ergebnisse zu deiner Anfrage"
 
 #: front/src/components/library/Artists.vue:53
-#, fuzzy
 msgctxt "Content/Artists/Placeholder"
 msgid "No results matching your query"
-msgstr "Keinen passende Kunstschaffende Person gefunden"
+msgstr "Keine Ergebnisse zu deiner Anfrage"
 
 #: front/src/views/playlists/List.vue:46
 #, fuzzy
@@ -3766,7 +3758,7 @@ msgstr "Sortierung"
 #: front/src/views/playlists/List.vue:17
 msgctxt "Content/Search/Dropdown.Label/Noun"
 msgid "Ordering"
-msgstr "Reihenfolge"
+msgstr "Sortieren nach"
 
 #: front/src/components/library/Albums.vue:27
 #: src/components/library/Artists.vue:27
@@ -3782,11 +3774,10 @@ msgstr "Reihenfolge"
 #: front/src/views/content/libraries/FilesTable.vue:60
 msgctxt "Content/Search/Dropdown.Label/Noun"
 msgid "Ordering direction"
-msgstr "Sortierreihenfolge"
+msgstr "Sortierrichtung"
 
 #: front/src/components/mixins/Translations.vue:63
 #: front/src/components/mixins/Translations.vue:64
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Other"
 msgstr "Andere"
@@ -3798,22 +3789,19 @@ msgid "Other"
 msgstr "Andere"
 
 #: front/src/views/channels/DetailBase.vue:205
-#, fuzzy
 msgctxt "Content/Channels/Link"
 msgid "Overview"
-msgstr "Vorschau"
+msgstr "Übersicht"
 
 #: front/src/views/auth/ProfileBase.vue:60
-#, fuzzy
 msgctxt "Content/Profile/Link"
 msgid "Overview"
-msgstr "Vorschau"
+msgstr "Übersicht"
 
 #: front/src/views/library/DetailBase.vue:33
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Owned by %{ username }"
-msgstr "Angemeldet als %{ username }"
+msgstr "Im Besitz von %{ username }"
 
 #: front/src/components/manage/moderation/ReportCard.vue:143
 #: front/src/components/manage/users/InvitationsTable.vue:38
@@ -4662,10 +4650,9 @@ msgid "Requesting a fetch…"
 msgstr "Abruf wird angefordert …"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:279
-#, fuzzy
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Requests"
-msgstr "Kennwort beantragen"
+msgstr "Anfragen"
 
 #: front/src/components/admin/SignupFormBuilder.vue:49
 msgctxt "*/*/Form-builder,Help"
@@ -4741,10 +4728,9 @@ msgid "Retry"
 msgstr "Erneut versuchen"
 
 #: front/src/components/library/FileUpload.vue:104
-#, fuzzy
 msgctxt "Content/Library/Table"
 msgid "Retry failed uploads"
-msgstr "Mediathek aktualisiert"
+msgstr "Wiederhole fehlgeschlagene Uploads"
 
 #: front/src/views/auth/EmailConfirm.vue:17
 msgctxt "Content/Signup/Link/Verb"
@@ -4886,10 +4872,9 @@ msgid "Search by domain, actor, name, reference, source…"
 msgstr "Suche nach Domain, Benutzernamen, Biografie…"
 
 #: front/src/components/manage/ChannelsTable.vue:180
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, name, account…"
-msgstr "Suche nach Domain, Benutzernamen, Biografie…"
+msgstr "Suche nach Domain, Name, Konto…"
 
 #: front/src/components/manage/library/ArtistsTable.vue:181
 msgctxt "Content/Search/Input.Placeholder"
@@ -4956,7 +4941,7 @@ msgstr "Musik suchen"
 #: front/src/components/library/TagsSelector.vue:6
 msgctxt "*/Dropdown/Placeholder/Verb"
 msgid "Search for tags…"
-msgstr "Nach Tags suchen…"
+msgstr "Nach Schlagwörter suchen…"
 
 #: front/src/components/library/AlbumDropdown.vue:36
 #: front/src/components/library/ArtistBase.vue:77
@@ -4966,10 +4951,9 @@ msgid "Search on Discogs"
 msgstr "Auf Discogs suchen"
 
 #: front/src/components/audio/SearchBar.vue:159
-#, fuzzy
 msgctxt "Search/*/*"
 msgid "Search on the fediverse"
-msgstr "Auf Wikipedia suchen"
+msgstr "Suche im Fediverse"
 
 #: front/src/components/library/ArtistBase.vue:69
 #: front/src/components/library/TrackBase.vue:56
@@ -4978,10 +4962,9 @@ msgid "Search on Wikipedia"
 msgstr "Auf Wikipedia suchen"
 
 #: front/src/components/common/InlineSearchBar.vue:24
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search…"
-msgstr "Suchen"
+msgstr "Suchen…"
 
 #: front/src/components/library/Library.vue:18
 #: src/views/admin/library/Base.vue:38
@@ -5042,12 +5025,12 @@ msgstr "Nur die aktuelle Seite auswählen"
 #: front/src/components/library/TrackDetail.vue:81
 msgctxt "*/*/*"
 msgid "Serie"
-msgstr ""
+msgstr "Serie"
 
 #: front/src/views/channels/DetailOverview.vue:61
 msgctxt "Content/Channel/Paragraph"
 msgid "Series"
-msgstr ""
+msgstr "Serien"
 
 #: front/src/components/Home.vue:45
 msgctxt "Content/Home/Link"
@@ -5216,10 +5199,9 @@ msgid "Sign-up date"
 msgstr "Anmeldedatum"
 
 #: front/src/views/admin/Settings.vue:81
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Sign-ups"
-msgstr "Anmeldung"
+msgstr "Registrierungen"
 
 #: front/src/components/library/FileUpload.vue:94
 #: front/src/components/library/TrackDetail.vue:24
@@ -5336,10 +5318,9 @@ msgid "Status"
 msgstr "Status"
 
 #: front/src/views/playlists/Detail.vue:30
-#, fuzzy
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "Stop Editing"
-msgstr "Radio ausschalten"
+msgstr "Bearbeitung beenden"
 
 #: front/src/components/Queue.vue:194 src/components/radios/Button.vue:3
 msgctxt "*/Player/Button.Label/Short, Verb"
@@ -5347,10 +5328,9 @@ msgid "Stop radio"
 msgstr "Radio ausschalten"
 
 #: front/src/components/audio/ChannelForm.vue:110
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Subcategory"
-msgstr "Kategorie"
+msgstr "Unterkategorie"
 
 #: front/src/components/SetInstanceModal.vue:23
 msgctxt "*/*/Button.Label/Verb"
@@ -5402,7 +5382,7 @@ msgstr "Abonnieren"
 #, fuzzy
 msgctxt "Content/Channels/Header"
 msgid "Subscribe on Funkwhale"
-msgstr "Funkwhale nutzen"
+msgstr "Auf Funkwhale abonnieren"
 
 #: front/src/views/channels/DetailBase.vue:58
 msgctxt "Content/Channels/Header"
@@ -5417,28 +5397,29 @@ msgstr "Abonniere einen Podcast via RSS-Feed"
 #: front/src/components/audio/SearchBar.vue:177
 msgctxt "Search/*/*"
 msgid "Subscribe to podcast via RSS"
-msgstr ""
+msgstr "Abonniere Podcast via RSS"
 
 #: front/src/views/channels/DetailBase.vue:35
 msgctxt "Popup/Channel/Title/Verb"
 msgid "Subscribe to this channel"
-msgstr ""
+msgstr "Abonniere diesen Kanal"
 
 #: front/src/views/channels/DetailBase.vue:50
+#, fuzzy
 msgctxt "Content/Channels/Header"
 msgid "Subscribe via RSS"
-msgstr ""
+msgstr "Abonniere via RSS"
 
 #: front/src/views/channels/SubscriptionsList.vue:81
 msgctxt "Content/Subscriptions/Header"
 msgid "Subscribed Channels"
-msgstr ""
+msgstr "Abonnierte Kanäle"
 
 #: front/src/views/channels/SubscriptionsList.vue:14
 #, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Subscription"
-msgstr "Beschreibung"
+msgstr "Abonnement"
 
 #: front/src/views/admin/Settings.vue:88
 msgctxt "Content/Admin/Menu"
@@ -5517,7 +5498,6 @@ msgid "Tag data"
 msgstr "Tag-Daten"
 
 #: front/src/components/audio/ChannelForm.vue:63
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Tags"
 msgstr "Schlagwörter"
@@ -6313,10 +6293,12 @@ msgid "Uploaded"
 msgstr "Hochgeladen"
 
 #: front/src/components/library/TrackBase.vue:271
-#, fuzzy
 msgctxt "Content/Track/Paragraph"
 msgid "Uploaded by <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }</a> on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
-msgstr "Aus dem Album <a class=\"internal\" href=\"%{ albumUrl }\">%{ album } </a> von <a class=\"internal\" href=\"%{ artistUrl }\">%{ artist }</a>"
+msgstr ""
+"Hochgeladen von <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader "
+"}</a> am <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate "
+"}</time>"
 
 #: front/src/components/library/TrackBase.vue:279
 msgctxt "Content/Track/Paragraph"
@@ -6645,12 +6627,12 @@ msgstr "Willkommen"
 #: front/src/components/Home.vue:5
 msgctxt "Content/Home/Header"
 msgid "Welcome to %{ podName }!"
-msgstr ""
+msgstr "Willkommen bei %{ podName }!"
 
 #: front/src/components/audio/ChannelForm.vue:11
 msgctxt "Content/Channel/Paragraph"
 msgid "What this channel will be used for?"
-msgstr ""
+msgstr "Wofür wird dieser Kanal verwendet?"
 
 #: front/src/components/audio/EmbedWizard.vue:23
 msgctxt "Popup/Embed/Input.Label"
@@ -6665,32 +6647,32 @@ msgstr "Grafikobjektsbreite"
 #: front/src/components/common/ContentForm.vue:5
 msgctxt "*/Form/Menu.item"
 msgid "Write"
-msgstr ""
+msgstr "Verfassen"
 
 #: front/src/components/auth/ApplicationForm.vue:157
 msgctxt "Content/OAuth Scopes/Label/Verb"
 msgid "Write"
-msgstr ""
+msgstr "Schreiben"
 
 #: front/src/components/common/ContentForm.vue:96
 msgctxt "*/Form/Placeholder"
 msgid "Write a few words here…"
-msgstr ""
+msgstr "Schreibe hier ein paar Worte…"
 
 #: front/src/components/auth/Authorize.vue:21
 msgctxt "Content/Auth/Label/Noun"
 msgid "Write-only"
-msgstr ""
+msgstr "Nur schreiben"
 
 #: front/src/components/auth/ApplicationForm.vue:158
 msgctxt "Content/OAuth Scopes/Help Text"
 msgid "Write-only access to user data"
-msgstr ""
+msgstr "Schreibzugriff auf Nutzerdaten"
 
 #: front/src/components/library/TrackDetail.vue:91
 msgctxt "*/*/*"
 msgid "Year"
-msgstr ""
+msgstr "Jahr"
 
 #: front/src/components/admin/SignupFormBuilder.vue:72
 #: front/src/components/manage/moderation/AccountsTable.vue:72
@@ -6720,11 +6702,17 @@ msgstr "Die Musik wird bald zu deiner Mediathek hochgeladen. Prüfe bitte vorab,
 msgctxt "Popup/Login/Paragraph"
 msgid "You are currently connected to <a href=\"%{ url }\" target=\"_blank\">%{ hostname }&nbsp;<i class=\"external icon\"/></a>. If you continue, you will be disconnected from your current instance and all your local data will be deleted."
 msgstr ""
+"Du bist derzeit mit <a href=\"%{ url }\" target=\"_blank\">%{ hostname "
+"}&nbsp;<i class=\"external icon\"/></a> verbunden. Wenn du fortfährst, wirst "
+"du von deiner aktuellen Instanz getrennt und alle deine lokalen Daten werden "
+"gelöscht."
 
 #: front/src/components/library/ArtistDetail.vue:6
 msgctxt "Content/Artist/Paragraph"
 msgid "You are currently hiding content related to this artist."
 msgstr ""
+"Du versteckst derzeit Inhalte, die sich auf diese kunstschaffende Person "
+"beziehen."
 
 #: front/src/components/auth/Logout.vue:7
 msgctxt "Content/Login/Paragraph"
