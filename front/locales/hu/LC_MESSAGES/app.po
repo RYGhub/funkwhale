@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2020-01-26 19:56+0000\n"
+"PO-Revision-Date: 2020-04-16 17:53+0000\n"
 "Last-Translator: M.G. <magardner2010@gmail.com>\n"
 "Language-Team: none\n"
 "Language: hu\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9\n"
+"X-Generator: Weblate 3.11.3\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:6
 msgctxt "Popup/Playlist/Paragraph"
@@ -25,12 +25,12 @@ msgstr "%{ artist } : \"%{ title }\""
 
 #: front/src/components/audio/ChannelCard.vue:28
 msgid "{{ object.artist.modification_date | fromNow }}"
-msgstr ""
+msgstr "{{ object.artist.modification_date | fromNow }}"
 
 #: front/src/components/RemoteSearchForm.vue:71
 msgctxt "Head/Fetch/Field.Placeholder"
 msgid "@channel@pod.example or https://website.example/rss.xml"
-msgstr ""
+msgstr "@channel@pod.example vagy https://website.example/rss.xml"
 
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
@@ -70,12 +70,11 @@ msgstr[1] "%{ count } művész"
 #: front/src/components/library/AlbumBase.vue:25
 #: front/src/components/library/AlbumBase.vue:67
 #: src/views/channels/DetailBase.vue:19
-#, fuzzy
 msgctxt "Content/Channel/Paragraph"
 msgid "%{ count } episode"
 msgid_plural "%{ count } episodes"
-msgstr[0] "%{ count } művész"
-msgstr[1] "%{ count } művész"
+msgstr[0] "%{ count } epizód"
+msgstr[1] "%{ count } epizód"
 
 #: front/src/components/favorites/List.vue:10
 msgctxt "Content/Favorites/Title"
@@ -175,7 +174,7 @@ msgstr "%{ minutes } perc"
 #: front/src/components/notifications/NotificationRow.vue:44
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } accepted your follow on library \"%{ library }\""
-msgstr ""
+msgstr "%{ username } elfogadta a  \"%{ library }\" követésedet"
 
 #: front/src/components/notifications/NotificationRow.vue:43
 msgctxt "Content/Notifications/Paragraph"
@@ -221,7 +220,7 @@ msgstr "Hálózati hiba történt ennek az állománynak a feltöltése közben"
 #: front/src/App.vue:414
 msgctxt "App/Message/Paragraph"
 msgid "A new version of the app is available."
-msgstr ""
+msgstr "Az alkalmazás új verziója elérhető."
 
 #: front/src/components/library/EditForm.vue:180
 msgctxt "*/*/Placeholder"
@@ -247,7 +246,7 @@ msgstr ""
 #: front/src/components/Footer.vue:56 src/components/Home.vue:87
 msgctxt "Footer/*/Title/Short"
 msgid "About Funkwhale"
-msgstr ""
+msgstr "Funkwhaleról"
 
 #: front/src/components/Footer.vue:13
 msgctxt "Footer/About/List item.Link"
@@ -257,23 +256,23 @@ msgstr "Rólunk"
 #: front/src/components/Home.vue:21
 msgctxt "Content/Home/Header"
 msgid "About this Funkwhale pod"
-msgstr ""
+msgstr "Erről a Funkwhale egyedről"
 
 #: front/src/components/channels/LicenseSelect.vue:14
+#, fuzzy
 msgctxt "Content/*/*"
 msgid "About this license"
-msgstr ""
+msgstr "Erről a licencről"
 
 #: front/src/components/About.vue:23 src/components/About.vue:53
 msgctxt "Content/About/Header"
 msgid "About this pod"
-msgstr ""
+msgstr "Erről az egyedről"
 
 #: front/src/components/Sidebar.vue:145
-#, fuzzy
 msgctxt "Sidebar/*/List item.Link"
 msgid "About this pod"
-msgstr "%{ podName}ról"
+msgstr "Erről az egyedről"
 
 #: front/src/views/library/Edit.vue:41
 msgctxt "Content/Library/Button.Label"
@@ -412,8 +411,8 @@ msgstr ""
 msgctxt "Content/*/Paragraph"
 msgid "Action %{ action } was launched successfully on %{ count } element"
 msgid_plural "Action %{ action } was launched successfully on %{ count } elements"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Egy elemen sikeresen végrehajtódott a(z) %{ action } művelet"
+msgstr[1] "%{ count } elemen sikeresen végrehajtódott a(z) %{ action } művelet"
 
 #: front/src/components/library/FileUpload.vue:96
 #, fuzzy
@@ -427,7 +426,7 @@ msgstr "Pályázat"
 #: front/src/components/manage/moderation/UserRequestCard.vue:113
 msgctxt "Content/*/*/Noun"
 msgid "Actions"
-msgstr ""
+msgstr "műveletek"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgctxt "Content/Admin/Table"
@@ -466,10 +465,9 @@ msgstr "Hozzáadás"
 
 #: front/src/components/library/AlbumBase.vue:101
 #: front/src/components/library/AlbumBase.vue:113
-#, fuzzy
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Add a description…"
-msgstr "Adjon hozzá moderációs irányelvet"
+msgstr "Adj hozzá leírást…"
 
 #: front/src/views/admin/moderation/DomainsList.vue:13
 msgctxt "Content/Moderation/Form.Label/Verb"
@@ -480,6 +478,8 @@ msgstr ""
 msgctxt "Content/Channels/Popup.Paragraph"
 msgid "Add a license to your upload to ensure some freedoms to your public."
 msgstr ""
+"Adjon hozzá licencet a feltöltéséhez, hogy bizonyos szabadságokat "
+"biztosítson a nyilvánosság számára."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:79
 msgctxt "Content/Moderation/Button/Verb"
@@ -489,7 +489,7 @@ msgstr "Adjon hozzá moderációs irányelvet"
 #: front/src/components/admin/SignupFormBuilder.vue:97
 msgctxt "*/*/Form-builder"
 msgid "Add a new field"
-msgstr ""
+msgstr "Új mező hozzáadása"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:4
 msgctxt "Content/Moderation/Card.Button.Label/Verb"
@@ -526,10 +526,9 @@ msgstr "Szűrők hozzáadása a rádió testreszabásához"
 #: src/views/auth/ProfileOverview.vue:27
 #: front/src/views/channels/DetailOverview.vue:66
 #: front/src/views/channels/SubscriptionsList.vue:8
-#, fuzzy
 msgctxt "Content/Profile/Button"
 msgid "Add new"
-msgstr "Jegyzet hozzáadása"
+msgstr "Új létrehozása"
 
 #: front/src/components/manage/moderation/NoteForm.vue:12
 msgctxt "Content/Moderation/Button.Label/Verb"
@@ -540,14 +539,14 @@ msgstr "Jegyzet hozzáadása"
 #: src/components/library/Artists.vue:62
 msgctxt "Content/*/Verb"
 msgid "Add some music"
-msgstr ""
+msgstr "Adj hozzá zenét"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:197
 #: front/src/views/admin/moderation/DomainsDetail.vue:46
 #: front/src/views/admin/moderation/DomainsList.vue:18
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Add to allow-list"
-msgstr ""
+msgstr "Hozzáadás az engedélyezett listához"
 
 #: front/src/components/audio/PlayButton.vue:85
 msgctxt "*/Queue/Dropdown/Button/Title"
@@ -561,10 +560,9 @@ msgid "Add to favorites"
 msgstr "Hozzáadás a kedvencekhez"
 
 #: front/src/components/playlists/PlaylistModal.vue:5
-#, fuzzy
 msgctxt "Popup/Playlist/Title/Verb"
 msgid "Add to playlist"
-msgstr "Hozzáadás lejátszási listához …"
+msgstr "Hozzáadás a lejátszási listához"
 
 #: front/src/components/playlists/TrackPlaylistIcon.vue:6
 #: front/src/components/playlists/TrackPlaylistIcon.vue:35
@@ -590,12 +588,12 @@ msgstr "Dal hozzáadása"
 #: front/src/components/admin/SignupFormBuilder.vue:156
 msgctxt "*/*/Form-builder"
 msgid "Additional field"
-msgstr ""
+msgstr "További mező"
 
 #: front/src/components/admin/SignupFormBuilder.vue:34
 msgctxt "*/*/Label"
 msgid "Additional fields"
-msgstr ""
+msgstr "További mezők"
 
 #: front/src/components/admin/SignupFormBuilder.vue:37
 msgctxt "*/*/Help"
