@@ -26,6 +26,16 @@ sys.path.insert(0, os.path.abspath("../api"))
 
 import funkwhale_api  # NOQA
 
+FUNKWHALE_CONFIG = {
+    "FUNKWHALE_URL": "mypod.funkwhale",
+    "FUNKWHAL_PROTOCOL": "https",
+    "DATABASE_URL": "postgres://localhost:5432/db",
+    "AWS_ACCESS_KEY_ID": 'my_access_key',
+    "AWS_SECRET_ACCESS_KEY": 'my_secret_key',
+    "AWS_STORAGE_BUCKET_NAME": 'my_bucket',
+}
+for key, value in FUNKWHALE_CONFIG.items():
+    os.environ[key] = value
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -35,8 +45,9 @@ import funkwhale_api  # NOQA
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.graphviz"]
-
+extensions = ["sphinx.ext.graphviz", "sphinx.ext.autodoc"]
+autodoc_mock_imports = ["celery", "django_auth_ldap", "ldap"]
+add_module_names = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
