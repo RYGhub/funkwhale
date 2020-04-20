@@ -3,6 +3,8 @@ Tagging Music With MusicBrainz Picard
 
 In order to get the most out of Funkwhale, it is important to tag files correctly. Good tagging makes managing your library much easier and provides Funkwhale with the information necessary to display album art, metadata, and other useful information. The recommended tool for tagging music is `MusicBrainz Picard <https://picard.musicbrainz.org/>`_.
 
+In addition to using an external tagging service, tags can be applied :doc:`directly in Funkwhale <editing>`.
+
 Tagging Items
 --------------
 

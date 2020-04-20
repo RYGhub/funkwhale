@@ -18,9 +18,11 @@ To create a playlist:
 - A pop-up will appear listing any of your existing playlists
 - Enter a name for your playlist under the "Playlist name" section
 - Choose a visibility setting:
-    - **Nobody except me**: The playlist will be hidden from all users of the instance
-    - **Everyone on this instance**: The playlist will be visible to local accounts, but not to external users
-    - **Everyone**: The playlist will be public
+
+   - **Nobody except me**: The playlist will be hidden from all users of the instance
+   - **Everyone on this instance**: The playlist will be visible to local accounts, but not to external users
+   - **Everyone**: The playlist will be public
+
 - Click "Create Playlist" to commit your changes
 
 .. note::

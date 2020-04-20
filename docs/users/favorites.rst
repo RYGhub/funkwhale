@@ -16,6 +16,16 @@ To add a track to your favorites from your library:
 - Click on the gray heart icon next to the track
 - Once the gray heart has turned pink, the song will be in your favorites list
 
+From a Channel
+^^^^^^^^^^^^^^
+
+To add a track to your favorites from a channel:
+
+- Click on the channel in question and find the track you would like to favorite
+- Click on the track to open its overview page
+- Click on the white heart icon next to the Play button
+- Once the white heart has turned pink, the track will be in your favorites list
+
 From Currently Playing
 ^^^^^^^^^^^^^^^^^^^^^^
 
