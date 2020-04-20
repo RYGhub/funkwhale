@@ -5,7 +5,7 @@ To upload content to any Funkwhale instance, you need:
 
 1. :doc:`An account on that instance <create>`
 2. :ref:`Storage space <upload-storage>`
-3. :ref:`A library <upload-library>`
+3. :ref:`A library <upload-library>` or :ref:`channel <upload-channel>`
 4. :ref:`Properly tagged files <upload-tagging>`
 5. :ref:`To upload your files <upload-upload>`
 
@@ -24,10 +24,26 @@ if you'd like some additional storage space.
 You can view your current quota and usage at any time by visiting ``/content/libraries/`` on your instance,
 or clicking the "Add content" link in the sidebar, then visiting the "Upload audio content" section.
 
+.. _upload-channel:
+
+Using a Channel
+---------------
+
+A channel is a collection of content that is published directly to funkwhale. Channels are always public
+and can be followed from different fediverse software such as Mastodon, Reel2Bits or other Funkwhale
+pods.
+
+There are two types of channel:
+
+- A podcast channel
+- An artist discography channel
+
+See :doc:`channels` for more information on channels.
+  
 .. _upload-library:
 
-Creating a library
-------------------
+Using a library
+---------------
 
 In Funkwhale's world, a library is a collection of audio files with an associated visibility level. A library can be:
 
@@ -39,8 +55,6 @@ Regardless of visibility settings, you can share the library link to specific us
 and accept their follow request in order to grant then access to its content. Typically, this
 is useful when you have a private library you want to share with friends or family.
 
-You can create your first library by visiting ``/content/libraries/`` or clicking the "Add content" link in the sidebar, then visiting the "Upload audio content" section.
-
 Before you upload your content, you need to know the content audience and license:
 
 - If the content is under an open license (like Creative Commons licenses), it's usually fine to upload it in a public library
@@ -49,6 +63,8 @@ Before you upload your content, you need to know the content audience and licens
 .. note::
 
     As a rule of thumb, only use public and local libraries for content for which you own the copyright or for content you know you can share with a wider audience.
+
+See :doc:`libraries <managing>` for more information on libraries.
 
 .. _upload-tagging:
 
@@ -128,36 +144,6 @@ The easiest way to inspect and edit file tags is with `MusicBrainz Picard <https
 software, that works on Windows, MacOS and Linux. Picard is able to automatically tag many files,
 and include non-necessary but nice to have information, such as album covers. For a guide on tagging content with Picard,
 see :doc:`tagging`.
-
-.. _upload-upload:
-
-Uploading your files
---------------------
-
-Once you've chose the library and have properly tagged files, you can start the actual upload.
-Simply visit ``/content/libraries/`` or click the "Add content" link in the sidebar, then visit the "Upload audio content" section. Click on
-the "Upload" button next to the library of your choice, and follow the instructions.
-
-You can queue as many files as you want for the upload, simply leave your browser window open on the upload page
-until all files are uploaded.
-
-By default, Funkwhale accepts files up to 100MB in size, but this limit can be increased or reduced
-by instance admins.
-
-Once uploaded, your files should be processed shortly. It's usually a matter of seconds, but
-can vary depending on server load.
-
-.. _upload-remove:
-
-Removing files
---------------
-
-If you want to remove some of the files you have uploaded, visit ``/content/libraries/tracks/`` or click "Add content" in the sidebar then "Tracks" in the top menu.
-Then select the files you want to delete using the checkboxes on the left ; you can filter the list of files using a search pattern.
-Finally, select "Delete" in the "Action" menu and click "Go".
-
-This operation does *not* remove metadata, meaning that deleted tracks will remain visible in your library. They just won't be playable anymore.
-
 
 Common errors during import
 ---------------------------

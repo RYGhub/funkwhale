@@ -8,10 +8,10 @@ Add Tracks to Your Queue
 
 There are four options to choose from when adding music to a queue:
 
-- Play - this will start playing the selected item(s) immediately, stopping any currently playing tracks
-- Add to queue - this adds the selected item(s) to the bottom of the queue. If the queue is empty, it will add them but not start playing
-- Play next - this adds the selected item(s) just underneath the currently selected track in the queue
-- Play now - this acts the same as "Play"
+- **Play** - this will start playing the selected item(s) immediately, stopping any currently playing tracks
+- **Add to queue** - this adds the selected item(s) to the bottom of the queue. If the queue is empty, it will add them but not start playing
+- **Play next** - this adds the selected item(s) just underneath the currently selected track in the queue
+- **Play now** - this acts the same as "Play"
 
 Add a Song to the Queue
 ^^^^^^^^^^^^^^^^^^^^^^^

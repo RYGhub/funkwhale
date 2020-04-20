@@ -33,13 +33,10 @@ Following Other Libraries
 
 Once you've got the library link, you can start following the library by doing the following:
 
-- Click on the "Add content" menu under "Music" on the left-hand side
-- Under "Follow Remote Libraries", select "Get Started"
-- In the search bar that appears, paste the library link of the library you wish to follow
-- If the URL is valid, the name of the library will appear. Click "Follow" to start following the library
-- Once your follow request is approved, the library will be scanned for content (this will be automatic for public libraries)
-- Click on "Browse library" under "Music" on the left-hand side to return to the library overview
-- The library content should now be visible and playable on your instance
+- Click on the upload icon on the side bar
+- Select "Get Started" under the "Follow Remote Libraries" section
+- Paste the library link in the search bar and click on the magnifying glass
+- Click on the "Follow" button when the library card appears
 
 If another user on your instance has followed a library, you can follow it as well in case the user
 leaves or stops following it. To do this:
@@ -54,7 +51,8 @@ Sharing Your Libraries
 As well as being able to follow other users, you can also share your libraries with friends, family, and
 the network at large. To find your library link:
 
-- Navigate to ``https://your-instance/content/libraries`` or click "Add Content" under the "Music" menu, select "Upload audio content", and click "Detail" under the library you want the code for
-- Under the "Followers" tab, you will be able to see information about followers this library currently has. The sharing link will also be visible
-- Click on "Copy" to copy the sharing link to your clipboard
-- Depending on the visibility settings you have chosen for the library, you will need to approve follow requests for those with whom you share the link
+- Navigate to ``https://your-instance/content/libraries`` or click the upload button and select "Get Started"
+  under the "Upload third-party content in a library" section to access your libraries
+- Find the library in question and click on the "Details" button
+- The sharing link should be shown on under the library details. Click on the "Copy" button to copy the link
+- Share this link with other users
