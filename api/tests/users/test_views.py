@@ -418,7 +418,9 @@ def test_username_with_existing_local_account_are_invalid(
     assert "username" in response.data
 
 
-def test_signup_with_approval_enabled(preferences, factories, api_client, mocker):
+def test_signup_with_approval_enabled(
+    preferences, factories, api_client, mocker, mailoutbox, settings
+):
     url = reverse("rest_register")
     data = {
         "username": "test1",
@@ -454,6 +456,10 @@ def test_signup_with_approval_enabled(preferences, factories, api_client, mocker
         user_request_id=user_request.pk,
         new_status="pending",
     )
+
+    confirmation_message = mailoutbox[-1]
+    assert "confirm" in confirmation_message.body
+    assert settings.FUNKWHALE_HOSTNAME in confirmation_message.body
 
 
 def test_signup_with_approval_enabled_validation_error(
