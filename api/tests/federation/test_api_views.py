@@ -215,6 +215,21 @@ def test_can_retrieve_actor(factories, api_client, preferences):
     assert response.data == expected
 
 
+def test_can_retrieve_local_actor_with_allow_list_enabled(
+    factories, api_client, preferences
+):
+    preferences["common__api_authentication_required"] = False
+    preferences["moderation__allow_list_enabled"] = True
+    actor = factories["federation.Actor"](local=True)
+    url = reverse(
+        "api:v1:federation:actors-detail", kwargs={"full_username": actor.full_username}
+    )
+    response = api_client.get(url)
+
+    expected = api_serializers.FullActorSerializer(actor).data
+    assert response.data == expected
+
+
 @pytest.mark.parametrize(
     "object_id, expected_url",
     [

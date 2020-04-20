@@ -2,7 +2,7 @@ import requests.exceptions
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from rest_framework import decorators
 from rest_framework import mixins
@@ -282,7 +282,8 @@ class ActorViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             domain__instance_policy__block_all=True,
         )
         if preferences.get("moderation__allow_list_enabled"):
-            qs = qs.filter(domain__allowed=True)
+            query = Q(domain_id=settings.FUNKWHALE_HOSTNAME) | Q(domain__allowed=True)
+            qs = qs.filter(query)
         return qs
 
     libraries = decorators.action(methods=["get"], detail=True)(
