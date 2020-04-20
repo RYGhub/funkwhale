@@ -352,6 +352,7 @@ $sidebar-color: #2D2F33;
 
 .sidebar {
   background: $sidebar-color;
+  z-index: auto;
   @include media(">desktop") {
     display: flex;
     flex-direction: column;
