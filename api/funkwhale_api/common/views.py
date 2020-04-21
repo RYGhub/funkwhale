@@ -1,3 +1,4 @@
+import logging
 import time
 
 from django.conf import settings
@@ -21,6 +22,9 @@ from . import signals
 from . import tasks
 from . import throttling
 from . import utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class SkipFilterForGetObject:
@@ -172,7 +176,11 @@ class AttachmentViewSet(
         if size not in ["original", "medium_square_crop"]:
             size = "original"
 
-        tasks.fetch_remote_attachment(instance)
+        try:
+            tasks.fetch_remote_attachment(instance)
+        except Exception:
+            logger.exception("Error while fetching attachment %s", instance.url)
+            return response.Response(status=500)
         data = self.serializer_class(instance).data
         redirect = response.Response(status=302)
         redirect["Location"] = data["urls"][size]
