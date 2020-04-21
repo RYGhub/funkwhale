@@ -103,7 +103,7 @@ def get_track_data(album, track, upload):
         "isDir": "false",
         "title": track.title,
         "album": album.title if album else "",
-        "artist": album.artist.name,
+        "artist": track.artist.name,
         "track": track.position or 1,
         "discNumber": track.disc_number or 1,
         # Ugly fallback to mp3 but some subsonic clients fail if the value is empty or null, and we don't always
