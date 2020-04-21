@@ -77,7 +77,7 @@ def fetch_remote_attachment(attachment, filename=None, save=True):
     attachment.last_fetch_date = timezone.now()
     with tempfile.TemporaryFile() as tf:
         with s.get(attachment.url, timeout=5, stream=True) as r:
-            for chunk in r.iter_content():
+            for chunk in r.iter_content(chunk_size=1024 * 100):
                 tf.write(chunk)
             tf.seek(0)
             if not filename:
