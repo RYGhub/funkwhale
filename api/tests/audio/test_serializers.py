@@ -184,9 +184,6 @@ def test_channel_serializer_update(factories, mocker):
         sorted(channel.artist.tagged_items.values_list("tag__name", flat=True))
         == data["tags"]
     )
-    assert channel.actor.summary == common_utils.render_html(
-        data["description"]["text"], "text/markdown"
-    )
     assert channel.artist.description.text == data["description"]["text"]
     assert channel.artist.description.content_type == "text/markdown"
     assert channel.actor.name == data["name"]

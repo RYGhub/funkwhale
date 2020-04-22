@@ -4,7 +4,7 @@
       <div v-if="isLoading" class="ui centered active inline loader"></div>
       <div class="ui stackable grid" v-else-if="object">
         <div class="ui five wide column">
-          <div class="ui pointing dropdown icon small basic right floated button" ref="dropdown" v-dropdown="{direction: 'downward'}" style="position: absolute; right: 1em; top: 1em; z-index: 5">
+          <div class="ui pointing dropdown icon small basic right floated button" ref="dropdown" v-dropdown="{direction: 'downward'}" style="position: absolute; right: 1em; top: 1em;">
             <i class="ellipsis vertical icon"></i>
             <div class="menu">
               <div

@@ -18,12 +18,11 @@
       </button>
     </template>
     <template v-if="!isLoading && objects.length === 0">
-      <div class="ui placeholder segment">
-        <div class="ui icon header">
-          <i class="compact disc icon"></i>
-          No results matching your query
-        </div>
-      </div>
+      <empty-state @refresh="fetchData('albums/')" :refresh="true">
+        <p>
+          <translate translate-context="Content/Channels/*">You may need to subscribe to this channel to see its contents.</translate>
+        </p>
+      </empty-state>
     </template>
   </div>
 </template>
