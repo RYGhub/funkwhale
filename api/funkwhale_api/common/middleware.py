@@ -204,7 +204,8 @@ def get_api_response(request, url):
     except urls.exceptions.Resolver404:
         return http.HttpResponseNotFound()
     response = match.func(request, *match.args, **match.kwargs)
-    response.render()
+    if hasattr(response, "render"):
+        response.render()
     return response
 
 
