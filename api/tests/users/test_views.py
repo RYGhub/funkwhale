@@ -319,6 +319,7 @@ def test_user_can_patch_their_own_avatar(logged_in_api_client, factories):
     user.refresh_from_db()
 
     assert user.actor.attachment_icon == attachment
+    assert "avatar" in response.data
 
 
 def test_creating_user_creates_actor_as_well(
