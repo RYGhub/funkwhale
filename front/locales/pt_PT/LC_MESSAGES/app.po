@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 09:12+0200\n"
+"POT-Creation-Date: 2020-04-22 11:22+0200\n"
 "PO-Revision-Date: 2019-01-18 21:50+0000\n"
 "Last-Translator: troll <my_name_is_troll@protonmail.com>\n"
 "Language-Team: none\n"
@@ -4288,7 +4288,7 @@ msgstr ""
 
 #: front/src/components/audio/ChannelForm.vue:198
 msgctxt "Content/Channels/Help"
-msgid "Publish music  you make as a nice discography of albums and singles."
+msgid "Publish music you make as a nice discography of albums and singles."
 msgstr ""
 
 #: front/src/views/content/Home.vue:10
@@ -6231,14 +6231,15 @@ msgctxt "Content/*/*/Short"
 msgid "Unresolved"
 msgstr ""
 
+#: front/src/components/channels/SubscribeButton.vue:19
+#, fuzzy
+msgctxt "Content/Channel/Button/Verb"
+msgid "Unsubscribe"
+msgstr "%{ count } preferida"
+
 #: front/src/components/channels/SubscribeButton.vue:3
 msgctxt "Content/Track/Button.Message"
 msgid "Unsubscribe"
-msgstr ""
-
-#: front/src/components/channels/SubscribeButton.vue:19
-msgctxt "Content/Channel/Button/Verb"
-msgid "Unubscribe"
 msgstr ""
 
 #: front/src/components/channels/UploadModal.vue:32
@@ -6395,7 +6396,7 @@ msgstr ""
 
 #: front/src/components/library/TrackBase.vue:279
 msgctxt "Content/Track/Paragraph"
-msgid "Uploaded by on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
+msgid "Uploaded on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
 msgstr ""
 
 #: front/src/components/channels/UploadForm.vue:83
@@ -6893,6 +6894,18 @@ msgstr "Você pode ter um problema de conectividade."
 #, fuzzy
 msgctxt "*/*/*"
 msgid "You may need to follow this library to see its content."
+msgstr "Ao deixar de seguir esta biblioteca, você perderá o acesso ao seu conteúdo."
+
+#: front/src/components/audio/ChannelEntries.vue:17
+#, fuzzy
+msgctxt "Content/Channels/*"
+msgid "You may need to subscribe to this channel to see its content."
+msgstr "Ao deixar de seguir esta biblioteca, você perderá o acesso ao seu conteúdo."
+
+#: front/src/components/audio/ChannelSeries.vue:22
+#, fuzzy
+msgctxt "Content/Channels/*"
+msgid "You may need to subscribe to this channel to see its contents."
 msgstr "Ao deixar de seguir esta biblioteca, você perderá o acesso ao seu conteúdo."
 
 #: front/src/components/notifications/NotificationRow.vue:45

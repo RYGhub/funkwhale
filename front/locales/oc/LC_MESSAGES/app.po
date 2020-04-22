@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-09 09:12+0200\n"
+"POT-Creation-Date: 2020-04-22 11:22+0200\n"
 "PO-Revision-Date: 2020-04-12 21:05+0000\n"
 "Last-Translator: Quentin PAGÈS <quentinantonin@free.fr>\n"
 "Language-Team: none\n"
@@ -471,9 +471,7 @@ msgstr "Ajustar un domeni"
 #: front/src/components/channels/UploadForm.vue:23
 msgctxt "Content/Channels/Popup.Paragraph"
 msgid "Add a license to your upload to ensure some freedoms to your public."
-msgstr ""
-"Ajustatz una licéncia a vòstre mandadís per assegurar las libertats de "
-"vòstre public."
+msgstr "Ajustatz una licéncia a vòstre mandadís per assegurar las libertats de vòstre public."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:79
 msgctxt "Content/Moderation/Button/Verb"
@@ -592,9 +590,7 @@ msgstr "Camps addicionals"
 #: front/src/components/admin/SignupFormBuilder.vue:37
 msgctxt "*/*/Help"
 msgid "Additional form fields to be displayed in the form. Only shown if manual sign-up validation is enabled."
-msgstr ""
-"Camps addicionals pel formulari. Se veson sonque se la validacion de l’"
-"inscripcion es activada."
+msgstr "Camps addicionals pel formulari. Se veson sonque se la validacion de l’inscripcion es activada."
 
 #: front/src/components/manage/users/UsersTable.vue:70
 msgctxt "Content/Admin/Table.User role"
@@ -1359,8 +1355,7 @@ msgstr "Copiatz-pegatz lo còdi seguent dins l’aplicacion :"
 #: front/src/views/channels/DetailBase.vue:52
 msgctxt "Content/Channels/Label"
 msgid "Copy-paste the following URL in your favorite podcasting app:"
-msgstr ""
-"Copiatz-pegatz l’URL seguenta dins vòstra aplicacion de podcast preferida :"
+msgstr "Copiatz-pegatz l’URL seguenta dins vòstra aplicacion de podcast preferida :"
 
 #: front/src/components/audio/EmbedWizard.vue:31
 msgctxt "Popup/Embed/Paragraph"
@@ -1934,9 +1929,7 @@ msgstr "Lisatz las linhas per triar las pistas de la lista de lectura"
 #: front/src/components/channels/UploadForm.vue:130
 msgctxt "Content/Channels/Paragraph"
 msgid "Drag and drop your files here or open the browser to upload your files"
-msgstr ""
-"Lisatz depausatz los fichièrs aquí o dorbissètz lo navegador per enviar de "
-"fichièrs"
+msgstr "Lisatz depausatz los fichièrs aquí o dorbissètz lo navegador per enviar de fichièrs"
 
 #: front/src/components/Queue.vue:269
 msgctxt "*/*/*"
@@ -2487,10 +2480,7 @@ msgstr "Seguir"
 #: front/src/views/content/Home.vue:35
 msgctxt "Content/Library/Paragraph"
 msgid "Follow libraries from other users to get access to new music. Public libraries can be followed immediately, while following a private library requires approval from its owner."
-msgstr ""
-"Podètz seguir las bibliotècas d’autres utilizaires per accedir a de nòvas "
-"musicas. Las bibliotècas publicas pòdon èsser seguidas còp sec, mentre qu’"
-"una bibliotèca privada demanda una aprovacion de sus proprietaris."
+msgstr "Podètz seguir las bibliotècas d’autres utilizaires per accedir a de nòvas musicas. Las bibliotècas publicas pòdon èsser seguidas còp sec, mentre qu’una bibliotèca privada demanda una aprovacion de sus proprietaris."
 
 #: front/src/views/content/Home.vue:33
 msgctxt "Content/Library/Title/Verb"
@@ -2520,9 +2510,7 @@ msgstr "Seguir"
 #: front/src/components/moderation/ReportModal.vue:56
 msgctxt "*/*/Field,Help"
 msgid "Forward an anonymized copy of your report to the server hosting this element."
-msgstr ""
-"Transferir una còpi anonimizada del senhalement al servidor qu’alerga "
-"aqueste element."
+msgstr "Transferir una còpi anonimizada del senhalement al servidor qu’alerga aqueste element."
 
 #: front/src/components/moderation/ReportModal.vue:53
 msgctxt "*/*/Field.Label/Verb"
@@ -2645,8 +2633,7 @@ msgstr "Se l’adreça qu’avètz provesida es valida e associada a un compte u
 #: front/src/views/content/Home.vue:13
 msgctxt "Content/Library/Paragraph"
 msgid "If you are a musician or a podcaster, channels are designed for you!"
-msgstr ""
-"Se sètz musician o creator de podcasts, las cadenas son fachas per vos !"
+msgstr "Se sètz musician o creator de podcasts, las cadenas son fachas per vos !"
 
 #: front/src/components/auth/Settings.vue:195
 msgctxt "Content/Applications/Paragraph"
@@ -2656,16 +2643,12 @@ msgstr "S’autorizatz de tèrças aplicacions a accedir a vòstras donadas, ser
 #: front/src/components/auth/LoginForm.vue:6
 msgctxt "Content/Login/Error message.List item/Call to action"
 msgid "If you signed-up recently, you may need to wait before our moderation team review your account, or verify your email."
-msgstr ""
-"Se vos sètz marcat fa pas gaire, benlèu que vos cal esperar que nòstra còla "
-"de moderacion repasse vòstre compte, o verificatz vòstra adreça electronica."
+msgstr "Se vos sètz marcat fa pas gaire, benlèu que vos cal esperar que nòstra còla de moderacion repasse vòstre compte, o verificatz vòstra adreça electronica."
 
 #: front/src/views/channels/DetailBase.vue:60
 msgctxt "Content/Channels/Label"
 msgid "If you're using Mastodon or other fediverse applications, you can subscribe to this account:"
-msgstr ""
-"S’utilizatz Mastodon o una autra aplicacion del fediverse, podètz tanben vos "
-"abonar a aqueste compte :"
+msgstr "S’utilizatz Mastodon o una autra aplicacion del fediverse, podètz tanben vos abonar a aqueste compte :"
 
 #: front/src/components/channels/UploadForm.vue:43
 msgctxt "*/*/*"
@@ -3823,8 +3806,7 @@ msgstr "Senhal corrèctament modificat"
 #: front/src/components/RemoteSearchForm.vue:14
 msgctxt "Content/Fetch/Paragraph"
 msgid "Paste here the RSS url or the fediverse address to subscribe to its feed."
-msgstr ""
-"Pegatz aquí l’url del flux RSS o l’adreça del fediverse per vos i abonar."
+msgstr "Pegatz aquí l’url del flux RSS o l’adreça del fediverse per vos i abonar."
 
 #: front/src/App.vue:310 src/components/audio/Player.vue:661
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
@@ -4010,16 +3992,12 @@ msgstr "Mercés de verificar que lo senhal es corrèct"
 #: front/src/components/auth/LoginForm.vue:9
 msgctxt "Content/Login/Error message.List item/Call to action"
 msgid "Please double-check your username/password couple is correct and ensure you verified your email."
-msgstr ""
-"Mercés de verificar que lo nom d’utilizaire e lo senhal son corrèctes e "
-"asseguratz-vos d’aver verificat vòstre corrièl."
+msgstr "Mercés de verificar que lo nom d’utilizaire e lo senhal son corrèctes e asseguratz-vos d’aver verificat vòstre corrièl."
 
 #: front/src/components/common/AttachmentInput.vue:26
 msgctxt "Content/*/Paragraph"
 msgid "PNG or JPG. Dimensions should be between 1400x1400px and 3000x3000px. Maximum file size allowed is 5MB."
-msgstr ""
-"PNG o JPG. Las dimensions devon èsser entre 1400x1400px e 3000x3000px. La "
-"talha maximala autorizada es 5 Mo."
+msgstr "PNG o JPG. Las dimensions devon èsser entre 1400x1400px e 3000x3000px. La talha maximala autorizada es 5 Mo."
 
 #: front/src/components/About.vue:74
 msgctxt "Content/About/Header/Name"
@@ -4157,10 +4135,10 @@ msgid "Publish audio"
 msgstr "Publicar àudio"
 
 #: front/src/components/audio/ChannelForm.vue:198
+#, fuzzy
 msgctxt "Content/Channels/Help"
-msgid "Publish music  you make as a nice discography of albums and singles."
-msgstr ""
-"Publicatz la musica que fasètz coma una bona discografia d’albums e singles."
+msgid "Publish music you make as a nice discography of albums and singles."
+msgstr "Publicatz la musica que fasètz coma una bona discografia d’albums e singles."
 
 #: front/src/views/content/Home.vue:10
 msgctxt "Content/Library/Title/Verb"
@@ -4387,9 +4365,7 @@ msgstr "Inscripcions"
 #: front/src/components/auth/SignupForm.vue:21
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Registrations on this pod are open, but reviewed by moderators before approval."
-msgstr ""
-"Las inscripcions sus aquesta instància son dobèrtas, mas l’equipa de "
-"moderacion repassa las demanda."
+msgstr "Las inscripcions sus aquesta instància son dobèrtas, mas l’equipa de moderacion repassa las demanda."
 
 #: front/src/components/manage/users/UsersTable.vue:72
 msgctxt "Content/Admin/Table, User role"
@@ -5013,17 +4989,12 @@ msgstr "Ligam de partatge"
 #: front/src/views/library/DetailBase.vue:81
 msgctxt "Content/Library/Paragraph"
 msgid "Share this link with other users so they can request access to this library by copy-pasting it in their pod search bar."
-msgstr ""
-"Partejatz aqueste ligam amb d’autres utilizaires per que pòscan accedir a "
-"vòstra bibliotèca en lo copiar-pegar dins la barra de recèrca de lor "
-"instància."
+msgstr "Partejatz aqueste ligam amb d’autres utilizaires per que pòscan accedir a vòstra bibliotèca en lo copiar-pegar dins la barra de recèrca de lor instància."
 
 #: front/src/views/content/Home.vue:14
 msgctxt "Content/Library/Paragraph"
 msgid "Share your work publicly and get subscribers on Funkwhale, the Fediverse or any podcasting application."
-msgstr ""
-"Partejatz vòstre trabalh publicament e obtenètz de seguidors sus Funkwhale, "
-"sul Fediverse o de las aplicacions de podcast estant."
+msgstr "Partejatz vòstre trabalh publicament e obtenètz de seguidors sus Funkwhale, sul Fediverse o de las aplicacions de podcast estant."
 
 #: front/src/views/content/remote/Card.vue:92
 #: src/views/library/DetailBase.vue:78
@@ -5476,9 +5447,7 @@ msgstr "Tèxte copiat al quichapapièr !"
 #: front/src/components/library/AlbumDropdown.vue:53
 msgctxt "Content/Moderation/Paragraph"
 msgid "The album will be deleted, as well as any related files and data. This action is irreversible."
-msgstr ""
-"Aqueste album serà tirat, e mai los mandadisses e abonaments ligats. Aquesta "
-"accions es irreversibla."
+msgstr "Aqueste album serà tirat, e mai los mandadisses e abonaments ligats. Aquesta accions es irreversibla."
 
 #: front/src/views/admin/library/AlbumDetail.vue:81
 msgctxt "Content/Moderation/Paragraph"
@@ -5498,16 +5467,12 @@ msgstr "L’artista serà tirat, e mai los mandadisses, pistas, albums, favorits
 #: front/src/views/channels/DetailBase.vue:107
 msgctxt "Content/Moderation/Paragraph"
 msgid "The channel will be deleted, as well as any related files and data. This action is irreversible."
-msgstr ""
-"Aquesta cadena serà tirada, e mai totes los fichièrs e donadas ligats. "
-"Aquesta accions es irreversibla."
+msgstr "Aquesta cadena serà tirada, e mai totes los fichièrs e donadas ligats. Aquesta accions es irreversibla."
 
 #: front/src/views/admin/ChannelDetail.vue:67
 msgctxt "Content/Moderation/Paragraph"
 msgid "The channel will be removed, as well as associated uploads, tracks, and albums. This action is irreversible."
-msgstr ""
-"Aquesta cadena serà tirada, e mai los mandadisses, pistas e abonaments "
-"ligats. Aquesta accions es irreversibla."
+msgstr "Aquesta cadena serà tirada, e mai los mandadisses, pistas e abonaments ligats. Aquesta accions es irreversibla."
 
 #: front/src/components/Footer.vue:64
 msgctxt "Footer/*/List item.Link"
@@ -5642,9 +5607,7 @@ msgstr "La pista pòt pas èsser cargada"
 #: front/src/components/library/TrackBase.vue:77
 msgctxt "Content/Moderation/Paragraph"
 msgid "The track will be deleted, as well as any related files and data. This action is irreversible."
-msgstr ""
-"Aquesta pista serà tirada, e mai totes los fichièrs e donadas ligats. "
-"Aquesta accions es irreversibla."
+msgstr "Aquesta pista serà tirada, e mai totes los fichièrs e donadas ligats. Aquesta accions es irreversibla."
 
 #: front/src/views/admin/library/TrackDetail.vue:81
 msgctxt "Content/Moderation/Paragraph"
@@ -5754,8 +5717,7 @@ msgstr "Aqueste bibliotèca es publica e podètz accedir a son contengut liurame
 #: front/src/views/library/DetailBase.vue:175
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is restricted to users on this pod only"
-msgstr ""
-"Aquesta bibliotèca es restrencha als utilizaires d’aquesta instància solament"
+msgstr "Aquesta bibliotèca es restrencha als utilizaires d’aquesta instància solament"
 
 #: front/src/components/common/ActionTable.vue:46
 msgctxt "Modal/*/Paragraph"
@@ -5800,9 +5762,7 @@ msgstr "La pista es enviada mas pas encara tractada pel servidor"
 #: front/src/components/mixins/Translations.vue:30
 msgctxt "Content/Library/Help text"
 msgid "This track has been uploaded, but hasn't been scheduled for processing yet"
-msgstr ""
-"La pista es enviada mas pas encara prevista per tractament pel servidor pel "
-"moment"
+msgstr "La pista es enviada mas pas encara prevista per tractament pel servidor pel moment"
 
 #: front/src/components/mixins/Translations.vue:25
 #: front/src/components/mixins/Translations.vue:26
@@ -6056,14 +6016,15 @@ msgctxt "Content/*/*/Short"
 msgid "Unresolved"
 msgstr "Pas resolgut"
 
-#: front/src/components/channels/SubscribeButton.vue:3
-msgctxt "Content/Track/Button.Message"
+#: front/src/components/channels/SubscribeButton.vue:19
+#, fuzzy
+msgctxt "Content/Channel/Button/Verb"
 msgid "Unsubscribe"
 msgstr "Quitar de seguir"
 
-#: front/src/components/channels/SubscribeButton.vue:19
-msgctxt "Content/Channel/Button/Verb"
-msgid "Unubscribe"
+#: front/src/components/channels/SubscribeButton.vue:3
+msgctxt "Content/Track/Button.Message"
+msgid "Unsubscribe"
 msgstr "Quitar de seguir"
 
 #: front/src/components/channels/UploadModal.vue:32
@@ -6197,9 +6158,7 @@ msgstr "Lo mandadís es estat corrèctament tractat pel servidor."
 #: front/src/views/content/Home.vue:25
 msgctxt "Content/Library/Paragraph"
 msgid "Upload your personal music library to Funkwhale to enjoy it from anywhere and share it with friends and family."
-msgstr ""
-"Enviatz vòstra bibliotèca musicala personala a Funkwhale e aprofechatz-ne "
-"pertot e partejatz-la amb vòstres amics e familha."
+msgstr "Enviatz vòstra bibliotèca musicala personala a Funkwhale e aprofechatz-ne pertot e partejatz-la amb vòstres amics e familha."
 
 #: front/src/components/library/FileUpload.vue:120
 msgctxt "Content/Library/Table"
@@ -6209,16 +6168,13 @@ msgstr "Enviat"
 #: front/src/components/library/TrackBase.vue:271
 msgctxt "Content/Track/Paragraph"
 msgid "Uploaded by <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }</a> on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
-msgstr ""
-"Enviat per <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }</a> "
-"lo <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
+msgstr "Enviat per <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }</a> lo <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
 
 #: front/src/components/library/TrackBase.vue:279
+#, fuzzy
 msgctxt "Content/Track/Paragraph"
-msgid "Uploaded by on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
-msgstr ""
-"Enviat lo <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate "
-"}</time>"
+msgid "Uploaded on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
+msgstr "Enviat lo <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
 
 #: front/src/components/channels/UploadForm.vue:83
 msgctxt "Channels/*/*"
@@ -6310,9 +6266,7 @@ msgstr "Garnissètz aqueste formulari per demandar un nòu senhal. Auretz un cor
 #: front/src/components/RemoteSearchForm.vue:17
 msgctxt "Content/Fetch/Paragraph"
 msgid "Use this form to retrieve an object hosted somewhere else in the fediverse."
-msgstr ""
-"Utilizatz aqueste formulari per recuperar un objècte albergat endacòm sul "
-"fediverse."
+msgstr "Utilizatz aqueste formulari per recuperar un objècte albergat endacòm sul fediverse."
 
 #: front/src/components/moderation/ReportModal.vue:18
 msgctxt "*/Moderation/Popup,Paragraph"
@@ -6332,9 +6286,7 @@ msgstr "Utilizat"
 #: front/src/components/audio/ChannelForm.vue:44
 msgctxt "Content/Channels/Paragraph"
 msgid "Used in URLs and to follow this channel on the federation. You cannot change it afterwards."
-msgstr ""
-"Utilizat dins las URL e per seguir aquesta cadena sus la federacion. O "
-"podètz pas cambiar mai tard."
+msgstr "Utilizat dins las URL e per seguir aquesta cadena sus la federacion. O podètz pas cambiar mai tard."
 
 #: front/src/components/Home.vue:127
 msgctxt "Content/Home/Header"
@@ -6679,9 +6631,7 @@ msgstr "Avètz pas cap de règla en plaça per aqueste domeni."
 #: front/src/components/channels/UploadForm.vue:32
 msgctxt "Content/Library/Paragraph"
 msgid "You don't have any space left to upload your files. Please contact the moderators."
-msgstr ""
-"Avètz pas mai d’espaci per enviar los fichièrs. Mercés de contactar los "
-"moderators."
+msgstr "Avètz pas mai d’espaci per enviar los fichièrs. Mercés de contactar los moderators."
 
 #: front/src/components/library/EditForm.vue:52
 msgctxt "Content/Library/Paragraph"
@@ -6708,14 +6658,24 @@ msgstr "Poiriá arribar qu’ajatz de problèma de connexion."
 #: front/src/views/library/DetailTracks.vue:10
 msgctxt "*/*/*"
 msgid "You may need to follow this library to see its content."
-msgstr ""
-"Es possible que vos calga seguir aquesta bibliotèca per veire son contengut."
+msgstr "Es possible que vos calga seguir aquesta bibliotèca per veire son contengut."
+
+#: front/src/components/audio/ChannelEntries.vue:17
+#, fuzzy
+msgctxt "Content/Channels/*"
+msgid "You may need to subscribe to this channel to see its content."
+msgstr "Es possible que vos calga seguir aquesta bibliotèca per veire son contengut."
+
+#: front/src/components/audio/ChannelSeries.vue:22
+#, fuzzy
+msgctxt "Content/Channels/*"
+msgid "You may need to subscribe to this channel to see its contents."
+msgstr "Es possible que vos calga seguir aquesta bibliotèca per veire son contengut."
 
 #: front/src/components/notifications/NotificationRow.vue:45
 msgctxt "Content/Notifications/Paragraph"
 msgid "You rejected %{ username }&#39;s request to follow \"%{ library }\""
-msgstr ""
-"Avètz refusat la demanda de %{ username }&#39;s per seguir « %{ library } »"
+msgstr "Avètz refusat la demanda de %{ username }&#39;s per seguir « %{ library } »"
 
 #: front/src/components/auth/Settings.vue:90
 msgctxt "Popup/Settings/List item"
@@ -6750,16 +6710,12 @@ msgstr "Lo compte pòt pas èsser creat."
 #: front/src/components/auth/SignupForm.vue:4
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account request was successfully submitted. You will be notified by email when our moderation team has reviewed your request."
-msgstr ""
-"Vòstra demanda de compte es estada corrèctament enviada. Seretz notificat "
-"per corrièl un còp que nòstra equipa de moderacion aja repassat la demanda."
+msgstr "Vòstra demanda de compte es estada corrèctament enviada. Seretz notificat per corrièl un còp que nòstra equipa de moderacion aja repassat la demanda."
 
 #: front/src/components/auth/SignupForm.vue:7
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account was successfully created. Please verify your email before trying to login."
-msgstr ""
-"Lo compte es estat corrèctament creat. Volgatz verificar vòstra bóstia de "
-"recepcion abans d’ensajar de vos connectar."
+msgstr "Lo compte es estat corrèctament creat. Volgatz verificar vòstra bóstia de recepcion abans d’ensajar de vos connectar."
 
 #: front/src/components/auth/Settings.vue:271
 msgctxt "Content/Settings/Paragraph'"
