@@ -30,7 +30,7 @@
         <h3 class="ui header" >
           <translate translate-context="*/*/*">New channels</translate>
         </h3>
-        <channels-widget :show-modification-date="true" :limit="12" :filters="{ordering: '-creation_date'}"></channels-widget>
+        <channels-widget :show-modification-date="true" :limit="12" :filters="{ordering: '-creation_date', external: 'false'}"></channels-widget>
       </template>
 
 

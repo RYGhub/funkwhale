@@ -4,6 +4,7 @@ import django_filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.common import filters as common_filters
+from funkwhale_api.federation import actors
 from funkwhale_api.moderation import filters as moderation_filters
 
 from . import models
@@ -28,6 +29,7 @@ class ChannelFilter(moderation_filters.HiddenContentFilterSet):
     subscribed = django_filters.BooleanFilter(
         field_name="_", method="filter_subscribed"
     )
+    external = django_filters.BooleanFilter(field_name="_", method="filter_external")
     ordering = django_filters.OrderingFilter(
         # tuple-mapping retains order
         fields=(
@@ -38,7 +40,7 @@ class ChannelFilter(moderation_filters.HiddenContentFilterSet):
 
     class Meta:
         model = models.Channel
-        fields = ["q", "scope", "tag", "subscribed", "ordering"]
+        fields = ["q", "scope", "tag", "subscribed", "ordering", "external"]
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["CHANNEL"]
 
     def filter_subscribed(self, queryset, name, value):
@@ -55,6 +57,18 @@ class ChannelFilter(moderation_filters.HiddenContentFilterSet):
             return queryset.filter(query)
         else:
             return queryset.exclude(query)
+
+    def filter_external(self, queryset, name, value):
+        query = Q(
+            attributed_to=actors.get_service_actor(),
+            actor__preferred_username__startswith="rssfeed-",
+        )
+        if value is True:
+            queryset = queryset.filter(query)
+        if value is False:
+            queryset = queryset.exclude(query)
+
+        return queryset
 
 
 class IncludeChannelsFilterSet(django_filters.FilterSet):
