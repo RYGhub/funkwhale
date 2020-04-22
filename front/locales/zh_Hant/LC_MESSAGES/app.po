@@ -8,19 +8,21 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-09 09:12+0200\n"
-"PO-Revision-Date: 2019-09-23 11:57+0200\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2020-04-22 05:37+0000\n"
+"Last-Translator: 呗 <xyq565843@gmail.com>\n"
 "Language-Team: none\n"
 "Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 3.11.3\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:6
+#, fuzzy
 msgctxt "Popup/Playlist/Paragraph"
 msgid "\"%{ title }\", by %{ artist }"
-msgstr ""
+msgstr "\"%{ title }\", by %{ artist }"
 
 #: front/src/components/audio/ChannelCard.vue:28
 msgid "{{ object.artist.modification_date | fromNow }}"
@@ -29,33 +31,30 @@ msgstr ""
 #: front/src/components/RemoteSearchForm.vue:71
 msgctxt "Head/Fetch/Field.Placeholder"
 msgid "@channel@pod.example or https://website.example/rss.xml"
-msgstr ""
+msgstr "@channel@pod.example 或 https://website.example/rss.xml"
 
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr ""
+msgstr "%{ app } 需要訪問您的funkwhale賬戶"
 
 #: front/src/components/About.vue:175 src/components/Home.vue:58
 msgctxt "Content/Home/Stat"
 msgid "%{ count } active user"
 msgid_plural "%{ count } active users"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 活躍用戶"
 
 #: front/src/components/About.vue:184
 msgctxt "Content/Home/Stat"
 msgid "%{ count } albums"
 msgid_plural "%{ count } albums"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 專輯"
 
 #: front/src/components/About.vue:154
 msgctxt "*/*/*"
 msgid "%{ count } allowed domains"
 msgid_plural "%{ count } allowed domains"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 允許的域名"
 
 #: front/src/components/About.vue:181
 msgctxt "Content/Home/Stat"
@@ -79,29 +78,26 @@ msgstr[1] ""
 msgctxt "Content/Favorites/Title"
 msgid "%{ count } favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 喜愛"
 
 #: front/src/components/About.vue:178 src/components/Home.vue:61
 msgctxt "Content/Home/Stat"
 msgid "%{ count } hour of music"
 msgid_plural "%{ count } hours of music"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 小時"
 
 #: front/src/components/About.vue:190
 msgctxt "Content/Home/Stat"
 msgid "%{ count } listenings"
 msgid_plural "%{ count } listenings"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 正在聽"
 
 #: front/src/components/common/ActionTable.vue:67
+#, fuzzy
 msgctxt "Content/*/Paragraph"
 msgid "%{ count } on %{ total } selected"
 msgid_plural "%{ count } on %{ total } selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } 中 %{ total } 選中"
 
 #: front/src/views/channels/DetailBase.vue:27
 msgctxt "Content/Channel/Paragraph"
@@ -212,12 +208,13 @@ msgstr ""
 #: front/src/components/library/FileUpload.vue:289
 msgctxt "Content/Library/Help text"
 msgid "A network error occurred while uploading this file"
-msgstr ""
+msgstr "上傳這個文件時發生了網絡錯誤"
 
 #: front/src/App.vue:414
+#, fuzzy
 msgctxt "App/Message/Paragraph"
 msgid "A new version of the app is available."
-msgstr ""
+msgstr "有一個該app的新版本"
 
 #: front/src/components/library/EditForm.vue:180
 msgctxt "*/*/Placeholder"
@@ -227,22 +224,23 @@ msgstr ""
 #: front/src/components/About.vue:5
 msgctxt "Content/Home/Header"
 msgid "About %{ podName }!"
-msgstr ""
+msgstr "關於 %{ podName }!"
 
 #: front/src/components/Footer.vue:6
+#, fuzzy
 msgctxt "Footer/About/Title"
 msgid "About %{instanceName}"
-msgstr ""
+msgstr "關於 %{instanceName}"
 
 #: front/src/components/Footer.vue:9
 msgctxt "Footer/About/Title"
 msgid "About %{instanceUrl}"
-msgstr ""
+msgstr "關於"
 
 #: front/src/components/Footer.vue:56 src/components/Home.vue:87
 msgctxt "Footer/*/Title/Short"
 msgid "About Funkwhale"
-msgstr ""
+msgstr "關於 Funkwhale"
 
 #: front/src/components/Footer.vue:13
 msgctxt "Footer/About/List item.Link"
@@ -250,19 +248,22 @@ msgid "About page"
 msgstr ""
 
 #: front/src/components/Home.vue:21
+#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About this Funkwhale pod"
-msgstr ""
+msgstr "關於此Funkwhale媒體池"
 
 #: front/src/components/channels/LicenseSelect.vue:14
+#, fuzzy
 msgctxt "Content/*/*"
 msgid "About this license"
-msgstr ""
+msgstr "關於此許可"
 
 #: front/src/components/About.vue:23 src/components/About.vue:53
+#, fuzzy
 msgctxt "Content/About/Header"
 msgid "About this pod"
-msgstr ""
+msgstr "關於此媒體庫"
 
 #: front/src/components/Sidebar.vue:145
 msgctxt "Sidebar/*/List item.Link"
@@ -272,12 +273,12 @@ msgstr ""
 #: front/src/views/library/Edit.vue:41
 msgctxt "Content/Library/Button.Label"
 msgid "Accept"
-msgstr ""
+msgstr "確認"
 
 #: front/src/views/library/Edit.vue:33
 msgctxt "Content/Library/Table/Short"
 msgid "Accepted"
-msgstr ""
+msgstr "已確認"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:115
 msgctxt "Content/Settings/Message"
