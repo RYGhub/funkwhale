@@ -200,7 +200,7 @@ class ChannelUpdateSerializer(serializers.Serializer):
         obj.save(update_fields=["metadata"])
 
         if "description" in validated_data:
-            description_obj = common_utils.attach_content(
+            common_utils.attach_content(
                 obj.artist, "description", validated_data["description"]
             )
 
