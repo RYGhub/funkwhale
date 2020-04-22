@@ -10,6 +10,81 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.21-rc2 (2020-04-22)
+---------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+More reliable CLI importer [manual change suggested]
+----------------------------------------------------
+
+Our CLI importer is now more reliable and less prone to Out-of-Memory issues, especially when scanning large libraries. (hundreds of GB or bigger)
+
+We've also improved the directory crawling logic, so that you don't have to use glob patterns or specify extensions when importing.
+
+This means you can replace scripts that look like this::
+
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/**/*.ogg" "/srv/funkwhale/data/music/**/*.mp3" --recursive --noinput
+
+By this::
+
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/" --recursive --noinput
+
+And Funkwhale will happily import any supported audio file from the specified directory.
+
+Enhancements:
+
+- CLI Importer is now more reliable and less resource-hungry on large libraries
+- Add support custom domain for S3 storage
+- Better placeholders for channels when there are no episodes or series
+- Updated documentation for 0.21 release
+- Improved performance and error handling when fetching remote attachments
+
+Bugfixes:
+
+- Remove double spaces in ChannelForm
+- Deduplicate tags in Audio ActivityPub representation
+- Add support custom domain for S3 storage
+- Fix #1079: fixed z-index issues with dropdowns (#1079 and #1075)
+- Exclude external podcasts from library home
+- Fixed broken channel save when description is too long
+- Fixed 500 error when federation is disabled and application+json is requested
+- Fixed minor subsonic API crash
+- Fixed broken local profile page when allow-list is enabled
+- Fixed issue with confirmation email not sending when signup-approval was enabled
+- Ensure 0 quota on user is honored
+- Fixed attachments URL not honoring media URL
+- Fix grammar in msg string in TrackBase.vue
+- Fix typo in SubscribeButton.vue
+
+Translations:
+
+- Arabic
+- Catalan
+- English (United Kingdom)
+- German
+- Occitan
+- Portuguese (Brazil)
+- Russian
+
+
+Contributors to this release (translation, development, documentation, reviews, design, testing, third-party projects):
+
+- Agate
+- ButterflyOfFire
+- Ciarán Ainsworth
+- Creak
+- Daniele Lira Mereb
+- Eloisa
+- Francesc Galí
+- gerhardbeck
+- marzzzello
+- Quentin PAGÈS
+- Satsuki Yanagi
+- SpcCw
+- Xaloc
+
 0.21-rc1 (2020-04-09)
 ---------------------
 
