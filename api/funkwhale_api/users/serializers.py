@@ -179,6 +179,13 @@ class UserWriteSerializer(serializers.ModelSerializer):
             obj.actor.save(update_fields=["attachment_icon"])
         return obj
 
+    def to_representation(self, instance):
+        r = super().to_representation(instance)
+        r["avatar"] = common_serializers.AttachmentSerializer(
+            instance.get_avatar()
+        ).data
+        return r
+
 
 class UserReadSerializer(serializers.ModelSerializer):
 
