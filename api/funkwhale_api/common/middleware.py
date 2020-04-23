@@ -101,8 +101,8 @@ def get_spa_file(spa_url, name):
         # strip the filename
         path = os.path.join(os.path.dirname(spa_url), name)
         # we try to open a local file
-        with open(path) as f:
-            return f.read()
+        with open(path, "rb") as f:
+            return f.read().decode("utf-8")
     cache_key = "spa-file:{}:{}".format(spa_url, name)
     cached = caches["local"].get(cache_key)
     if cached:
