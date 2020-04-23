@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-22 11:22+0200\n"
-"PO-Revision-Date: 2020-04-13 17:53+0000\n"
+"PO-Revision-Date: 2020-04-23 07:34+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -471,7 +471,9 @@ msgstr "Afegir un domini"
 #: front/src/components/channels/UploadForm.vue:23
 msgctxt "Content/Channels/Popup.Paragraph"
 msgid "Add a license to your upload to ensure some freedoms to your public."
-msgstr "Afegeix una llicència a la teva pujada per assegurar les llibertats del teu públic."
+msgstr ""
+"Afegeix una llicència de la teva càrrega per assegurar les llibertats del "
+"teu públic."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:79
 msgctxt "Content/Moderation/Button/Verb"
@@ -1301,7 +1303,7 @@ msgstr "Contacte"
 #: front/src/components/mixins/Translations.vue:60
 msgctxt "Content/*/Dropdown.Label/Noun"
 msgid "Content category"
-msgstr "Categories del contingut"
+msgstr "Categoria de contingut"
 
 #: front/src/components/moderation/FilterModal.vue:90
 msgctxt "*/Moderation/Message"
@@ -2510,7 +2512,9 @@ msgstr "Seguidors"
 #: front/src/components/moderation/ReportModal.vue:56
 msgctxt "*/*/Field,Help"
 msgid "Forward an anonymized copy of your report to the server hosting this element."
-msgstr "Reenvia una copa anonimitzada del teu informe al servidor que allotja aquest element."
+msgstr ""
+"Reenvia una copa anònima del teu informe al servidor que allotja aquest "
+"element."
 
 #: front/src/components/moderation/ReportModal.vue:53
 msgctxt "*/*/Field.Label/Verb"
@@ -4135,10 +4139,10 @@ msgid "Publish audio"
 msgstr "Publicar àudio"
 
 #: front/src/components/audio/ChannelForm.vue:198
-#, fuzzy
 msgctxt "Content/Channels/Help"
 msgid "Publish music you make as a nice discography of albums and singles."
-msgstr "Publicar música  que feu com una bonica discografia d'àlbums i singles."
+msgstr ""
+"Publiqueu música que feu com ara una bonica discografia d'àlbums o senzills."
 
 #: front/src/views/content/Home.vue:10
 msgctxt "Content/Library/Title/Verb"
@@ -4415,7 +4419,7 @@ msgstr "Data de publicació"
 #: front/src/components/library/TrackDetail.vue:64
 msgctxt "Content/*/*"
 msgid "Release Details"
-msgstr "Detalls de publicació"
+msgstr "Detalls de la publicació"
 
 #: front/src/components/library/FileUpload.vue:63
 msgctxt "Content/Library/Paragraph"
@@ -4644,7 +4648,7 @@ msgstr "Resultats per pàgina"
 #: front/src/components/channels/UploadForm.vue:46
 msgctxt "*/*/*"
 msgid "Resume"
-msgstr "Continuar"
+msgstr "Reprèn"
 
 #: front/src/components/channels/UploadForm.vue:94
 msgctxt "*/*/*"
@@ -5284,37 +5288,37 @@ msgstr "Envia't per"
 #: front/src/views/channels/SubscriptionsList.vue:30
 msgctxt "*/*/*/Verb"
 msgid "Subscribe"
-msgstr "Subscriure's"
+msgstr "Subscriu-te"
 
 #: front/src/components/channels/SubscribeButton.vue:17
 msgctxt "Content/Channel/Button/Verb"
 msgid "Subscribe"
-msgstr "Subscriu"
+msgstr "Subscriu-te"
 
 #: front/src/components/channels/SubscribeButton.vue:4
 msgctxt "Content/Track/*/Verb"
 msgid "Subscribe"
-msgstr "Subscriu"
+msgstr "Subscriu-te"
 
 #: front/src/views/channels/DetailBase.vue:43
 msgctxt "Content/Channels/Header"
 msgid "Subscribe on Funkwhale"
-msgstr "Subscriu a Funkwhale"
+msgstr "Subscriu-te a Funkwhale"
 
 #: front/src/views/channels/DetailBase.vue:58
 msgctxt "Content/Channels/Header"
 msgid "Subscribe on the Fediverse"
-msgstr "Subscriu a la Fediverse"
+msgstr "Subscriu-te a la Fediverse"
 
 #: front/src/components/RemoteSearchForm.vue:68 src/views/Search.vue:27
 msgctxt "Head/Fetch/Title"
 msgid "Subscribe to a podcast RSS feed"
-msgstr "Subscriu al flux RSS d'un podcast"
+msgstr "Subscriu-te al flux RSS d'un podcast"
 
 #: front/src/components/audio/SearchBar.vue:177
 msgctxt "Search/*/*"
 msgid "Subscribe to podcast via RSS"
-msgstr "Subscriu a un podcast a través de RSS"
+msgstr "Subscriu-te a un podcast a través de RSS"
 
 #: front/src/views/channels/DetailBase.vue:35
 msgctxt "Popup/Channel/Title/Verb"
@@ -6017,7 +6021,6 @@ msgid "Unresolved"
 msgstr "No resolt"
 
 #: front/src/components/channels/SubscribeButton.vue:19
-#, fuzzy
 msgctxt "Content/Channel/Button/Verb"
 msgid "Unsubscribe"
 msgstr "Cancel·lar subscripció"
@@ -6171,10 +6174,11 @@ msgid "Uploaded by <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }
 msgstr "Carregat per <a class=\"internal\" href=\"%{ uploaderUrl }\">%{ uploader }</a> el <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
 
 #: front/src/components/library/TrackBase.vue:279
-#, fuzzy
 msgctxt "Content/Track/Paragraph"
 msgid "Uploaded on <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
-msgstr "Carregat el <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate }</time>"
+msgstr ""
+"Carregat el <time title=\"%{ date }\" datetime=\"%{ date }\">%{ prettyDate "
+"}</time>"
 
 #: front/src/components/channels/UploadForm.vue:83
 msgctxt "Channels/*/*"
@@ -6661,16 +6665,18 @@ msgid "You may need to follow this library to see its content."
 msgstr "És possible que hagueu de seguir aquesta biblioteca per veure'n el contingut."
 
 #: front/src/components/audio/ChannelEntries.vue:17
-#, fuzzy
 msgctxt "Content/Channels/*"
 msgid "You may need to subscribe to this channel to see its content."
-msgstr "És possible que hagueu de seguir aquesta biblioteca per veure'n el contingut."
+msgstr ""
+"És possible que hagueu de subscriure-vos aquesta biblioteca per veure'n el "
+"contingut."
 
 #: front/src/components/audio/ChannelSeries.vue:22
-#, fuzzy
 msgctxt "Content/Channels/*"
 msgid "You may need to subscribe to this channel to see its contents."
-msgstr "És possible que hagueu de seguir aquesta biblioteca per veure'n el contingut."
+msgstr ""
+"És possible que hagueu de subscriure-vos aquesta biblioteca per veure'n els "
+"continguts."
 
 #: front/src/components/notifications/NotificationRow.vue:45
 msgctxt "Content/Notifications/Paragraph"
