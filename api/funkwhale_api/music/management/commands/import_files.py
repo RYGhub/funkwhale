@@ -200,7 +200,7 @@ class Command(BaseCommand):
         start_time = time.time()
         reference = options["reference"] or "cli-{}".format(timezone.now().isoformat())
 
-        import_url = "{}://{}/content/libraries/{}/upload?{}"
+        import_url = "{}://{}/library/{}/upload?{}"
         import_url = import_url.format(
             settings.FUNKWHALE_PROTOCOL,
             settings.FUNKWHALE_HOSTNAME,
