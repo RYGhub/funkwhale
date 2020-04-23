@@ -48,8 +48,9 @@ django-dynamic-preferences>=1.8.1,<1.9
 raven>=6.10,<7
 python-magic==0.4.15
 channels>=2.4,<2.5
-# XXX: increase when compat with Python 3.5 isn't needed anymore
-channels_redis>=2.3.2,<2.4
+# XXX: remove when we drop support for python 3.5
+channels_redis==2.2.1; python_version < '3.6'
+channels_redis>=2.3.2,<2.4; python_version > '3.5'
 uvicorn==0.8.6; python_version < '3.6'
 uvicorn>=0.11.3,<0.12; python_version > '3.5'
 gunicorn>=20.0.4,<20.1
