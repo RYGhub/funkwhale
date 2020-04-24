@@ -33,13 +33,15 @@ def get_valid_filepart(s):
 
 
 def get_track_path(track, suffix):
-    artist_part = get_valid_filepart(track.artist.name)
-    album_part = get_valid_filepart(track.album.title)
+    parts = []
+    parts.append(get_valid_filepart(track.artist.name))
+    if track.album:
+        parts.append(get_valid_filepart(track.album.title))
     track_part = get_valid_filepart(track.title) + "." + suffix
     if track.position:
         track_part = "{} - {}".format(track.position, track_part)
-
-    return "/".join([artist_part, album_part, track_part])
+    parts.append(track_part)
+    return "/".join(parts)
 
 
 def get_artist_data(artist_values):
@@ -235,41 +237,6 @@ def get_playlist_detail_data(playlist):
             continue
         td = get_track_data(plt.track.album, plt.track, uploads)
         data["entry"].append(td)
-    return data
-
-
-def get_music_directory_data(artist):
-    tracks = artist.tracks.select_related("album").prefetch_related("uploads")
-    data = {"id": artist.pk, "parent": 1, "name": artist.name, "child": []}
-    for track in tracks:
-        try:
-            upload = [upload for upload in track.uploads.all()][0]
-        except IndexError:
-            continue
-        album = track.album
-        td = {
-            "id": track.pk,
-            "isDir": "false",
-            "title": track.title,
-            "album": album.title,
-            "artist": artist.name,
-            "track": track.position or 1,
-            "year": track.album.release_date.year if track.album.release_date else 0,
-            "contentType": upload.mimetype,
-            "suffix": upload.extension or "",
-            "path": get_track_path(track, upload.extension or "mp3"),
-            "duration": upload.duration or 0,
-            "created": to_subsonic_date(track.creation_date),
-            "albumId": album.pk,
-            "artistId": artist.pk,
-            "parent": artist.id,
-            "type": "music",
-        }
-        if upload.bitrate:
-            td["bitrate"] = int(upload.bitrate / 1000)
-        if upload.size:
-            td["size"] = upload.size
-        data["child"].append(td)
     return data
 
 

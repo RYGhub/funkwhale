@@ -252,43 +252,6 @@ def test_playlist_detail_serializer(factories):
     assert data == expected
 
 
-def test_directory_serializer_artist(factories):
-    track = factories["music.Track"]()
-    upload = factories["music.Upload"](track=track, bitrate=42000, duration=43, size=44)
-    album = track.album
-    artist = track.artist
-
-    expected = {
-        "id": artist.pk,
-        "parent": 1,
-        "name": artist.name,
-        "child": [
-            {
-                "id": track.pk,
-                "isDir": "false",
-                "title": track.title,
-                "album": album.title,
-                "artist": artist.name,
-                "track": track.position,
-                "year": track.album.release_date.year,
-                "contentType": upload.mimetype,
-                "suffix": upload.extension or "",
-                "path": serializers.get_track_path(track, upload.extension),
-                "bitrate": 42,
-                "duration": 43,
-                "size": 44,
-                "created": serializers.to_subsonic_date(track.creation_date),
-                "albumId": album.pk,
-                "artistId": artist.pk,
-                "parent": artist.pk,
-                "type": "music",
-            }
-        ],
-    }
-    data = serializers.get_music_directory_data(artist)
-    assert data == expected
-
-
 def test_scrobble_serializer(factories):
     upload = factories["music.Upload"]()
     track = upload.track
