@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-22 11:22+0200\n"
-"PO-Revision-Date: 2020-04-23 07:34+0000\n"
+"PO-Revision-Date: 2020-04-24 07:32+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -5323,12 +5323,12 @@ msgstr "Subscriu-te a un podcast a través de RSS"
 #: front/src/views/channels/DetailBase.vue:35
 msgctxt "Popup/Channel/Title/Verb"
 msgid "Subscribe to this channel"
-msgstr "Subscriure's a aquest canal"
+msgstr "Subscriure-te a aquest canal"
 
 #: front/src/views/channels/DetailBase.vue:50
 msgctxt "Content/Channels/Header"
 msgid "Subscribe via RSS"
-msgstr "Subscriure's via RSS"
+msgstr "Subscriure-te via RSS"
 
 #: front/src/views/channels/SubscriptionsList.vue:81
 msgctxt "Content/Subscriptions/Header"
@@ -5731,7 +5731,7 @@ msgstr "Això pot afectar molts elements o tenir conseqüències irreversibles, 
 #: front/src/components/RemoteSearchForm.vue:139
 msgctxt "Content/*/Error message.Title"
 msgid "This object cannot be retrieved"
-msgstr "No es pot obtenir aquest objecte"
+msgstr "No es pot recuperar aquest objecte"
 
 #: front/src/components/library/AlbumEdit.vue:8
 #: front/src/components/library/ArtistEdit.vue:8
@@ -5766,7 +5766,8 @@ msgstr "Aquesta pista s’ha carregat, però el servidor encara no l’ha proces
 #: front/src/components/mixins/Translations.vue:30
 msgctxt "Content/Library/Help text"
 msgid "This track has been uploaded, but hasn't been scheduled for processing yet"
-msgstr "Aquesta pista s’ha carregat, però encara no s'ha previst que sigui processada"
+msgstr ""
+"Aquesta pista s’ha carregat, però encara no s'ha programat per processar-la"
 
 #: front/src/components/mixins/Translations.vue:25
 #: front/src/components/mixins/Translations.vue:26
@@ -5787,7 +5788,7 @@ msgstr "Aquesta pista és present en una d'aquestes biblioteques:"
 #: front/src/views/auth/ProfileOverview.vue:33
 msgctxt "Content/Profile/Paragraph"
 msgid "This user shared the following libraries."
-msgstr "Aquest usuari ha compartit les biblioteques següents."
+msgstr "Aquest usuari ha compartit les biblioteques que segueix."
 
 #: front/src/components/manage/moderation/UserRequestCard.vue:98
 msgctxt "Content/Moderation/Paragraph"
@@ -6088,13 +6089,13 @@ msgstr "Actualitzat el %{ date }"
 #: front/src/views/channels/DetailBase.vue:142
 msgctxt "Content/Channels/Button.Label/Verb"
 msgid "Upload"
-msgstr "Pujar"
+msgstr "Carregar"
 
 #: front/src/views/content/libraries/Card.vue:45
 #: src/views/library/DetailBase.vue:99
 msgctxt "Content/Library/Card.Button.Label/Verb"
 msgid "Upload"
-msgstr "Pujar"
+msgstr "Carregar"
 
 #: front/src/views/admin/library/UploadDetail.vue:85
 msgctxt "Content/Moderation/Title"
