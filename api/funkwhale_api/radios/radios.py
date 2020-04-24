@@ -5,10 +5,11 @@ from django.db import connection
 from django.db.models import Q
 from rest_framework import serializers
 
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import fields as federation_fields
 from funkwhale_api.moderation import filters as moderation_filters
-from funkwhale_api.music.models import Artist, Track
+from funkwhale_api.music.models import Artist, Library, Track, Upload
 from funkwhale_api.tags.models import Tag
-
 from . import filters, models
 from .registries import registry
 
@@ -271,3 +272,47 @@ class LessListenedRadio(SessionRadio):
         qs = super().get_queryset(**kwargs)
         listened = self.session.user.listenings.all().values_list("track", flat=True)
         return qs.exclude(pk__in=listened).order_by("?")
+
+
+@registry.register(name="actor_content")
+class ActorContentRadio(RelatedObjectRadio):
+    """
+    Play content from given actor libraries
+    """
+
+    model = federation_models.Actor
+    related_object_field = federation_fields.ActorRelatedField(required=True)
+
+    def get_related_object(self, value):
+        return value
+
+    def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
+        actor_uploads = Upload.objects.filter(
+            library__actor=self.session.related_object,
+        )
+        return qs.filter(pk__in=actor_uploads.values("track"))
+
+    def get_related_object_id_repr(self, obj):
+        return obj.full_username
+
+
+@registry.register(name="library")
+class LibraryRadio(RelatedObjectRadio):
+    """
+    Play content from a given library
+    """
+
+    model = Library
+    related_object_field = serializers.UUIDField(required=True)
+
+    def get_related_object(self, value):
+        return Library.objects.get(uuid=value)
+
+    def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
+        actor_uploads = Upload.objects.filter(library=self.session.related_object,)
+        return qs.filter(pk__in=actor_uploads.values("track"))
+
+    def get_related_object_id_repr(self, obj):
+        return obj.uuid

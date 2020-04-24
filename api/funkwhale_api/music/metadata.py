@@ -2,7 +2,7 @@ import base64
 from collections.abc import Mapping
 import datetime
 import logging
-import pendulum
+import arrow
 
 import mutagen._util
 import mutagen.oggtheora
@@ -43,6 +43,8 @@ def get_id3_tag(f, k):
                 v = v[0]
             return v
         except KeyError:
+            break
+        except IndexError:
             break
         except AttributeError:
             continue
@@ -166,6 +168,17 @@ def get_mp3_recording_id(f, k):
         raise TagNotFound(k)
 
 
+def get_mp3_comment(f, k):
+    keys_to_try = ["COMM", "COMM::eng"]
+    for key in keys_to_try:
+        try:
+            return get_id3_tag(f, key)
+        except TagNotFound:
+            pass
+
+    raise TagNotFound("COMM")
+
+
 VALIDATION = {}
 
 CONF = {
@@ -190,6 +203,7 @@ CONF = {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
             },
+            "comment": {"field": "comment"},
         },
     },
     "OggVorbis": {
@@ -213,6 +227,7 @@ CONF = {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
             },
+            "comment": {"field": "comment"},
         },
     },
     "OggTheora": {
@@ -232,6 +247,7 @@ CONF = {
             "license": {},
             "copyright": {},
             "genre": {},
+            "comment": {"field": "comment"},
         },
     },
     "MP3": {
@@ -253,6 +269,7 @@ CONF = {
             "pictures": {},
             "license": {"field": "WCOP"},
             "copyright": {"field": "TCOP"},
+            "comment": {"field": "COMM", "getter": get_mp3_comment},
         },
     },
     "MP4": {
@@ -280,6 +297,7 @@ CONF = {
             "pictures": {},
             "license": {"field": "----:com.apple.iTunes:LICENSE"},
             "copyright": {"field": "cprt"},
+            "comment": {"field": "©cmt"},
         },
     },
     "FLAC": {
@@ -302,6 +320,7 @@ CONF = {
             "pictures": {},
             "license": {},
             "copyright": {},
+            "comment": {},
         },
     },
 }
@@ -320,6 +339,7 @@ ALL_FIELDS = [
     "mbid",
     "license",
     "copyright",
+    "comment",
 ]
 
 
@@ -492,9 +512,10 @@ class ArtistField(serializers.Field):
                 mbid = None
             artist = {"name": name, "mbid": mbid}
             final.append(artist)
-
-        field = serializers.ListField(child=ArtistSerializer(), min_length=1)
-
+        field = serializers.ListField(
+            child=ArtistSerializer(strict=self.context.get("strict", True)),
+            min_length=1,
+        )
         return field.to_internal_value(final)
 
 
@@ -554,9 +575,9 @@ class PermissiveDateField(serializers.CharField):
                 return datetime.date(parsed.year, parsed.month, parsed.day)
 
         try:
-            parsed = pendulum.parse(str(value))
+            parsed = arrow.get(str(value))
             return datetime.date(parsed.year, parsed.month, parsed.day)
-        except pendulum.exceptions.ParserError:
+        except (arrow.parser.ParserError, ValueError):
             pass
 
         return None
@@ -627,14 +648,30 @@ class MBIDField(serializers.UUIDField):
 
 
 class ArtistSerializer(serializers.Serializer):
-    name = serializers.CharField()
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     mbid = MBIDField()
+
+    def __init__(self, *args, **kwargs):
+        self.strict = kwargs.pop("strict", True)
+        super().__init__(*args, **kwargs)
+
+    def validate_name(self, v):
+        if self.strict and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
 
 class AlbumSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(required=False, allow_null=True)
     mbid = MBIDField()
-    release_date = PermissiveDateField(required=False, allow_null=True)
+    release_date = PermissiveDateField(
+        required=False, allow_null=True, allow_blank=True
+    )
+
+    def validate_title(self, v):
+        if self.context.get("strict", True) and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
 
 class PositionField(serializers.CharField):
@@ -655,14 +692,30 @@ class PositionField(serializers.CharField):
             pass
 
 
+class DescriptionField(serializers.CharField):
+    def get_value(self, data):
+        return data
+
+    def to_internal_value(self, data):
+        try:
+            value = data.get("comment") or None
+        except TagNotFound:
+            return None
+        if not value:
+            return None
+        value = super().to_internal_value(value)
+        return {"text": value, "content_type": "text/plain"}
+
+
 class TrackMetadataSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(required=False, allow_null=True)
     position = PositionField(allow_blank=True, allow_null=True, required=False)
     disc_number = PositionField(allow_blank=True, allow_null=True, required=False)
     copyright = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     license = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     mbid = MBIDField()
     tags = TagsField(allow_blank=True, allow_null=True, required=False)
+    description = DescriptionField(allow_null=True, allow_blank=True, required=False)
 
     album = AlbumField()
     artists = ArtistField()
@@ -670,12 +723,18 @@ class TrackMetadataSerializer(serializers.Serializer):
 
     remove_blank_null_fields = [
         "copyright",
+        "description",
         "license",
         "position",
         "disc_number",
         "mbid",
         "tags",
     ]
+
+    def validate_title(self, v):
+        if self.context.get("strict", True) and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
     def validate(self, validated_data):
         validated_data = super().validate(validated_data)
@@ -686,6 +745,7 @@ class TrackMetadataSerializer(serializers.Serializer):
                 continue
             if v in ["", None, []]:
                 validated_data.pop(field)
+        validated_data["album"]["cover_data"] = validated_data.pop("cover_data", None)
         return validated_data
 
 

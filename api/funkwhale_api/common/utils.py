@@ -1,5 +1,11 @@
+import datetime
+
+from django.core.files.base import ContentFile
 from django.utils.deconstruct import deconstructible
 
+import bleach.sanitizer
+import logging
+import markdown
 import os
 import shutil
 import uuid
@@ -10,6 +16,9 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from django.conf import settings
 from django import urls
 from django.db import models, transaction
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 def rename_file(instance, field_name, new_name, allow_missing_file=False):
@@ -125,6 +134,17 @@ def join_url(start, end):
     return start + end
 
 
+def media_url(path):
+    if settings.MEDIA_URL.startswith("http://") or settings.MEDIA_URL.startswith(
+        "https://"
+    ):
+        return join_url(settings.MEDIA_URL, path)
+
+    from funkwhale_api.federation import utils as federation_utils
+
+    return federation_utils.full_url(path)
+
+
 def spa_reverse(name, args=[], kwargs={}):
     return urls.reverse(name, urlconf=settings.SPA_URLCONF, args=args, kwargs=kwargs)
 
@@ -228,9 +248,188 @@ def get_updated_fields(conf, data, obj):
             data_value = data[data_field]
         except KeyError:
             continue
-
-        obj_value = getattr(obj, obj_field)
-        if obj_value != data_value:
+        if obj.pk:
+            obj_value = getattr(obj, obj_field)
+            if obj_value != data_value:
+                final_data[obj_field] = data_value
+        else:
             final_data[obj_field] = data_value
 
     return final_data
+
+
+def join_queries_or(left, right):
+    if left:
+        return left | right
+    else:
+        return right
+
+
+MARKDOWN_RENDERER = markdown.Markdown(extensions=settings.MARKDOWN_EXTENSIONS)
+
+
+def render_markdown(text):
+    return MARKDOWN_RENDERER.convert(text)
+
+
+SAFE_TAGS = [
+    "p",
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "blockquote",
+    "code",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "strong",
+    "ul",
+]
+HTMl_CLEANER = bleach.sanitizer.Cleaner(strip=True, tags=SAFE_TAGS)
+
+HTML_PERMISSIVE_CLEANER = bleach.sanitizer.Cleaner(
+    strip=True,
+    tags=SAFE_TAGS + ["h1", "h2", "h3", "h4", "h5", "h6", "div", "section", "article"],
+    attributes=["class", "rel", "alt", "title"],
+)
+
+# support for additional tlds
+# cf https://github.com/mozilla/bleach/issues/367#issuecomment-384631867
+ALL_TLDS = set(settings.LINKIFIER_SUPPORTED_TLDS + bleach.linkifier.TLDS)
+URL_RE = bleach.linkifier.build_url_re(tlds=sorted(ALL_TLDS, reverse=True))
+HTML_LINKER = bleach.linkifier.Linker(url_re=URL_RE)
+
+
+def clean_html(html, permissive=False):
+    return (
+        HTML_PERMISSIVE_CLEANER.clean(html) if permissive else HTMl_CLEANER.clean(html)
+    )
+
+
+def render_html(text, content_type, permissive=False):
+    if not text:
+        return ""
+    rendered = render_markdown(text)
+    if content_type == "text/html":
+        rendered = text
+    elif content_type == "text/markdown":
+        rendered = render_markdown(text)
+    else:
+        rendered = render_markdown(text)
+    rendered = HTML_LINKER.linkify(rendered)
+    return clean_html(rendered, permissive=permissive).strip().replace("\n", "")
+
+
+def render_plain_text(html):
+    if not html:
+        return ""
+    return bleach.clean(html, tags=[], strip=True)
+
+
+def same_content(old, text=None, content_type=None):
+    return old.text == text and old.content_type == content_type
+
+
+@transaction.atomic
+def attach_content(obj, field, content_data):
+    from . import models
+
+    content_data = content_data or {}
+    existing = getattr(obj, "{}_id".format(field))
+
+    if existing:
+        if same_content(getattr(obj, field), **content_data):
+            # optimization to avoid a delete/save if possible
+            return getattr(obj, field)
+        getattr(obj, field).delete()
+        setattr(obj, field, None)
+
+    if not content_data:
+        return
+
+    content_obj = models.Content.objects.create(
+        text=content_data["text"][: models.CONTENT_TEXT_MAX_LENGTH],
+        content_type=content_data["content_type"],
+    )
+    setattr(obj, field, content_obj)
+    obj.save(update_fields=[field])
+    return content_obj
+
+
+@transaction.atomic
+def attach_file(obj, field, file_data, fetch=False):
+    from . import models
+    from . import tasks
+
+    existing = getattr(obj, "{}_id".format(field))
+    if existing:
+        getattr(obj, field).delete()
+
+    if not file_data:
+        return
+
+    if isinstance(file_data, models.Attachment):
+        attachment = file_data
+    else:
+        extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
+        extension = extensions.get(file_data["mimetype"], "jpg")
+        attachment = models.Attachment(mimetype=file_data["mimetype"])
+        name_fields = ["uuid", "full_username", "pk"]
+        name = [
+            getattr(obj, field) for field in name_fields if getattr(obj, field, None)
+        ][0]
+        filename = "{}-{}.{}".format(field, name, extension)
+        if "url" in file_data:
+            attachment.url = file_data["url"]
+        else:
+            f = ContentFile(file_data["content"])
+            attachment.file.save(filename, f, save=False)
+
+        if not attachment.file and fetch:
+            try:
+                tasks.fetch_remote_attachment(attachment, filename=filename, save=False)
+            except Exception as e:
+                logger.warn(
+                    "Cannot download attachment at url %s: %s", attachment.url, e
+                )
+                attachment = None
+
+        if attachment:
+            attachment.save()
+
+    setattr(obj, field, attachment)
+    obj.save(update_fields=[field])
+    return attachment
+
+
+def get_mimetype_from_ext(path):
+    parts = path.lower().split(".")
+    ext = parts[-1]
+    match = {
+        "jpeg": "image/jpeg",
+        "jpg": "image/jpeg",
+        "png": "image/png",
+        "gif": "image/gif",
+    }
+    return match.get(ext)
+
+
+def get_audio_mimetype(mt):
+    aliases = {"audio/x-mp3": "audio/mpeg", "audio/mpeg3": "audio/mpeg"}
+    return aliases.get(mt, mt)
+
+
+def update_modification_date(obj, field="modification_date", date=None):
+    IGNORE_DELAY = 60
+    current_value = getattr(obj, field)
+    date = date or timezone.now()
+    ignore = current_value is not None and current_value < date - datetime.timedelta(
+        seconds=IGNORE_DELAY
+    )
+    if ignore:
+        setattr(obj, field, date)
+        obj.__class__.objects.filter(pk=obj.pk).update(**{field: date})
+
+    return date

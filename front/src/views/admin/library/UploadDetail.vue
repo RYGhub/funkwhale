@@ -61,7 +61,7 @@
                 </div>
                 <div class="ui buttons">
                   <dangerous-button
-                    :class="['ui', {loading: isLoading}, 'basic button']"
+                    :class="['ui', {loading: isLoading}, 'basic red button']"
                     :action="remove">
                     <translate translate-context="*/*/*/Verb">Delete</translate>
                     <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this upload?</translate></p>
@@ -240,7 +240,7 @@
                     </td>
                     <td>
                       <template v-if="object.duration">
-                        {{ time.parse(object.duration) }}
+                        {{ object.duration | duration }}
                       </template>
                       <translate v-else translate-context="*/*/*">N/A</translate>
                     </td>

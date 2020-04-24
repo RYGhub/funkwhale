@@ -1,3 +1,5 @@
+from . import schema_org
+
 CONTEXTS = [
     {
         "shortId": "LDP",
@@ -219,6 +221,12 @@ CONTEXTS = [
         },
     },
     {
+        "shortId": "SC",
+        "contextUrl": None,
+        "documentUrl": "http://schema.org",
+        "document": {"@context": schema_org.CONTEXT},
+    },
+    {
         "shortId": "SEC",
         "contextUrl": None,
         "documentUrl": "https://w3id.org/security/v1",
@@ -280,6 +288,7 @@ CONTEXTS = [
                 "type": "@type",
                 "as": "https://www.w3.org/ns/activitystreams#",
                 "fw": "https://funkwhale.audio/ns#",
+                "schema": "http://schema.org#",
                 "xsd": "http://www.w3.org/2001/XMLSchema#",
                 "Album": "fw:Album",
                 "Track": "fw:Track",
@@ -298,6 +307,40 @@ CONTEXTS = [
                 "musicbrainzId": "fw:musicbrainzId",
                 "license": {"@id": "fw:license", "@type": "@id"},
                 "copyright": "fw:copyright",
+                "category": "schema:category",
+                "language": "schema:inLanguage",
+            }
+        },
+    },
+    {
+        "shortId": "LITEPUB",
+        "contextUrl": None,
+        "documentUrl": "http://litepub.social/ns",
+        "document": {
+            # from https://ap.thequietplace.social/schemas/litepub-0.1.jsonld
+            "@context": {
+                "Emoji": "toot:Emoji",
+                "Hashtag": "as:Hashtag",
+                "PropertyValue": "schema:PropertyValue",
+                "atomUri": "ostatus:atomUri",
+                "conversation": {"@id": "ostatus:conversation", "@type": "@id"},
+                "discoverable": "toot:discoverable",
+                "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+                "ostatus": "http://ostatus.org#",
+                "schema": "http://schema.org#",
+                "toot": "http://joinmastodon.org/ns#",
+                "value": "schema:value",
+                "sensitive": "as:sensitive",
+                "litepub": "http://litepub.social/ns#",
+                "invisible": "litepub:invisible",
+                "directMessage": "litepub:directMessage",
+                "listMessage": {"@id": "litepub:listMessage", "@type": "@id"},
+                "oauthRegistrationEndpoint": {
+                    "@id": "litepub:oauthRegistrationEndpoint",
+                    "@type": "@id",
+                },
+                "EmojiReact": "litepub:EmojiReact",
+                "alsoKnownAs": {"@id": "as:alsoKnownAs", "@type": "@id"},
             }
         },
     },
@@ -332,3 +375,5 @@ AS = NS(CONTEXTS_BY_ID["AS"])
 LDP = NS(CONTEXTS_BY_ID["LDP"])
 SEC = NS(CONTEXTS_BY_ID["SEC"])
 FW = NS(CONTEXTS_BY_ID["FW"])
+SC = NS(CONTEXTS_BY_ID["SC"])
+LITEPUB = NS(CONTEXTS_BY_ID["LITEPUB"])

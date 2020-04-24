@@ -36,6 +36,7 @@ def test_can_validate_config(logged_in_api_client, factories):
         "count": candidates.count(),
         "sample": TrackSerializer(candidates, many=True).data,
     }
+
     assert payload["filters"][0]["candidates"] == expected
     assert payload["filters"][0]["errors"] == []
 

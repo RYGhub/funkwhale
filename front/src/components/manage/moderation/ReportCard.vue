@@ -229,7 +229,6 @@
               <dangerous-button
                 v-if="action.dangerous && action.show(obj)"
                 :class="['ui', {loading: isLoading}, 'button']"
-                color=""
                 :action="action.handler">
                 <i :class="[action.iconColor, action.icon, 'icon']"></i>&nbsp;
                 {{ action.label }}

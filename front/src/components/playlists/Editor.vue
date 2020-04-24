@@ -47,7 +47,7 @@
           </translate>
         </div>
 
-      <dangerous-button :disabled="plts.length === 0" class="labeled right floated icon" color='yellow' :action="clearPlaylist">
+      <dangerous-button :disabled="plts.length === 0" class="ui labeled right floated yellow icon button" :action="clearPlaylist">
         <i class="eraser icon"></i> <translate translate-context="*/Playlist/Button.Label/Verb">Clear playlist</translate>
         <p slot="modal-header" v-translate="{playlist: playlist.name}" translate-context="Popup/Playlist/Title"  :translate-params="{playlist: playlist.name}">
           Do you want to clear the playlist "%{ playlist }"?
@@ -64,7 +64,7 @@
               <tr v-for="(plt, index) in plts" :key="plt.id">
                 <td class="left aligned">{{ plt.index + 1}}</td>
                 <td class="center aligned">
-                  <img class="ui mini image" v-if="plt.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](plt.track.album.cover.small_square_crop)">
+                  <img class="ui mini image" v-if="plt.track.album && plt.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](plt.track.album.cover.small_square_crop)">
                   <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">

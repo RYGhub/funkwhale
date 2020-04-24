@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :key="String($store.state.instance.instanceUrl)">
+  <div id="app" :key="String($store.state.instance.instanceUrl)" :class="[$store.state.ui.queueFocused ? 'queue-focused' : '', {'has-bottom-player': $store.state.queue.tracks.length > 0}, `is-${ $store.getters['ui/windowSize']}`]">
     <!-- here, we display custom stylesheets, if any -->
     <link
       v-for="url in customStylesheets"
@@ -11,15 +11,20 @@
     <template>
       <sidebar></sidebar>
       <set-instance-modal @update:show="showSetInstanceModal = $event" :show="showSetInstanceModal"></set-instance-modal>
-      <service-messages v-if="messages.length > 0"/>
-      <router-view :key="$route.fullPath"></router-view>
-      <div class="ui fitted divider"></div>
+      <service-messages></service-messages>
+      <transition name="queue">
+        <queue @touch-progress="$refs.player.setCurrentTime($event)" v-if="$store.state.ui.queueFocused"></queue>
+      </transition>
+      <router-view :class="{hidden: $store.state.ui.queueFocused}"></router-view>
+      <player ref="player"></player>
       <app-footer
+        :class="{hidden: $store.state.ui.queueFocused}"
         :version="version"
         @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"
         @show:set-instance-modal="showSetInstanceModal = !showSetInstanceModal"
       ></app-footer>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+      <channel-upload-modal v-if="$store.state.auth.authenticated"></channel-upload-modal>
       <filter-modal v-if="$store.state.auth.authenticated"></filter-modal>
       <report-modal></report-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
@@ -32,32 +37,28 @@
 import Vue from 'vue'
 import axios from 'axios'
 import _ from '@/lodash'
-import {mapState, mapGetters} from 'vuex'
+import {mapState, mapGetters, mapActions} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
-import Sidebar from '@/components/Sidebar'
-import AppFooter from '@/components/Footer'
-import ServiceMessages from '@/components/ServiceMessages'
 import moment from  'moment'
 import locales from './locales'
-import PlaylistModal from '@/components/playlists/PlaylistModal'
-import FilterModal from '@/components/moderation/FilterModal'
-import ReportModal from '@/components/moderation/ReportModal'
-import ShortcutsModal from '@/components/ShortcutsModal'
-import SetInstanceModal from '@/components/SetInstanceModal'
+import {getClientOnlyRadio} from '@/radios'
 
 export default {
   name: 'app',
   components: {
-    Sidebar,
-    AppFooter,
-    FilterModal,
-    ReportModal,
-    PlaylistModal,
-    ShortcutsModal,
+    Player:  () => import(/* webpackChunkName: "audio" */ "@/components/audio/Player"),
+    Queue:  () => import(/* webpackChunkName: "audio" */ "@/components/Queue"),
+    PlaylistModal:  () => import(/* webpackChunkName: "auth-audio" */ "@/components/playlists/PlaylistModal"),
+    ChannelUploadModal:  () => import(/* webpackChunkName: "auth-audio" */ "@/components/channels/UploadModal"),
+    Sidebar:  () => import(/* webpackChunkName: "core" */ "@/components/Sidebar"),
+    AppFooter:  () => import(/* webpackChunkName: "core" */ "@/components/Footer"),
+    ServiceMessages:  () => import(/* webpackChunkName: "core" */ "@/components/ServiceMessages"),
+    SetInstanceModal:  () => import(/* webpackChunkName: "core" */ "@/components/SetInstanceModal"),
+    ShortcutsModal:  () => import(/* webpackChunkName: "core" */ "@/components/ShortcutsModal"),
+    FilterModal:  () => import(/* webpackChunkName: "moderation" */ "@/components/moderation/FilterModal"),
+    ReportModal:  () => import(/* webpackChunkName: "moderation" */ "@/components/moderation/ReportModal"),
     GlobalEvents,
-    ServiceMessages,
-    SetInstanceModal,
   },
   data () {
     return {
@@ -68,6 +69,19 @@ export default {
     }
   },
   async created () {
+
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener(
+        'controllerchange', () => {
+          if (this.serviceWorker.refreshing) return;
+          this.$store.commit('ui/serviceWorker', {
+            refreshing: true
+          })
+          window.location.reload();
+        }
+      );
+    }
+
     this.openWebsocket()
     let self = this
     if (!this.$store.state.ui.selectedLanguage) {
@@ -82,6 +96,10 @@ export default {
     if (serverUrl) {
       this.$store.commit('instance/instanceUrl', serverUrl)
     }
+    const url = urlParams.get('_url')
+    if (url) {
+      this.$router.replace(url)
+    }
     else if (!this.$store.state.instance.instanceUrl) {
       // we have several way to guess the API server url. By order of precedence:
       // 1. use the url provided in settings.json, if any
@@ -90,7 +108,7 @@ export default {
       let defaultInstanceUrl = this.$store.state.instance.frontSettings.defaultServerUrl || process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
       this.$store.commit('instance/instanceUrl', defaultInstanceUrl)
     } else {
-      // needed to trigger initialization of axios
+      // needed to trigger initialization of axios / service worker
       this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
     }
     await this.fetchNodeInfo()
@@ -116,6 +134,16 @@ export default {
       id: 'sidebarPendingReviewReportCount',
       handler: this.incrementPendingReviewReportsCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'user_request.created',
+      id: 'sidebarPendingReviewRequestCount',
+      handler: this.incrementPendingReviewRequestsCountInSidebar
+    })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'Listen',
+      id: 'handleListen',
+      handler: this.handleListen
+    })
   },
   mounted () {
     let self = this
@@ -127,6 +155,9 @@ export default {
       self.$router.push(event.target.getAttribute('href'))
       event.preventDefault();
     }, false);
+    this.$nextTick(() => {
+      document.getElementById('fake-content').classList.add('loaded')
+    })
 
   },
   destroyed () {
@@ -146,6 +177,14 @@ export default {
       eventName: 'mutation.updated',
       id: 'sidebarPendingReviewReportCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'user_request.created',
+      id: 'sidebarPendingReviewRequestCount',
+    })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'Listen',
+      id: 'handleListen',
+    })
     this.disconnect()
   },
   methods: {
@@ -157,6 +196,17 @@ export default {
     },
     incrementPendingReviewReportsCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: event.unresolved_count})
+    },
+    incrementPendingReviewRequestsCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewRequests', value: event.pending_count})
+    },
+    handleListen (event) {
+      if (this.$store.state.radios.current && this.$store.state.radios.running) {
+        let current = this.$store.state.radios.current
+        if (current.clientOnly && current.type === 'account') {
+          getClientOnlyRadio(current).handleListen(current, event, this.$store)
+        }
+      }
     },
     async fetchNodeInfo () {
       let response = await axios.get('instance/nodeinfo/2.0/')
@@ -214,8 +264,9 @@ export default {
     },
     getTrackInformationText(track) {
       const trackTitle = track.title
+      const albumArtist = (track.album) ? track.album.artist.name : null
       const artistName = (
-        (track.artist) ? track.artist.name : track.album.artist.name)
+        (track.artist) ? track.artist.name : albumArtist)
       const text = `♫ ${trackTitle} – ${artistName} ♫`
       return text
     },
@@ -233,15 +284,39 @@ export default {
       parts.push(this.$store.state.instance.settings.instance.name.value || 'Funkwhale')
       document.title = parts.join(' – ')
     },
+
+    updateApp () {
+      this.$store.commit('ui/serviceWorker', {updateAvailable: false})
+      if (!this.serviceWorker.registration || !this.serviceWorker.registration.waiting) { return; }
+      this.serviceWorker.registration.waiting.postMessage({command: 'skipWaiting'})
+    }
   },
   computed: {
     ...mapState({
       messages: state => state.ui.messages,
       nodeinfo: state => state.instance.nodeinfo,
+      playing: state => state.player.playing,
+      bufferProgress: state => state.player.bufferProgress,
+      isLoadingAudio: state => state.player.isLoadingAudio,
+      serviceWorker: state => state.ui.serviceWorker,
     }),
     ...mapGetters({
-      currentTrack: 'queue/currentTrack'
+      hasNext: "queue/hasNext",
+      currentTrack: 'queue/currentTrack',
+      progress: "player/progress",
     }),
+    labels() {
+      let play = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Play track")
+      let pause = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Pause track")
+      let next = this.$pgettext('Sidebar/Player/Icon.Tooltip', "Next track")
+      let expandQueue = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Expand queue")
+      return {
+        play,
+        pause,
+        next,
+        expandQueue,
+      }
+    },
     suggestedInstances () {
       let instances = this.$store.state.instance.knownInstances.slice(0)
       if (this.$store.state.instance.frontSettings.defaultServerUrl) {
@@ -264,10 +339,10 @@ export default {
       if (this.$store.state.instance.frontSettings) {
         return this.$store.state.instance.frontSettings.additionalStylesheets || []
       }
-    }
+    },
   },
   watch: {
-    '$store.state.instance.instanceUrl' () {
+    '$store.state.instance.instanceUrl' (v) {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
     },
@@ -290,7 +365,12 @@ export default {
       immediate: true,
       handler(newValue) {
         let self = this
-        import(`./translations/${newValue}.json`).then((response) =>{
+        if (newValue === 'en_US') {
+          self.$language.current = 'noop'
+          self.$language.current = newValue
+          return self.$store.commit('ui/momentLocale', 'en')
+        }
+        import(/* webpackChunkName: "locale-[request]" */ `./translations/${newValue}.json`).then((response) =>{
           Vue.$translations[newValue] = response.default[newValue]
         }).finally(() => {
           // set current language twice, otherwise we seem to have a cache somewhere
@@ -298,16 +378,13 @@ export default {
           self.$language.current = 'noop'
           self.$language.current = newValue
         })
-        if (newValue === 'en_US') {
-          return self.$store.commit('ui/momentLocale', 'en')
-        }
         let momentLocale = newValue.replace('_', '-').toLowerCase()
-        import(`moment/locale/${momentLocale}.js`).then(() => {
+        import(/* webpackChunkName: "moment-locale-[request]" */ `moment/locale/${momentLocale}.js`).then(() => {
           self.$store.commit('ui/momentLocale', momentLocale)
         }).catch(() => {
           console.log('No momentjs locale available for', momentLocale)
           let shortLocale = momentLocale.split('-')[0]
-          import(`moment/locale/${shortLocale}.js`).then(() => {
+          import(/* webpackChunkName: "moment-locale-[request]" */ `moment/locale/${shortLocale}.js`).then(() => {
             self.$store.commit('ui/momentLocale', shortLocale)
           }).catch(() => {
             console.log('No momentjs locale available for', shortLocale)
@@ -327,10 +404,230 @@ export default {
         this.updateDocumentTitle()
       },
     },
+    'serviceWorker.updateAvailable': {
+      handler (v) {
+        if (!v) {
+          return
+        }
+        let self = this
+        this.$store.commit('ui/addMessage', {
+          content: this.$pgettext("App/Message/Paragraph", "A new version of the app is available."),
+          date: new Date(),
+          key: 'refreshApp',
+          displayTime: 0,
+          classActions: 'bottom attached opaque',
+          actions: [
+            {
+              text: this.$pgettext("App/Message/Paragraph", "Update"),
+              class: "primary",
+              click: function () {
+                self.updateApp()
+              },
+            },
+            {
+              text: this.$pgettext("App/Message/Paragraph", "Later"),
+              class: "basic",
+            }
+          ]
+        })
+      },
+      immediate: true,
+    }
   }
 }
 </script>
 
 <style lang="scss">
 @import "style/_main";
+
+.ui.bottom-player {
+  z-index: 999999;
+  width: 100%;
+  width: 100vw;
+  .ui.top.attached.progress {
+    top: 0;
+  }
+}
+.dimmed {
+  .ui.bottom-player {
+    @include media("<desktop") {
+      z-index: 0;
+    }
+  }
+}
+#app.queue-focused {
+  .queue-not-focused {
+    @include media("<desktop") {
+      display: none;
+    }
+  }
+}
+.when-queue-focused {
+  .group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+    > * {
+      margin-left: 0.5em;
+    }
+  }
+  @include media("<desktop") {
+    width: 100%;
+    justify-content: space-between !important;
+  }
+}
+#app:not(.queue-focused) {
+  .when-queue-focused {
+    @include media("<desktop") {
+      display: none;
+    }
+  }
+}
+.ui.bottom-player > .segment.fixed-controls {
+  width: 100%;
+  width: 100vw;
+  border-radius: 0;
+  padding: 0em;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  z-index: 1001;
+  height: $bottom-player-height;
+  .controls-row {
+    height: $bottom-player-height;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    @include media(">desktop") {
+      padding: 0 1em;
+      justify-content: space-around;
+    }
+  }
+  cursor: pointer;
+  .indicating.progress {
+    overflow: hidden;
+  }
+
+  .ui.progress .bar {
+    transition: none;
+  }
+
+  .ui.progress .buffer.bar {
+    position: absolute;
+  }
+
+  @keyframes MOVE-BG {
+    from {
+      transform: translateX(0px);
+    }
+    to {
+      transform: translateX(46px);
+    }
+  }
+  .discrete.link {
+    color: inherit;
+  }
+  .indicating.progress .bar {
+    left: -46px;
+    width: 200% !important;
+    color: grey;
+    background: repeating-linear-gradient(
+      -55deg,
+      grey 1px,
+      grey 10px,
+      transparent 10px,
+      transparent 20px
+    ) !important;
+
+    animation-name: MOVE-BG;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .ui.progress:not([data-percent]):not(.indeterminate)
+    .bar.position:not(.buffer) {
+    background: #ff851b;
+    min-width: 0;
+  }
+
+  .track-controls {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-grow: 1;
+    .image {
+      padding: 0.5em;
+      width: auto;
+      margin-right: 0.5em;
+      > img {
+        max-height: 3.7em;
+        max-width: 4.7em;
+      }
+    }
+  }
+  .controls {
+    min-width: 8em;
+    font-size: 1.1em;
+    @include media(">desktop") {
+      &:not(.fluid) {
+        width: 20%;
+      }
+      &.queue-controls {
+        width: 32.5%;
+      }
+      &.progress-controls {
+        width: 10%;
+      }
+      &.player-controls {
+        width: 15%;
+      }
+    }
+    &.small, .small {
+      @include media(">desktop") {
+        font-size: 0.9em;
+      }
+    }
+    .icon {
+      font-size: 1.1em;
+    }
+    .icon.large {
+      font-size: 1.4em;
+    }
+    &:not(.track-controls) {
+      @include media(">desktop") {
+        line-height: 1em;
+      }
+      justify-content: center;
+      align-items: center;
+      &.align-right {
+        justify-content: flex-end;
+      }
+      &.align-left {
+        justify-content: flex-start;
+      }
+      > * {
+        padding: 0.5em;
+      }
+    }
+    &.player-controls {
+      .icon {
+        margin: 0;
+      }
+    }
+
+  }
+}
+.queue-enter-active, .queue-leave-active {
+  transition: all 0.2s ease-in-out;
+  .current-track, .queue-column {
+    opacity: 0;
+  }
+}
+.queue-enter, .queue-leave-to {
+  transform: translateY(100vh);
+  opacity: 0;
+}
 </style>

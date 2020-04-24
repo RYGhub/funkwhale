@@ -3,6 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
@@ -173,7 +174,7 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
 
     @transaction.atomic
     def handle_purge(self, objects):
-        ids = objects.values_list("pk", flat=True)
+        ids = objects.values_list("pk", flat=True).order_by("pk")
         common_utils.on_commit(federation_tasks.purge_actors.delay, domains=list(ids))
 
     @transaction.atomic
@@ -383,31 +384,50 @@ class ManageNestedAlbumSerializer(ManageBaseAlbumSerializer):
         return getattr(obj, "tracks_count", None)
 
 
-class ManageArtistSerializer(ManageBaseArtistSerializer):
-    albums = ManageNestedAlbumSerializer(many=True)
-    tracks = ManageNestedTrackSerializer(many=True)
+class ManageArtistSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageBaseArtistSerializer
+):
     attributed_to = ManageBaseActorSerializer()
     tags = serializers.SerializerMethodField()
+    tracks_count = serializers.SerializerMethodField()
+    albums_count = serializers.SerializerMethodField()
+    channel = serializers.SerializerMethodField()
+    cover = music_serializers.cover_field
 
     class Meta:
         model = music_models.Artist
         fields = ManageBaseArtistSerializer.Meta.fields + [
-            "albums",
-            "tracks",
+            "tracks_count",
+            "albums_count",
             "attributed_to",
             "tags",
+            "cover",
+            "channel",
+            "content_category",
         ]
+
+    def get_tracks_count(self, obj):
+        return getattr(obj, "_tracks_count", None)
+
+    def get_albums_count(self, obj):
+        return getattr(obj, "_albums_count", None)
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
         return [ti.tag.name for ti in tagged_items]
+
+    def get_channel(self, obj):
+        if "channel" in obj._state.fields_cache and obj.get_channel():
+            return str(obj.channel.uuid)
 
 
 class ManageNestedArtistSerializer(ManageBaseArtistSerializer):
     pass
 
 
-class ManageAlbumSerializer(ManageBaseAlbumSerializer):
+class ManageAlbumSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageBaseAlbumSerializer
+):
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     artist = ManageNestedArtistSerializer()
@@ -435,12 +455,15 @@ class ManageTrackAlbumSerializer(ManageBaseAlbumSerializer):
         fields = ManageBaseAlbumSerializer.Meta.fields + ["artist"]
 
 
-class ManageTrackSerializer(ManageNestedTrackSerializer):
+class ManageTrackSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageNestedTrackSerializer
+):
     artist = ManageNestedArtistSerializer()
     album = ManageTrackAlbumSerializer()
     attributed_to = ManageBaseActorSerializer()
     uploads_count = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    cover = music_serializers.cover_field
 
     class Meta:
         model = music_models.Track
@@ -450,6 +473,7 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
             "attributed_to",
             "uploads_count",
             "tags",
+            "cover",
         ]
 
     def get_uploads_count(self, obj):
@@ -700,3 +724,56 @@ class ManageReportSerializer(serializers.ModelSerializer):
     def get_notes(self, o):
         notes = getattr(o, "_prefetched_notes", [])
         return ManageBaseNoteSerializer(notes, many=True).data
+
+
+class ManageUserRequestSerializer(serializers.ModelSerializer):
+    assigned_to = ManageBaseActorSerializer()
+    submitter = ManageBaseActorSerializer()
+    notes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = moderation_models.UserRequest
+        fields = [
+            "id",
+            "uuid",
+            "creation_date",
+            "handled_date",
+            "type",
+            "status",
+            "assigned_to",
+            "submitter",
+            "notes",
+            "metadata",
+        ]
+        read_only_fields = [
+            "id",
+            "uuid",
+            "submitter",
+            "creation_date",
+            "handled_date",
+            "metadata",
+        ]
+
+    def get_notes(self, o):
+        notes = getattr(o, "_prefetched_notes", [])
+        return ManageBaseNoteSerializer(notes, many=True).data
+
+
+class ManageChannelSerializer(serializers.ModelSerializer):
+    attributed_to = ManageBaseActorSerializer()
+    actor = ManageBaseActorSerializer()
+    artist = ManageArtistSerializer()
+
+    class Meta:
+        model = audio_models.Channel
+        fields = [
+            "id",
+            "uuid",
+            "creation_date",
+            "artist",
+            "attributed_to",
+            "actor",
+            "rss_url",
+            "metadata",
+        ]
+        read_only_fields = fields

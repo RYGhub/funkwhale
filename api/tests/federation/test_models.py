@@ -54,6 +54,12 @@ def test_actor_get_quota(factories):
         audio_file__from_path=None,
         audio_file__data=b"aaaa",
     )
+    factories["music.Upload"](
+        library=library,
+        import_status="draft",
+        audio_file__from_path=None,
+        audio_file__data=b"aaaaa",
+    )
 
     # this one is imported in place and don't count
     factories["music.Upload"](
@@ -72,7 +78,23 @@ def test_actor_get_quota(factories):
         audio_file__data=b"aaaa",
     )
 
-    expected = {"total": 14, "pending": 1, "skipped": 2, "errored": 3, "finished": 8}
+    # this one is in a channel
+    channel = factories["audio.Channel"](attributed_to=library.actor)
+    factories["music.Upload"](
+        library=channel.library,
+        import_status="finished",
+        audio_file__from_path=None,
+        audio_file__data=b"aaaaa",
+    )
+
+    expected = {
+        "total": 24,
+        "pending": 1,
+        "skipped": 2,
+        "errored": 3,
+        "finished": 13,
+        "draft": 5,
+    }
 
     assert library.actor.get_current_usage() == expected
 
@@ -104,6 +126,7 @@ def test_domain_stats(factories):
         "libraries": 0,
         "tracks": 0,
         "albums": 0,
+        "channels": 0,
         "uploads": 0,
         "artists": 0,
         "outbox_activities": 0,
@@ -126,6 +149,8 @@ def test_actor_stats(factories):
         "uploads": 0,
         "artists": 0,
         "reports": 0,
+        "channels": 0,
+        "requests": 0,
         "outbox_activities": 0,
         "received_library_follows": 0,
         "emitted_library_follows": 0,

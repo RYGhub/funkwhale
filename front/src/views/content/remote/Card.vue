@@ -2,7 +2,9 @@
   <div class="ui card">
     <div class="content">
       <div class="header">
-        {{ library.name }}
+        <router-link :to="{name: 'library.detail', params: {id: library.uuid}}">
+          {{ library.name }}
+        </router-link>
         <div class="ui right floated dropdown">
           <i class="ellipsis vertical grey large icon nomargin"></i>
           <div class="menu">
@@ -93,40 +95,38 @@
         </div>
       </div>
     </div>
-    <div v-if="displayFollow" :class="['ui', 'bottom', {two: library.follow}, 'attached', 'buttons']">
-      <button
-        v-if="!library.follow"
-        @click="follow()"
-        :class="['ui', 'green', {'loading': isLoadingFollow}, 'button']">
-        <translate translate-context="Content/Library/Card.Button.Label/Verb">Follow</translate>
-      </button>
-      <template v-else-if="!library.follow.approved">
+    <div v-if="displayFollow || radioPlayable" :class="['ui', {two: displayFollow && radioPlayable}, 'bottom', 'attached', 'buttons']">
+      <radio-button v-if="radioPlayable" :type="'library'" :object-id="library.uuid"></radio-button>
+      <template v-if="displayFollow">
         <button
-          class="ui disabled button"><i class="hourglass icon"></i>
-          <translate translate-context="Content/Library/Card.Paragraph">Follow request pending approval</translate>
+          v-if="!library.follow"
+          @click="follow()"
+          :class="['ui', 'green', {'loading': isLoadingFollow}, 'button']">
+          <translate translate-context="Content/Library/Card.Button.Label/Verb">Follow</translate>
         </button>
-        <button
-          @click="unfollow"
-          class="ui button">
-          <translate translate-context="Content/Library/Card.Paragraph">Cancel follow request</translate>
-        </button>
-      </template>
-      <template v-else-if="library.follow.approved">
-        <button
-          class="ui disabled button"><i class="check icon"></i>
-          <translate translate-context="Content/Library/Card.Paragraph">Following</translate>
-        </button>
-        <dangerous-button
-          color=""
-          :class="['ui', 'button']"
-          :action="unfollow">
-          <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>
-          <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
-          <div slot="modal-content">
-            <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
-          </div>
-          <div slot="modal-confirm"><translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate></div>
-        </dangerous-button>
+        <template v-else-if="!library.follow.approved">
+          <button
+            class="ui disabled button"><i class="hourglass icon"></i>
+            <translate translate-context="Content/Library/Card.Paragraph">Follow request pending approval</translate>
+          </button>
+          <button
+            @click="unfollow"
+            class="ui button">
+            <translate translate-context="Content/Library/Card.Paragraph">Cancel follow request</translate>
+          </button>
+        </template>
+        <template v-else-if="library.follow.approved">
+          <dangerous-button
+            :class="['ui', 'button']"
+            :action="unfollow">
+            <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>
+            <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
+            <div slot="modal-content">
+              <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
+            </div>
+            <div slot="modal-confirm"><translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate></div>
+          </dangerous-button>
+        </template>
       </template>
     </div>
   </div>
@@ -134,6 +134,7 @@
 <script>
 import axios from 'axios'
 import ReportMixin from '@/components/mixins/Report'
+import RadioButton from '@/components/radios/Button'
 import jQuery from 'jquery'
 
 export default {
@@ -143,6 +144,9 @@ export default {
     displayFollow: {type: Boolean, default: true},
     displayScan: {type: Boolean, default: true},
     displayCopyFid: {type: Boolean, default: true},
+  },
+  components: {
+    RadioButton
   },
   data () {
     return {
@@ -195,7 +199,13 @@ export default {
         return false
       }
       return true
-    }
+    },
+    radioPlayable () {
+      return (
+        (this.library.actor.is_local || this.scanStatus === 'finished') &&
+        (this.library.privacy_level === 'everyone' || (this.library.follow && this.library.follow.is_approved))
+      )
+    },
   },
   methods: {
     launchScan () {

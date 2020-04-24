@@ -9,7 +9,8 @@
           <div class="ui column">
             <div class="segment-content">
               <h2 class="ui header">
-                <i class="circular inverted user icon"></i>
+                <img v-if="object.cover && object.cover.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+                <img v-else src="../../../assets/audio/default-cover.png">
                 <div class="content">
                   {{ object.title | truncate(100) }}
                   <div class="sub header">
@@ -73,10 +74,10 @@
                 </div>
                 <div class="ui buttons">
                   <dangerous-button
-                    :class="['ui', {loading: isLoading}, 'basic button']"
+                    :class="['ui', {loading: isLoading}, 'basic red button']"
                     :action="remove">
                     <translate translate-context="*/*/*/Verb">Delete</translate>
-                    <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this album?</translate></p>
+                    <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this track?</translate></p>
                     <div slot="modal-content">
                       <p><translate translate-context="Content/Moderation/Paragraph">The track will be removed, as well as associated uploads, favorites and listening history. This action is irreversible.</translate></p>
                     </div>
@@ -108,7 +109,7 @@
                       {{ object.title }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="object.album">
                     <td>
                       <router-link :to="{name: 'manage.library.albums.detail', params: {id: object.album.id }}">
                         <translate translate-context="*/*/*">Album</translate>
@@ -129,7 +130,7 @@
                       {{ object.artist.name }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="object.album">
                     <td>
                       <router-link :to="{name: 'manage.library.artists.detail', params: {id: object.album.artist.id }}">
                         <translate translate-context="*/*/*/Noun">Album artist</translate>
@@ -180,6 +181,12 @@
                     <td>
                       {{ object.domain }}
                     </td>
+                  </tr>
+                  <tr v-if="object.description">
+                    <td>
+                      <translate translate-context="'*/*/*/Noun">Description</translate>
+                    </td>
+                    <td v-html="object.description.html"></td>
                   </tr>
                 </tbody>
               </table>

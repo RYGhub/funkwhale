@@ -6,6 +6,8 @@ services:
     networks:
       - default
     env_file: .env
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
     image: postgres:11
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
@@ -15,7 +17,7 @@ services:
     networks:
       - default
     env_file: .env
-    image: redis:3
+    image: redis:5
     volumes:
       - ./data/redis:/data
 
@@ -36,7 +38,7 @@ services:
     # of CPUs. You can adjust this, by explicitly setting the --concurrency
     # flag:
     #   celery -A funkwhale_api.taskapp worker -l INFO --concurrency=4
-    command: celery -A funkwhale_api.taskapp worker -l INFO
+    command: celery -A funkwhale_api.taskapp worker -l INFO --concurrency=${CELERYD_CONCURRENCY-0}
     environment:
       - C_FORCE_ROOT=true
     volumes:
@@ -52,7 +54,7 @@ services:
       - postgres
       - redis
     env_file: .env
-    command: celery -A funkwhale_api.taskapp beat -l INFO
+    command: celery -A funkwhale_api.taskapp beat --pidfile= -l INFO
 
   api:
     restart: unless-stopped

@@ -29,6 +29,7 @@ def test_user_can_get_his_favorites(
             favorite, context={"request": request}
         ).data
     ]
+
     assert response.status_code == 200
     assert response.data["results"] == expected
 

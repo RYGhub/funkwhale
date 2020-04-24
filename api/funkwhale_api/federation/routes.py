@@ -1,4 +1,7 @@
 import logging
+import uuid
+
+from django.db.models import Q
 
 from funkwhale_api.music import models as music_models
 
@@ -131,38 +134,53 @@ def outbox_follow(context):
 @outbox.register({"type": "Create", "object.type": "Audio"})
 def outbox_create_audio(context):
     upload = context["upload"]
-    serializer = serializers.ActivitySerializer(
-        {
-            "type": "Create",
-            "actor": upload.library.actor.fid,
-            "object": serializers.UploadSerializer(upload).data,
-        }
-    )
+    channel = upload.library.get_channel()
+    followers_target = channel.actor if channel else upload.library
+    actor = channel.actor if channel else upload.library.actor
+    if channel:
+        serializer = serializers.ChannelCreateUploadSerializer(upload)
+    else:
+        upload_serializer = serializers.UploadSerializer
+        serializer = serializers.ActivitySerializer(
+            {
+                "type": "Create",
+                "actor": actor.fid,
+                "object": upload_serializer(upload).data,
+            }
+        )
     yield {
         "type": "Create",
-        "actor": upload.library.actor,
+        "actor": actor,
         "payload": with_recipients(
-            serializer.data, to=[{"type": "followers", "target": upload.library}]
+            serializer.data, to=[{"type": "followers", "target": followers_target}]
         ),
         "object": upload,
-        "target": upload.library,
+        "target": None if channel else upload.library,
     }
 
 
 @inbox.register({"type": "Create", "object.type": "Audio"})
 def inbox_create_audio(payload, context):
-    serializer = serializers.UploadSerializer(
-        data=payload["object"],
-        context={"activity": context.get("activity"), "actor": context["actor"]},
-    )
-
+    is_channel = "library" not in payload["object"]
+    if is_channel:
+        channel = context["actor"].get_channel()
+        serializer = serializers.ChannelCreateUploadSerializer(
+            data=payload, context={"channel": channel},
+        )
+    else:
+        serializer = serializers.UploadSerializer(
+            data=payload["object"],
+            context={"activity": context.get("activity"), "actor": context["actor"]},
+        )
     if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
-        logger.warn("Discarding invalid audio create")
+        logger.warn("Discarding invalid audio create: %s", serializer.errors)
         return
 
     upload = serializer.save()
-
-    return {"object": upload, "target": upload.library}
+    if is_channel:
+        return {"object": upload, "target": channel}
+    else:
+        return {"object": upload, "target": upload.library}
 
 
 @inbox.register({"type": "Delete", "object.type": "Library"})
@@ -245,9 +263,10 @@ def inbox_delete_audio(payload, context):
         # we did not receive a list of Ids, so we can probably use the value directly
         upload_fids = [payload["object"]["id"]]
 
-    candidates = music_models.Upload.objects.filter(
-        library__actor=actor, fid__in=upload_fids
+    query = Q(fid__in=upload_fids) & (
+        Q(library__actor=actor) | Q(track__artist__channel__actor=actor)
     )
+    candidates = music_models.Upload.objects.filter(query)
 
     total = candidates.count()
     logger.info("Deleting %s uploads with ids %s", total, upload_fids)
@@ -258,6 +277,9 @@ def inbox_delete_audio(payload, context):
 def outbox_delete_audio(context):
     uploads = context["uploads"]
     library = uploads[0].library
+    channel = library.get_channel()
+    followers_target = channel.actor if channel else library
+    actor = channel.actor if channel else library.actor
     serializer = serializers.ActivitySerializer(
         {
             "type": "Delete",
@@ -266,9 +288,9 @@ def outbox_delete_audio(context):
     )
     yield {
         "type": "Delete",
-        "actor": library.actor,
+        "actor": actor,
         "payload": with_recipients(
-            serializer.data, to=[{"type": "followers", "target": library}]
+            serializer.data, to=[{"type": "followers", "target": followers_target}]
         ),
     }
 
@@ -310,6 +332,37 @@ def inbox_update_track(payload, context):
         queryset=music_models.Track.objects.all(),
         serializer_class=serializers.TrackSerializer,
     )
+
+
+@inbox.register({"type": "Update", "object.type": "Audio"})
+def inbox_update_audio(payload, context):
+    serializer = serializers.ChannelCreateUploadSerializer(
+        data=payload, context=context
+    )
+
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.info("Skipped update, invalid payload")
+        return
+    serializer.save()
+
+
+@outbox.register({"type": "Update", "object.type": "Audio"})
+def outbox_update_audio(context):
+    upload = context["upload"]
+    channel = upload.library.get_channel()
+    actor = channel.actor
+    serializer = serializers.ChannelCreateUploadSerializer(
+        upload, context={"type": "Update", "activity_id_suffix": str(uuid.uuid4())[:8]}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }
 
 
 @inbox.register({"type": "Update", "object.type": "Artist"})
@@ -416,7 +469,6 @@ def outbox_delete_actor(context):
     {
         "type": "Delete",
         "object.type": [
-            "Tombstone",
             "Actor",
             "Person",
             "Application",
@@ -441,3 +493,89 @@ def inbox_delete_actor(payload, context):
         logger.warn("Cannot delete actor %s, no matching object found", actor.fid)
         return
     actor.delete()
+
+
+@inbox.register({"type": "Delete", "object.type": "Tombstone"})
+def inbox_delete(payload, context):
+    serializer = serializers.DeleteSerializer(data=payload, context=context)
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.info("Skipped deletion, invalid payload")
+        return
+
+    to_delete = serializer.validated_data["object"]
+    to_delete.delete()
+
+
+@inbox.register({"type": "Flag"})
+def inbox_flag(payload, context):
+    serializer = serializers.FlagSerializer(data=payload, context=context)
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.debug(
+            "Discarding invalid report from {}: %s",
+            context["actor"].fid,
+            serializer.errors,
+        )
+        return
+
+    report = serializer.save()
+    return {"object": report.target, "related_object": report}
+
+
+@outbox.register({"type": "Flag"})
+def outbox_flag(context):
+    report = context["report"]
+    if not report.target or not report.target.fid:
+        return
+    actor = actors.get_service_actor()
+    serializer = serializers.FlagSerializer(report)
+    yield {
+        "type": "Flag",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            # Mastodon requires the report to be sent to the reported actor inbox
+            # (and not the shared inbox)
+            to=[{"type": "actor_inbox", "actor": report.target_owner}],
+        ),
+    }
+
+
+@inbox.register({"type": "Delete", "object.type": "Album"})
+def inbox_delete_album(payload, context):
+    actor = context["actor"]
+    album_id = payload["object"].get("id")
+    if not album_id:
+        logger.debug("Discarding deletion of empty library")
+        return
+
+    query = Q(fid=album_id) & (Q(attributed_to=actor) | Q(artist__channel__actor=actor))
+    try:
+        album = music_models.Album.objects.get(query)
+    except music_models.Album.DoesNotExist:
+        logger.debug("Discarding deletion of unkwnown album %s", album_id)
+        return
+
+    album.delete()
+
+
+@outbox.register({"type": "Delete", "object.type": "Album"})
+def outbox_delete_album(context):
+    album = context["album"]
+    actor = (
+        album.artist.channel.actor
+        if album.artist.get_channel()
+        else album.attributed_to
+    )
+    actor = actor or actors.get_service_actor()
+    serializer = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Album", "id": album.fid}}
+    )
+
+    yield {
+        "type": "Delete",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }

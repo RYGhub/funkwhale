@@ -6,16 +6,23 @@ export default {
   state: {
     currentLanguage: 'en_US',
     selectedLanguage: false,
+    queueFocused: null,
     momentLocale: 'en',
     lastDate: new Date(),
     maxMessages: 100,
-    messageDisplayDuration: 10000,
+    messageDisplayDuration: 5 * 1000,
+    supportedExtensions: ["flac", "ogg", "mp3", "opus", "aac", "m4a"],
     messages: [],
     theme: 'light',
+    window: {
+      height: 0,
+      width: 0,
+    },
     notifications: {
       inbox: 0,
       pendingReviewEdits: 0,
       pendingReviewReports: 0,
+      pendingReviewRequests: 0,
     },
     websocketEventsHandlers: {
       'inbox.item_added': {},
@@ -23,8 +30,92 @@ export default {
       'mutation.created': {},
       'mutation.updated': {},
       'report.created': {},
+      'user_request.created': {},
+      'Listen': {},
     },
-    pageTitle: null
+    pageTitle: null,
+    routePreferences: {
+      "library.albums.browse": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.artists.browse": {
+        paginateBy: 30,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.radios.browse": {
+        paginateBy: 12,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.playlists.browse": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.albums.me": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.artists.me": {
+        paginateBy: 30,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.radios.me": {
+        paginateBy: 12,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.playlists.me": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "content.libraries.files": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.detail.upload": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.detail.edit": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.detail": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "favorites": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "manage.moderation.requests.list": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "manage.moderation.reports.list": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+    },
+    serviceWorker: {
+      refreshing: false,
+      registration: null,
+      updateAvailable: false,
+    }
   },
   getters: {
     showInstanceSupportMessage: (state, getters, rootState) => {
@@ -62,6 +153,33 @@ export default {
         count += 1
       }
       return count
+    },
+
+    windowSize: (state, getters) => {
+      // IMPORTANT: if you modify these breakpoints, also modify the values in
+      // style/vendor/_media.scss
+      let width = state.window.width
+      let breakpoints = [
+        {name: 'widedesktop', width: 1200},
+        {name: 'desktop', width: 1024},
+        {name: 'tablet', width: 768},
+        {name: 'phone', width: 320},
+      ]
+      for (let index = 0; index < breakpoints.length; index++) {
+        const element = breakpoints[index];
+        if (width >= element.width) {
+          return element.name
+        }
+      }
+      return 'phone'
+
+    },
+    layoutVersion: (state, getters) => {
+      if (['tablet', 'phone'].indexOf(getters.windowSize) > -1) {
+        return 'small'
+      } else {
+        return 'large'
+      }
     }
   },
   mutations: {
@@ -82,14 +200,32 @@ export default {
     computeLastDate: (state) => {
       state.lastDate = new Date()
     },
+    queueFocused: (state, value) => {
+      state.queueFocused = value
+    },
+
     theme: (state, value) => {
       state.theme = value
     },
     addMessage (state, message) {
-      state.messages.push(message)
+      let finalMessage = {
+        displayTime: state.messageDisplayDuration,
+        key: String(new Date()),
+        ...message,
+      }
+      let key = finalMessage.key
+      state.messages = state.messages.filter((m) => {
+        return m.key != key
+      })
+      state.messages.push(finalMessage)
       if (state.messages.length > state.maxMessages) {
         state.messages.shift()
       }
+    },
+    removeMessage (state, key) {
+      state.messages = state.messages.filter((m) => {
+        return m.key != key
+      })
     },
     notifications (state, {type, count}) {
       state.notifications[type] = count
@@ -103,6 +239,22 @@ export default {
     },
     pageTitle: (state, value) => {
       state.pageTitle = value
+    },
+    paginateBy: (state, {route, value}) => {
+      state.routePreferences[route].paginateBy = value
+    },
+    ordering: (state, {route, value}) => {
+      state.routePreferences[route].ordering = value
+    },
+    orderingDirection: (state, {route, value}) => {
+      state.routePreferences[route].orderingDirection = value
+    },
+
+    serviceWorker: (state, value) => {
+      state.serviceWorker = {...state.serviceWorker, ...value}
+    },
+    window: (state, value) => {
+      state.window = value
     }
   },
   actions: {
@@ -119,6 +271,11 @@ export default {
     fetchPendingReviewReports ({commit, rootState}, payload) {
       axios.get('manage/moderation/reports/', {params: {is_handled: 'false', page_size: 1}}).then((response) => {
         commit('notifications', {type: 'pendingReviewReports', count: response.data.count})
+      })
+    },
+    fetchPendingReviewRequests ({commit, rootState}, payload) {
+      axios.get('manage/moderation/requests/', {params: {status: 'pending', page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'pendingReviewRequests', count: response.data.count})
       })
     },
     websocketEvent ({state}, event) {

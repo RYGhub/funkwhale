@@ -9,19 +9,18 @@ import string
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager as BaseUserManager
 from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from allauth.account.models import EmailAddress
 from django_auth_ldap.backend import populate_user as ldap_populate_user
 from oauth2_provider import models as oauth2_models
 from oauth2_provider import validators as oauth2_validators
 from versatileimagefield.fields import VersatileImageField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api.common import fields, preferences
 from funkwhale_api.common import utils as common_utils
@@ -48,6 +47,8 @@ PERMISSIONS_CONFIGURATION = {
             "write:instance:domains",
             "read:instance:reports",
             "write:instance:reports",
+            "read:instance:requests",
+            "write:instance:requests",
             "read:instance:notes",
             "write:instance:notes",
         },
@@ -94,7 +95,26 @@ def get_default_funkwhale_support_message_display_date():
     )
 
 
-@python_2_unicode_compatible
+class UserQuerySet(models.QuerySet):
+    def for_auth(self):
+        """Optimization to avoid additional queries during authentication"""
+        qs = self.select_related("actor__domain")
+        verified_emails = EmailAddress.objects.filter(
+            user=models.OuterRef("id"), primary=True
+        ).values("verified")[:1]
+        subquery = models.Subquery(verified_emails)
+        return qs.annotate(has_verified_primary_email=subquery)
+
+
+class UserManager(BaseUserManager):
+    def get_queryset(self):
+        return UserQuerySet(self.model, using=self._db)
+
+    def get_by_natural_key(self, key):
+        obj = BaseUserManager.get_by_natural_key(self.all().for_auth(), key)
+        return obj
+
+
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns
@@ -170,6 +190,8 @@ class User(AbstractUser):
         blank=True,
     )
 
+    objects = UserManager()
+
     def __str__(self):
         return self.username
 
@@ -230,13 +252,17 @@ class User(AbstractUser):
             self.last_activity = now
             self.save(update_fields=["last_activity"])
 
-    def create_actor(self):
-        self.actor = create_actor(self)
+    def create_actor(self, **kwargs):
+        self.actor = create_actor(self, **kwargs)
         self.save(update_fields=["actor"])
         return self.actor
 
     def get_upload_quota(self):
-        return self.upload_quota or preferences.get("users__upload_quota")
+        return (
+            self.upload_quota
+            if self.upload_quota is not None
+            else preferences.get("users__upload_quota")
+        )
 
     def get_quota_status(self):
         data = self.actor.get_current_usage()
@@ -245,6 +271,7 @@ class User(AbstractUser):
             "max": max_,
             "remaining": max(max_ - (data["total"] / 1000 / 1000), 0),
             "current": data["total"] / 1000 / 1000,
+            "draft": data["draft"] / 1000 / 1000,
             "skipped": data["skipped"] / 1000 / 1000,
             "pending": data["pending"] / 1000 / 1000,
             "finished": data["finished"] / 1000 / 1000,
@@ -264,15 +291,10 @@ class User(AbstractUser):
     def full_username(self):
         return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
 
-    @property
-    def avatar_path(self):
-        if not self.avatar:
-            return None
-        try:
-            return self.avatar.path
-        except NotImplementedError:
-            # external storage
-            return self.avatar.name
+    def get_avatar(self):
+        if not self.actor:
+            return
+        return self.actor.attachment_icon
 
 
 def generate_code(length=10):
@@ -362,7 +384,8 @@ def get_actor_data(username, **kwargs):
         "preferred_username": slugified_username,
         "domain": domain,
         "type": "Person",
-        "name": username,
+        "name": kwargs.get("name", username),
+        "summary": kwargs.get("summary"),
         "manually_approves_followers": False,
         "fid": federation_utils.full_url(
             reverse(
@@ -398,8 +421,9 @@ def get_actor_data(username, **kwargs):
     }
 
 
-def create_actor(user):
+def create_actor(user, **kwargs):
     args = get_actor_data(user.username)
+    args.update(kwargs)
     private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
@@ -411,13 +435,3 @@ def create_actor(user):
 def init_ldap_user(sender, user, ldap_user, **kwargs):
     if not user.actor:
         user.actor = create_actor(user)
-
-
-@receiver(models.signals.post_save, sender=User)
-def warm_user_avatar(sender, instance, **kwargs):
-    if not instance.avatar or not settings.CREATE_IMAGE_THUMBNAILS:
-        return
-    user_avatar_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
-    )
-    num_created, failed_to_create = user_avatar_warmer.warm()

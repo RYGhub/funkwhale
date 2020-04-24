@@ -4,20 +4,42 @@ from django.db import transaction
 from django import urls
 from django.conf import settings
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.playlists import models as playlists_models
-from funkwhale_api.tags.models import Tag
+from funkwhale_api.tags import models as tag_models
+from funkwhale_api.tags import serializers as tags_serializers
 
-from . import filters, models, tasks
+from . import filters, models, tasks, utils
+
+NOOP = object()
+
+COVER_WRITE_FIELD = common_serializers.RelatedField(
+    "uuid",
+    queryset=common_models.Attachment.objects.all().local(),
+    serializer=None,
+    allow_null=True,
+    required=False,
+    queryset_filter=lambda qs, context: qs.filter(actor=context["request"].user.actor),
+    write_only=True,
+)
+
+from funkwhale_api.audio import serializers as audio_serializers  # NOQA
 
 
-cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+class CoverField(
+    common_serializers.NullToEmptDict, common_serializers.AttachmentSerializer
+):
+    # XXX: BACKWARD COMPATIBILITY
+    pass
+
+
+cover_field = CoverField()
 
 
 def serialize_attributed_to(self, obj):
@@ -28,6 +50,20 @@ def serialize_attributed_to(self, obj):
         return
 
     return federation_serializers.APIActorSerializer(obj.attributed_to).data
+
+
+class OptionalDescriptionMixin(object):
+    def to_representation(self, obj):
+        repr = super().to_representation(obj)
+        if self.context.get("description", False):
+            description = obj.description
+            repr["description"] = (
+                common_serializers.ContentSerializer(description).data
+                if description
+                else None
+            )
+
+        return repr
 
 
 class LicenseSerializer(serializers.Serializer):
@@ -43,6 +79,9 @@ class LicenseSerializer(serializers.Serializer):
 
     def get_id(self, obj):
         return obj["identifiers"][0]
+
+    class Meta:
+        model = models.License
 
 
 class ArtistAlbumSerializer(serializers.Serializer):
@@ -74,17 +113,20 @@ class ArtistAlbumSerializer(serializers.Serializer):
 DATETIME_FIELD = serializers.DateTimeField()
 
 
-class ArtistWithAlbumsSerializer(serializers.Serializer):
+class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serializer):
     albums = ArtistAlbumSerializer(many=True)
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
+    channel = serializers.SerializerMethodField()
     tracks_count = serializers.SerializerMethodField()
     id = serializers.IntegerField()
     fid = serializers.URLField()
     mbid = serializers.UUIDField()
     name = serializers.CharField()
+    content_category = serializers.CharField()
     creation_date = serializers.DateTimeField()
     is_local = serializers.BooleanField()
+    cover = cover_field
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
@@ -96,16 +138,53 @@ class ArtistWithAlbumsSerializer(serializers.Serializer):
         tracks = getattr(o, "_prefetched_tracks", None)
         return len(tracks) if tracks else None
 
+    def get_channel(self, o):
+        channel = o.get_channel()
+        if not channel:
+            return
+
+        return {
+            "uuid": str(channel.uuid),
+            "actor": {
+                "full_username": channel.actor.full_username,
+                "preferred_username": channel.actor.preferred_username,
+                "domain": channel.actor.domain_id,
+            },
+        }
+
 
 def serialize_artist_simple(artist):
-    return {
+    data = {
         "id": artist.id,
         "fid": artist.fid,
         "mbid": str(artist.mbid),
         "name": artist.name,
         "creation_date": DATETIME_FIELD.to_representation(artist.creation_date),
+        "modification_date": DATETIME_FIELD.to_representation(artist.modification_date),
         "is_local": artist.is_local,
+        "content_category": artist.content_category,
     }
+    if "description" in artist._state.fields_cache:
+        data["description"] = (
+            common_serializers.ContentSerializer(artist.description).data
+            if artist.description
+            else None
+        )
+
+    if "attachment_cover" in artist._state.fields_cache:
+        data["cover"] = (
+            cover_field.to_representation(artist.attachment_cover)
+            if artist.attachment_cover
+            else None
+        )
+
+    if getattr(artist, "_tracks_count", None) is not None:
+        data["tracks_count"] = artist._tracks_count
+
+    if getattr(artist, "_prefetched_tagged_items", None) is not None:
+        data["tags"] = [ti.tag.name for ti in artist._prefetched_tagged_items]
+
+    return data
 
 
 def serialize_album_track(track):
@@ -130,7 +209,8 @@ def serialize_album_track(track):
     }
 
 
-class AlbumSerializer(serializers.Serializer):
+class AlbumSerializer(OptionalDescriptionMixin, serializers.Serializer):
+    # XXX: remove in 1.0, it's expensive and can work with a filter/api call
     tracks = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     cover = cover_field
@@ -203,7 +283,23 @@ def serialize_upload(upload):
     }
 
 
-class TrackSerializer(serializers.Serializer):
+def sort_uploads_for_listen(uploads):
+    """
+    Given a list of uploads, return a sorted list of uploads, with local or locally
+    cached ones first, and older first
+    """
+    score = {upload: 0 for upload in uploads}
+    for upload in uploads:
+        if upload.is_local:
+            score[upload] = 3
+        elif upload.audio_file:
+            score[upload] = 2
+
+    sorted_tuples = sorted(score.items(), key=lambda t: (t[1], -t[0].pk), reverse=True)
+    return [t[0] for t in sorted_tuples]
+
+
+class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
     artist = serializers.SerializerMethodField()
     album = TrackAlbumSerializer(read_only=True)
     uploads = serializers.SerializerMethodField()
@@ -222,7 +318,7 @@ class TrackSerializer(serializers.Serializer):
     disc_number = serializers.IntegerField()
     copyright = serializers.CharField()
     license = serializers.SerializerMethodField()
-
+    cover = cover_field
     get_attributed_to = serialize_attributed_to
 
     def get_artist(self, o):
@@ -232,7 +328,8 @@ class TrackSerializer(serializers.Serializer):
         return obj.listen_url
 
     def get_uploads(self, obj):
-        return [serialize_upload(u) for u in getattr(obj, "playable_uploads", [])]
+        uploads = getattr(obj, "playable_uploads", [])
+        return [serialize_upload(u) for u in sort_uploads_for_listen(uploads)]
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
@@ -246,6 +343,7 @@ class TrackSerializer(serializers.Serializer):
 class LibraryForOwnerSerializer(serializers.ModelSerializer):
     uploads_count = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
+    actor = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Library
@@ -258,6 +356,7 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
             "uploads_count",
             "size",
             "creation_date",
+            "actor",
         ]
         read_only_fields = ["fid", "uuid", "creation_date", "actor"]
 
@@ -272,14 +371,26 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
             {"type": "Update", "object": {"type": "Library"}}, context={"library": obj}
         )
 
+    def get_actor(self, o):
+        # Import at runtime to avoid a circular import issue
+        from funkwhale_api.federation import serializers as federation_serializers
+
+        return federation_serializers.APIActorSerializer(o.actor).data
+
 
 class UploadSerializer(serializers.ModelSerializer):
     track = TrackSerializer(required=False, allow_null=True)
     library = common_serializers.RelatedField(
         "uuid",
         LibraryForOwnerSerializer(),
-        required=True,
+        required=False,
         filters=lambda context: {"actor": context["user"].actor},
+    )
+    channel = common_serializers.RelatedField(
+        "uuid",
+        audio_serializers.ChannelSerializer(),
+        required=False,
+        filters=lambda context: {"attributed_to": context["user"].actor},
     )
 
     class Meta:
@@ -291,6 +402,7 @@ class UploadSerializer(serializers.ModelSerializer):
             "mimetype",
             "track",
             "library",
+            "channel",
             "duration",
             "mimetype",
             "bitrate",
@@ -308,11 +420,75 @@ class UploadSerializer(serializers.ModelSerializer):
             "size",
             "track",
             "import_date",
-            "import_status",
         ]
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if "audio_file" in validated_data:
+            audio_data = utils.get_audio_file_data(validated_data["audio_file"])
+            if audio_data:
+                validated_data["duration"] = audio_data["length"]
+                validated_data["bitrate"] = audio_data["bitrate"]
+        return validated_data
+
+
+def filter_album(qs, context):
+    if "channel" in context:
+        return qs.filter(artist__channel=context["channel"])
+    if "actor" in context:
+        return qs.filter(artist__attributed_to=context["actor"])
+
+    return qs.none()
+
+
+class ImportMetadataSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=500, required=True)
+    description = serializers.CharField(
+        max_length=5000, required=False, allow_null=True
+    )
+    mbid = serializers.UUIDField(required=False, allow_null=True)
+    copyright = serializers.CharField(max_length=500, required=False, allow_null=True)
+    position = serializers.IntegerField(min_value=1, required=False, allow_null=True)
+    tags = tags_serializers.TagsListField(required=False)
+    license = common_serializers.RelatedField(
+        "code", LicenseSerializer(), required=False, allow_null=True
+    )
+    cover = common_serializers.RelatedField(
+        "uuid",
+        queryset=common_models.Attachment.objects.all().local(),
+        serializer=None,
+        queryset_filter=lambda qs, context: qs.filter(actor=context["actor"]),
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+    album = common_serializers.RelatedField(
+        "id",
+        queryset=models.Album.objects.all(),
+        serializer=None,
+        queryset_filter=filter_album,
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+
+class ImportMetadataField(serializers.JSONField):
+    def to_internal_value(self, v):
+        v = super().to_internal_value(v)
+        s = ImportMetadataSerializer(
+            data=v, context={"actor": self.context["user"].actor}
+        )
+        s.is_valid(raise_exception=True)
+        return v
 
 
 class UploadForOwnerSerializer(UploadSerializer):
+    import_status = serializers.ChoiceField(
+        choices=["draft", "pending"], default="pending"
+    )
+    import_metadata = ImportMetadataField(required=False)
+
     class Meta(UploadSerializer.Meta):
         fields = UploadSerializer.Meta.fields + [
             "import_details",
@@ -325,7 +501,6 @@ class UploadForOwnerSerializer(UploadSerializer):
         write_only_fields = ["audio_file"]
         read_only_fields = UploadSerializer.Meta.read_only_fields + [
             "import_details",
-            "import_metadata",
             "metadata",
         ]
 
@@ -336,9 +511,27 @@ class UploadForOwnerSerializer(UploadSerializer):
         return r
 
     def validate(self, validated_data):
+        if (
+            not self.instance
+            and "library" not in validated_data
+            and "channel" not in validated_data
+        ):
+            raise serializers.ValidationError(
+                "You need to specify a channel or a library"
+            )
+        if (
+            not self.instance
+            and "library" in validated_data
+            and "channel" in validated_data
+        ):
+            raise serializers.ValidationError(
+                "You may specify a channel or a library, not both"
+            )
         if "audio_file" in validated_data:
             self.validate_upload_quota(validated_data["audio_file"])
 
+        if "channel" in validated_data:
+            validated_data["library"] = validated_data.pop("channel").library
         return super().validate(validated_data)
 
     def validate_upload_quota(self, f):
@@ -353,6 +546,7 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
     actions = [
         common_serializers.Action("delete", allow_all=True),
         common_serializers.Action("relaunch_import", allow_all=True),
+        common_serializers.Action("publish", allow_all=False),
     ]
     filterset_class = filters.UploadFilter
     pk_field = "uuid"
@@ -373,7 +567,15 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
 
     @transaction.atomic
     def handle_relaunch_import(self, objects):
-        qs = objects.exclude(import_status="finished")
+        qs = objects.filter(import_status__in=["pending", "skipped", "errored"])
+        pks = list(qs.values_list("id", flat=True))
+        qs.update(import_status="pending")
+        for pk in pks:
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=pk)
+
+    @transaction.atomic
+    def handle_publish(self, objects):
+        qs = objects.filter(import_status="draft")
         pks = list(qs.values_list("id", flat=True))
         qs.update(import_status="pending")
         for pk in pks:
@@ -382,7 +584,7 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Tag
+        model = tag_models.Tag
         fields = ("id", "name", "creation_date")
 
 
@@ -398,7 +600,7 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     name = serializers.CharField(source="title")
     artist = serializers.CharField(source="artist.name")
-    album = serializers.CharField(source="album.title")
+    album = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -406,6 +608,10 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return "Audio"
+
+    def get_album(self, o):
+        if o.album:
+            return o.album.title
 
 
 def get_embed_url(type, id):
@@ -450,12 +656,18 @@ class OembedSerializer(serializers.Serializer):
             embed_type = "track"
             embed_id = track.pk
             data["title"] = "{} by {}".format(track.title, track.artist.name)
-            if track.album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    track.album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if track.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = track.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
+            elif track.album and track.album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = track.album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["description"] = track.full_name
             data["author_name"] = track.artist.name
             data["height"] = 150
@@ -476,12 +688,12 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "album"
             embed_id = album.pk
-            if album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = "{} by {}".format(album.title, album.artist.name)
             data["description"] = "{} by {}".format(album.title, album.artist.name)
             data["author_name"] = album.artist.name
@@ -501,25 +713,59 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "artist"
             embed_id = artist.pk
-            album = (
-                artist.albums.filter(cover__isnull=False)
-                .exclude(cover="")
-                .order_by("-id")
-                .first()
-            )
+            album = artist.albums.exclude(attachment_cover=None).order_by("-id").first()
 
-            if album and album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if album and album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = artist.name
             data["description"] = artist.name
             data["author_name"] = artist.name
             data["height"] = 400
             data["author_url"] = federation_utils.full_url(
                 common_utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+            )
+        elif match.url_name == "channel_detail":
+            from funkwhale_api.audio.models import Channel
+
+            kwargs = {}
+            if "uuid" in match.kwargs:
+                kwargs["uuid"] = match.kwargs["uuid"]
+            else:
+                username_data = federation_utils.get_actor_data_from_username(
+                    match.kwargs["username"]
+                )
+                kwargs["actor__domain"] = username_data["domain"]
+                kwargs["actor__preferred_username__iexact"] = username_data["username"]
+            qs = Channel.objects.filter(**kwargs).select_related(
+                "artist__attachment_cover"
+            )
+            try:
+                channel = qs.get()
+            except models.Artist.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No channel matching id {}".format(match.kwargs["uuid"])
+                )
+            embed_type = "channel"
+            embed_id = channel.uuid
+
+            if channel.artist.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = channel.artist.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
+            data["title"] = channel.artist.name
+            data["description"] = channel.artist.name
+            data["author_name"] = channel.artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "channel_detail", kwargs={"uuid": channel.uuid}
+                )
             )
         elif match.url_name == "library_playlist":
             qs = playlists_models.Playlist.objects.filter(
@@ -533,19 +779,22 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "playlist"
             embed_id = obj.pk
-            playlist_tracks = obj.playlist_tracks.exclude(track__album__cover="")
-            playlist_tracks = playlist_tracks.exclude(track__album__cover=None)
-            playlist_tracks = playlist_tracks.select_related("track__album").order_by(
-                "index"
+            playlist_tracks = obj.playlist_tracks.exclude(
+                track__album__attachment_cover=None
             )
+            playlist_tracks = playlist_tracks.select_related(
+                "track__album__attachment_cover"
+            ).order_by("index")
             first_playlist_track = playlist_tracks.first()
 
             if first_playlist_track:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    first_playlist_track.track.album.cover.crop["400x400"].url
+                data[
+                    "thumbnail_url"
+                ] = (
+                    first_playlist_track.track.album.attachment_cover.download_url_medium_square_crop
                 )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = obj.name
             data["description"] = obj.name
             data["author_name"] = obj.name
@@ -566,3 +815,46 @@ class OembedSerializer(serializers.Serializer):
 
     def create(self, data):
         return data
+
+
+class AlbumCreateSerializer(serializers.Serializer):
+    title = serializers.CharField(required=True, max_length=255)
+    cover = COVER_WRITE_FIELD
+    release_date = serializers.DateField(required=False, allow_null=True)
+    tags = tags_serializers.TagsListField(required=False)
+    description = common_serializers.ContentSerializer(allow_null=True, required=False)
+
+    artist = common_serializers.RelatedField(
+        "id",
+        queryset=models.Artist.objects.exclude(channel__isnull=True),
+        required=True,
+        serializer=None,
+        filters=lambda context: {"attributed_to": context["user"].actor},
+    )
+
+    def validate(self, validated_data):
+        duplicates = validated_data["artist"].albums.filter(
+            title__iexact=validated_data["title"]
+        )
+        if duplicates.exists():
+            raise serializers.ValidationError("An album with this title already exist")
+
+        return super().validate(validated_data)
+
+    def to_representation(self, obj):
+        obj.artist.attachment_cover
+        return AlbumSerializer(obj, context=self.context).data
+
+    def create(self, validated_data):
+        instance = models.Album.objects.create(
+            attributed_to=self.context["user"].actor,
+            artist=validated_data["artist"],
+            release_date=validated_data.get("release_date"),
+            title=validated_data["title"],
+            attachment_cover=validated_data.get("cover"),
+        )
+        common_utils.attach_content(
+            instance, "description", validated_data.get("description")
+        )
+        tag_models.set_tags(instance, *(validated_data.get("tags", []) or []))
+        return instance

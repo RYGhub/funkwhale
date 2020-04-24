@@ -1,5 +1,4 @@
 import datetime
-import io
 import os
 import pytest
 import uuid
@@ -7,8 +6,10 @@ import uuid
 from django.core.paginator import Paginator
 from django.utils import timezone
 
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import jsonld
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import licenses, metadata, models, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -125,6 +126,21 @@ def test_can_create_track_from_file_metadata_featuring(factories):
 
     assert track.album.artist.name == "Santana"
     assert track.artist.name == "Santana feat. Chris Cornell"
+
+
+def test_can_create_track_from_file_metadata_description(factories):
+    metadata = {
+        "title": "Whole Lotta Love",
+        "position": 1,
+        "disc_number": 1,
+        "description": {"text": "hello there", "content_type": "text/plain"},
+        "album": {"title": "Test album"},
+        "artists": [{"name": "Santana"}],
+    }
+    track = tasks.get_track_from_import_metadata(metadata)
+
+    assert track.description.text == "hello there"
+    assert track.description.content_type == "text/plain"
 
 
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
@@ -254,7 +270,7 @@ def test_can_create_track_from_file_metadata_distinct_position(factories):
     assert new_track != track
 
 
-def test_can_create_track_from_file_metadata_federation(factories, mocker, r_mock):
+def test_can_create_track_from_file_metadata_federation(factories, mocker):
     metadata = {
         "artists": [
             {"name": "Artist", "fid": "https://artist.fid", "fdate": timezone.now()}
@@ -263,6 +279,7 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
             "title": "Album",
             "fid": "https://album.fid",
             "fdate": timezone.now(),
+            "cover_data": {"url": "https://cover/hello.png", "mimetype": "image/png"},
             "artists": [
                 {
                     "name": "Album artist",
@@ -275,9 +292,7 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
         "position": 4,
         "fid": "https://hello",
         "fdate": timezone.now(),
-        "cover_data": {"url": "https://cover/hello.png", "mimetype": "image/png"},
     }
-    r_mock.get(metadata["cover_data"]["url"], body=io.BytesIO(b"coucou"))
 
     track = tasks.get_track_from_import_metadata(metadata, update_cover=True)
 
@@ -285,8 +300,12 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
     assert track.fid == metadata["fid"]
     assert track.creation_date == metadata["fdate"]
     assert track.position == 4
-    assert track.album.cover.read() == b"coucou"
-    assert track.album.cover_path.endswith(".png")
+    assert track.album.attachment_cover.url == metadata["album"]["cover_data"]["url"]
+    assert (
+        track.album.attachment_cover.mimetype
+        == metadata["album"]["cover_data"]["mimetype"]
+    )
+
     assert track.album.fid == metadata["album"]["fid"]
     assert track.album.title == metadata["album"]["title"]
     assert track.album.creation_date == metadata["album"]["fdate"]
@@ -309,10 +328,12 @@ def test_sort_candidates(factories):
 
 def test_upload_import(now, factories, temp_signal, mocker):
     outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
-    update_album_cover = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
+    populate_album_cover = mocker.patch(
+        "funkwhale_api.music.tasks.populate_album_cover"
+    )
     get_picture = mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture")
     get_track_from_import_metadata = mocker.spy(tasks, "get_track_from_import_metadata")
-    track = factories["music.Track"](album__cover="")
+    track = factories["music.Track"](album__attachment_cover=None)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": str(track.uuid)}}}
     )
@@ -329,8 +350,8 @@ def test_upload_import(now, factories, temp_signal, mocker):
     assert upload.import_status == "finished"
     assert upload.import_date == now
     get_picture.assert_called_once_with("cover_front", "other")
-    update_album_cover.assert_called_once_with(
-        upload.track.album, cover_data=get_picture.return_value, source=upload.source
+    populate_album_cover.assert_called_once_with(
+        upload.track.album, source=upload.source
     )
     assert (
         get_track_from_import_metadata.call_args[-1]["attributed_to"]
@@ -358,7 +379,7 @@ def test_upload_import_get_audio_data(factories, mocker):
         "funkwhale_api.music.models.Upload.get_audio_data",
         return_value={"size": 23, "duration": 42, "bitrate": 66},
     )
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
     )
@@ -429,8 +450,16 @@ def test_upload_import_skip_existing_track_in_own_library(factories, temp_signal
     )
 
 
+@pytest.mark.parametrize("import_status", ["draft", "errored", "finished"])
+def test_process_upload_picks_ignore_non_pending_uploads(import_status, factories):
+    upload = factories["music.Upload"](import_status=import_status)
+
+    with pytest.raises(upload.DoesNotExist):
+        tasks.process_upload(upload_id=upload.pk)
+
+
 def test_upload_import_track_uuid(now, factories):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
     )
@@ -446,7 +475,7 @@ def test_upload_import_track_uuid(now, factories):
 
 def test_upload_import_skip_federation(now, factories, mocker):
     outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None,
         import_metadata={
@@ -464,7 +493,7 @@ def test_upload_import_skip_federation(now, factories, mocker):
 
 def test_upload_import_skip_broadcast(now, factories, mocker):
     group_send = mocker.patch("funkwhale_api.common.channels.group_send")
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         library__actor__local=True,
         track=None,
@@ -530,46 +559,33 @@ def test_upload_import_error_metadata(factories, now, temp_signal, mocker):
 
 
 def test_upload_import_updates_cover_if_no_cover(factories, mocker, now):
-    mocked_update = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
-    album = factories["music.Album"](cover="")
+    populate_album_cover = mocker.patch(
+        "funkwhale_api.music.tasks.populate_album_cover"
+    )
+    album = factories["music.Album"](attachment_cover=None)
     track = factories["music.Track"](album=album)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
     )
     tasks.process_upload(upload_id=upload.pk)
-    mocked_update.assert_called_once_with(album, source=None, cover_data=None)
-
-
-def test_update_album_cover_mbid(factories, mocker):
-    album = factories["music.Album"](cover="")
-
-    mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
-    tasks.update_album_cover(album=album)
-
-    mocked_get.assert_called_once_with()
-
-
-def test_update_album_cover_file_data(factories, mocker):
-    album = factories["music.Album"](cover="", mbid=None)
-
-    mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
-    tasks.update_album_cover(album=album, cover_data={"hello": "world"})
-    mocked_get.assert_called_once_with(data={"hello": "world"})
+    populate_album_cover.assert_called_once_with(album, source=None)
 
 
 @pytest.mark.parametrize("ext,mimetype", [("jpg", "image/jpeg"), ("png", "image/png")])
-def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, mocker):
+def test_populate_album_cover_file_cover_separate_file(
+    ext, mimetype, factories, mocker
+):
     mocker.patch("funkwhale_api.music.tasks.IMAGE_TYPES", [(ext, mimetype)])
     image_path = os.path.join(DATA_DIR, "cover.{}".format(ext))
     with open(image_path, "rb") as f:
         image_content = f.read()
-    album = factories["music.Album"](cover="", mbid=None)
+    album = factories["music.Album"](attachment_cover=None, mbid=None)
 
-    mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
+    attach_file = mocker.patch("funkwhale_api.common.utils.attach_file")
     mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture", return_value=None)
-    tasks.update_album_cover(album=album, source="file://" + image_path)
-    mocked_get.assert_called_once_with(
-        data={"mimetype": mimetype, "content": image_content}
+    tasks.populate_album_cover(album=album, source="file://" + image_path)
+    attach_file.assert_called_once_with(
+        album, "attachment_cover", {"mimetype": mimetype, "content": image_content}
     )
 
 
@@ -595,6 +611,12 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "copyright": "2018 Someone",
         "attributedTo": "http://track.attributed",
         "tag": [{"type": "Hashtag", "name": "TrackTag"}],
+        "content": "hello there",
+        "image": {
+            "type": "Link",
+            "href": "http://cover.test/track",
+            "mediaType": "image/png",
+        },
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -604,15 +626,24 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "released": released.isoformat(),
             "tag": [{"type": "Hashtag", "name": "AlbumTag"}],
             "attributedTo": "http://album.attributed",
+            "content": "album desc",
+            "mediaType": "text/plain",
             "artists": [
                 {
                     "type": "Artist",
                     "published": published.isoformat(),
                     "id": "http://hello.artist",
                     "name": "John Smith",
+                    "content": "album artist desc",
+                    "mediaType": "text/markdown",
                     "musicbrainzId": str(uuid.uuid4()),
                     "attributedTo": "http://album-artist.attributed",
                     "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
+                    "image": {
+                        "type": "Link",
+                        "href": "http://cover.test/album-artist",
+                        "mediaType": "image/png",
+                    },
                 }
             ],
             "cover": {
@@ -627,9 +658,16 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "type": "Artist",
                 "id": "http://hello.trackartist",
                 "name": "Bob Smith",
+                "content": "artist desc",
+                "mediaType": "text/html",
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": "http://artist.attributed",
                 "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
+                "image": {
+                    "type": "Link",
+                    "href": "http://cover.test/artist",
+                    "mediaType": "image/png",
+                },
             }
         ],
     }
@@ -646,6 +684,11 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "fid": payload["id"],
         "attributed_to": references["http://track.attributed"],
         "tags": ["TrackTag"],
+        "description": {"content_type": "text/html", "text": "hello there"},
+        "cover_data": {
+            "mimetype": serializer.validated_data["image"]["mediaType"],
+            "url": serializer.validated_data["image"]["href"],
+        },
         "album": {
             "title": payload["album"]["name"],
             "attributed_to": references["http://album.attributed"],
@@ -654,6 +697,11 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "fid": payload["album"]["id"],
             "fdate": serializer.validated_data["album"]["published"],
             "tags": ["AlbumTag"],
+            "description": {"content_type": "text/plain", "text": "album desc"},
+            "cover_data": {
+                "mimetype": serializer.validated_data["album"]["cover"]["mediaType"],
+                "url": serializer.validated_data["album"]["cover"]["href"],
+            },
             "artists": [
                 {
                     "name": a["name"],
@@ -663,7 +711,19 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "fdate": serializer.validated_data["album"]["artists"][i][
                         "published"
                     ],
+                    "description": {
+                        "content_type": "text/markdown",
+                        "text": "album artist desc",
+                    },
                     "tags": ["AlbumArtistTag"],
+                    "cover_data": {
+                        "mimetype": serializer.validated_data["album"]["artists"][i][
+                            "image"
+                        ]["mediaType"],
+                        "url": serializer.validated_data["album"]["artists"][i][
+                            "image"
+                        ]["href"],
+                    },
                 }
                 for i, a in enumerate(payload["album"]["artists"])
             ],
@@ -678,13 +738,16 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "fdate": serializer.validated_data["artists"][i]["published"],
                 "attributed_to": references["http://artist.attributed"],
                 "tags": ["ArtistTag"],
+                "description": {"content_type": "text/html", "text": "artist desc"},
+                "cover_data": {
+                    "mimetype": serializer.validated_data["artists"][i]["image"][
+                        "mediaType"
+                    ],
+                    "url": serializer.validated_data["artists"][i]["image"]["href"],
+                },
             }
             for i, a in enumerate(payload["artists"])
         ],
-        "cover_data": {
-            "mimetype": serializer.validated_data["album"]["cover"]["mediaType"],
-            "url": serializer.validated_data["album"]["cover"]["href"],
-        },
     }
 
     result = tasks.federation_audio_track_to_metadata(
@@ -723,12 +786,13 @@ def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_moc
     scan_page = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
     scan = factories["music.LibraryScan"](status="scanning", total_files=5)
     uploads = [
-        factories["music.Upload"].build(
+        factories["music.Upload"](
             fid="https://track.test/{}".format(i),
             size=42,
             bitrate=66,
             duration=99,
             library=scan.library,
+            track__album__with_cover=True,
         )
         for i in range(5)
     ]
@@ -739,7 +803,9 @@ def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_moc
         "page": Paginator(uploads, 3).page(1),
         "item_serializer": federation_serializers.UploadSerializer,
     }
+    uploads[0].__class__.objects.filter(pk__in=[u.pk for u in uploads]).delete()
     page = federation_serializers.CollectionPageSerializer(page_conf)
+
     r_mock.get(page.data["id"], json=page.data)
 
     tasks.scan_library_page(library_scan_id=scan.pk, page_url=page.data["id"])
@@ -908,3 +974,358 @@ def test_get_cover_from_fs_ignored(name, tmpdir):
         f.write(content)
 
     assert tasks.get_cover_from_fs(tmpdir) is None
+
+
+def test_get_track_from_import_metadata_with_forced_values(factories, mocker, faker):
+    actor = factories["federation.Actor"]()
+    forced_values = {
+        "title": "Real title",
+        "artist": factories["music.Artist"](),
+        "album": None,
+        "license": factories["music.License"](),
+        "position": 3,
+        "copyright": "Real copyright",
+        "mbid": faker.uuid4(),
+        "attributed_to": actor,
+        "tags": ["hello", "world"],
+    }
+    metadata = {
+        "title": "Test track",
+        "artists": [{"name": "Test artist"}],
+        "album": {"title": "Test album", "release_date": datetime.date(2012, 8, 15)},
+        "position": 4,
+        "disc_number": 2,
+        "copyright": "2018 Someone",
+        "tags": ["foo", "bar"],
+    }
+
+    track = tasks.get_track_from_import_metadata(metadata, **forced_values)
+
+    assert track.title == forced_values["title"]
+    assert track.mbid == forced_values["mbid"]
+    assert track.position == forced_values["position"]
+    assert track.disc_number == metadata["disc_number"]
+    assert track.copyright == forced_values["copyright"]
+    assert track.album == forced_values["album"]
+    assert track.artist == forced_values["artist"]
+    assert track.attributed_to == forced_values["attributed_to"]
+    assert track.license == forced_values["license"]
+    assert (
+        sorted(track.tagged_items.values_list("tag__name", flat=True))
+        == forced_values["tags"]
+    )
+
+
+def test_get_track_from_import_metadata_with_forced_values_album(
+    factories, mocker, faker
+):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist, with_cover=True)
+
+    forced_values = {
+        "title": "Real title",
+        "album": album.pk,
+    }
+    upload = factories["music.Upload"](
+        import_metadata=forced_values, library=channel.library, track=None
+    )
+    tasks.process_upload(upload_id=upload.pk)
+    upload.refresh_from_db()
+    assert upload.import_status == "finished"
+
+    assert upload.track.title == forced_values["title"]
+    assert upload.track.album == album
+    assert upload.track.artist == channel.artist
+
+
+def test_process_channel_upload_forces_artist_and_attributed_to(
+    factories, mocker, faker
+):
+    channel = factories["audio.Channel"](attributed_to__local=True)
+    update_modification_date = mocker.spy(common_utils, "update_modification_date")
+
+    attachment = factories["common.Attachment"](actor=channel.attributed_to)
+    import_metadata = {
+        "title": "Real title",
+        "position": 3,
+        "copyright": "Real copyright",
+        "tags": ["hello", "world"],
+        "description": "my description",
+        "cover": attachment.uuid,
+    }
+    expected_forced_values = import_metadata.copy()
+    expected_forced_values["artist"] = channel.artist
+    expected_forced_values["cover"] = attachment
+    upload = factories["music.Upload"](
+        track=None, import_metadata=import_metadata, library=channel.library
+    )
+    get_track_from_import_metadata = mocker.spy(tasks, "get_track_from_import_metadata")
+
+    tasks.process_upload(upload_id=upload.pk)
+
+    upload.refresh_from_db()
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None}, expected_forced_values, {"funkwhale": {}},
+    )
+    assert upload.import_status == "finished"
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata,
+        attributed_to=channel.attributed_to,
+        **expected_forced_values
+    )
+
+    assert upload.track.description.content_type == "text/markdown"
+    assert upload.track.description.text == import_metadata["description"]
+    assert upload.track.title == import_metadata["title"]
+    assert upload.track.position == import_metadata["position"]
+    assert upload.track.copyright == import_metadata["copyright"]
+    assert upload.track.get_tags() == import_metadata["tags"]
+    assert upload.track.artist == channel.artist
+    assert upload.track.attributed_to == channel.attributed_to
+    assert upload.track.attachment_cover == attachment
+
+    update_modification_date.assert_called_once_with(channel.artist)
+
+
+def test_process_upload_uses_import_metadata_if_valid(factories, mocker):
+    track = factories["music.Track"](album__with_cover=True)
+    import_metadata = {"title": "hello", "funkwhale": {"foo": "bar"}}
+    upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
+    get_track_from_import_metadata = mocker.patch.object(
+        tasks, "get_track_from_import_metadata", return_value=track
+    )
+    tasks.process_upload(upload_id=upload.pk)
+
+    serializer = tasks.metadata.TrackMetadataSerializer(
+        data=tasks.metadata.Metadata(upload.get_audio_file())
+    )
+    assert serializer.is_valid() is True
+    audio_metadata = serializer.validated_data
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None},
+        audio_metadata,
+        {"funkwhale": import_metadata["funkwhale"]},
+    )
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata, attributed_to=upload.library.actor, title="hello"
+    )
+
+
+def test_process_upload_skips_import_metadata_if_invalid(factories, mocker):
+    track = factories["music.Track"](album__with_cover=True)
+    import_metadata = {"title": None, "funkwhale": {"foo": "bar"}}
+    upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
+    get_track_from_import_metadata = mocker.patch.object(
+        tasks, "get_track_from_import_metadata", return_value=track
+    )
+    tasks.process_upload(upload_id=upload.pk)
+
+    serializer = tasks.metadata.TrackMetadataSerializer(
+        data=tasks.metadata.Metadata(upload.get_audio_file())
+    )
+    assert serializer.is_valid() is True
+    audio_metadata = serializer.validated_data
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None},
+        audio_metadata,
+        {"funkwhale": import_metadata["funkwhale"]},
+    )
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata, attributed_to=upload.library.actor
+    )
+
+
+def test_tag_albums_from_tracks(queryset_equal_queries, factories, mocker):
+    get_tags_from_foreign_key = mocker.patch(
+        "funkwhale_api.tags.tasks.get_tags_from_foreign_key"
+    )
+    add_tags_batch = mocker.patch("funkwhale_api.tags.tasks.add_tags_batch")
+
+    expected_queryset = (
+        federation_utils.local_qs(
+            models.Album.objects.filter(tagged_items__isnull=True)
+        )
+        .values_list("id", flat=True)
+        .order_by("id")
+    )
+    tasks.albums_set_tags_from_tracks(ids=[1, 2])
+    get_tags_from_foreign_key.assert_called_once_with(
+        ids=expected_queryset.filter(pk__in=[1, 2]),
+        foreign_key_model=models.Track,
+        foreign_key_attr="album",
+    )
+
+    add_tags_batch.assert_called_once_with(
+        get_tags_from_foreign_key.return_value, model=models.Album,
+    )
+
+
+def test_tag_artists_from_tracks(queryset_equal_queries, factories, mocker):
+    get_tags_from_foreign_key = mocker.patch(
+        "funkwhale_api.tags.tasks.get_tags_from_foreign_key"
+    )
+    add_tags_batch = mocker.patch("funkwhale_api.tags.tasks.add_tags_batch")
+
+    expected_queryset = (
+        federation_utils.local_qs(
+            models.Artist.objects.filter(tagged_items__isnull=True)
+        )
+        .values_list("id", flat=True)
+        .order_by("id")
+    )
+    tasks.artists_set_tags_from_tracks(ids=[1, 2])
+    get_tags_from_foreign_key.assert_called_once_with(
+        ids=expected_queryset.filter(pk__in=[1, 2]),
+        foreign_key_model=models.Track,
+        foreign_key_attr="artist",
+    )
+
+    add_tags_batch.assert_called_once_with(
+        get_tags_from_foreign_key.return_value, model=models.Artist,
+    )
+
+
+def test_can_download_image_file_for_album_mbid(binary_cover, mocker, factories):
+    mocker.patch(
+        "funkwhale_api.musicbrainz.api.images.get_front", return_value=binary_cover
+    )
+    # client._api.get_image_front('55ea4f82-b42b-423e-a0e5-290ccdf443ed')
+    album = factories["music.Album"](mbid="55ea4f82-b42b-423e-a0e5-290ccdf443ed")
+    tasks.populate_album_cover(album, replace=True)
+
+    assert album.attachment_cover.file.read() == binary_cover
+    assert album.attachment_cover.mimetype == "image/jpeg"
+
+
+def test_can_import_track_with_same_mbid_in_different_albums(factories, mocker):
+    artist = factories["music.Artist"]()
+    upload = factories["music.Upload"](
+        playable=True, track__artist=artist, track__album__artist=artist
+    )
+    assert upload.track.mbid is not None
+    data = {
+        "title": upload.track.title,
+        "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        "album": {
+            "title": "The Slip",
+            "mbid": uuid.UUID("12b57d46-a192-499e-a91f-7da66790a1c1"),
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        },
+        "position": 1,
+        "disc_number": 1,
+        "mbid": upload.track.mbid,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "finished"
+
+
+def test_import_track_with_same_mbid_in_same_albums_skipped(factories, mocker):
+    artist = factories["music.Artist"]()
+    upload = factories["music.Upload"](
+        playable=True, track__artist=artist, track__album__artist=artist
+    )
+    assert upload.track.mbid is not None
+    data = {
+        "title": upload.track.title,
+        "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        "album": {
+            "title": upload.track.album.title,
+            "mbid": upload.track.album.mbid,
+            "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        },
+        "position": 1,
+        "disc_number": 1,
+        "mbid": upload.track.mbid,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "skipped"
+
+
+def test_can_import_track_with_same_position_in_different_discs(factories, mocker):
+    upload = factories["music.Upload"](playable=True)
+    artist_data = [
+        {
+            "name": upload.track.album.artist.name,
+            "mbid": upload.track.album.artist.mbid,
+        }
+    ]
+    data = {
+        "title": upload.track.title,
+        "artists": artist_data,
+        "album": {
+            "title": "The Slip",
+            "mbid": upload.track.album.mbid,
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": artist_data,
+        },
+        "position": upload.track.position,
+        "disc_number": 2,
+        "mbid": None,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "finished"
+
+
+def test_can_import_track_with_same_position_in_same_discs_skipped(factories, mocker):
+    upload = factories["music.Upload"](playable=True)
+    artist_data = [
+        {
+            "name": upload.track.album.artist.name,
+            "mbid": upload.track.album.artist.mbid,
+        }
+    ]
+    data = {
+        "title": upload.track.title,
+        "artists": artist_data,
+        "album": {
+            "title": "The Slip",
+            "mbid": upload.track.album.mbid,
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": artist_data,
+        },
+        "position": upload.track.position,
+        "disc_number": upload.track.disc_number,
+        "mbid": None,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "skipped"

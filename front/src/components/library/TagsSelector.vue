@@ -29,14 +29,30 @@ export default {
         return value
       }
       let settings = {
+        keys : {
+          delimiter  : 32,
+        },
+        forceSelection: false,
         saveRemoteData: false,
         filterRemoteData: true,
+        preserveHTML : false,
         apiSettings: {
           url: this.$store.getters['instance/absoluteUrl']('/api/v1/tags/?name__startswith={query}&ordering=length&page_size=5'),
           beforeXHR: function (xhrObject) {
             xhrObject.setRequestHeader('Authorization', self.$store.getters['auth/header'])
             return xhrObject
           },
+          onResponse(response) {
+            let currentSearch = $(self.$refs.dropdown).dropdown('get query')
+            response = {
+              results: [],
+              ...response,
+            }
+            if (currentSearch) {
+              response.results = [{name: currentSearch}, ...response.results]
+            }
+            return response
+          }
         },
         fields: {
           remoteValues: 'results',
@@ -74,4 +90,3 @@ export default {
 }
 
 </style>
-

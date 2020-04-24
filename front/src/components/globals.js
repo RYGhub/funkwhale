@@ -1,63 +1,23 @@
 import Vue from 'vue'
 
-import HumanDate from '@/components/common/HumanDate'
-
-Vue.component('human-date', HumanDate)
-
-import Username from '@/components/common/Username'
-
-Vue.component('username', Username)
-
-import UserLink from '@/components/common/UserLink'
-
-Vue.component('user-link', UserLink)
-
-import ActorLink from '@/components/common/ActorLink'
-
-Vue.component('actor-link', ActorLink)
-
-import ActorAvatar from '@/components/common/ActorAvatar'
-
-Vue.component('actor-avatar', ActorAvatar)
-
-import Duration from '@/components/common/Duration'
-
-Vue.component('duration', Duration)
-
-import DangerousButton from '@/components/common/DangerousButton'
-
-Vue.component('dangerous-button', DangerousButton)
-
-import Message from '@/components/common/Message'
-
-Vue.component('message', Message)
-
-import CopyInput from '@/components/common/CopyInput'
-
-Vue.component('copy-input', CopyInput)
-
-import AjaxButton from '@/components/common/AjaxButton'
-
-Vue.component('ajax-button', AjaxButton)
-
-import Tooltip from '@/components/common/Tooltip'
-
-Vue.component('tooltip', Tooltip)
-
-import EmptyState from '@/components/common/EmptyState'
-
-Vue.component('empty-state', EmptyState)
-
-import ExpandableDiv from '@/components/common/ExpandableDiv'
-
-Vue.component('expandable-div', ExpandableDiv)
-
-import CollapseLink from '@/components/common/CollapseLink'
-
-Vue.component('collapse-link', CollapseLink)
-
-import ActionFeedback from '@/components/common/ActionFeedback'
-
-Vue.component('action-feedback', ActionFeedback)
+Vue.component('human-date', () => import(/* webpackChunkName: "common" */ "@/components/common/HumanDate"))
+Vue.component('human-duration', () => import(/* webpackChunkName: "common" */ "@/components/common/HumanDuration"))
+Vue.component('username', () => import(/* webpackChunkName: "common" */ "@/components/common/Username"))
+Vue.component('user-link', () => import(/* webpackChunkName: "common" */ "@/components/common/UserLink"))
+Vue.component('actor-link', () => import(/* webpackChunkName: "common" */ "@/components/common/ActorLink"))
+Vue.component('actor-avatar', () => import(/* webpackChunkName: "common" */ "@/components/common/ActorAvatar"))
+Vue.component('duration', () => import(/* webpackChunkName: "common" */ "@/components/common/Duration"))
+Vue.component('dangerous-button', () => import(/* webpackChunkName: "common" */ "@/components/common/DangerousButton"))
+Vue.component('message', () => import(/* webpackChunkName: "common" */ "@/components/common/Message"))
+Vue.component('copy-input', () => import(/* webpackChunkName: "common" */ "@/components/common/CopyInput"))
+Vue.component('ajax-button', () => import(/* webpackChunkName: "common" */ "@/components/common/AjaxButton"))
+Vue.component('tooltip', () => import(/* webpackChunkName: "common" */ "@/components/common/Tooltip"))
+Vue.component('empty-state', () => import(/* webpackChunkName: "common" */ "@/components/common/EmptyState"))
+Vue.component('expandable-div', () => import(/* webpackChunkName: "common" */ "@/components/common/ExpandableDiv"))
+Vue.component('collapse-link', () => import(/* webpackChunkName: "common" */ "@/components/common/CollapseLink"))
+Vue.component('action-feedback', () => import(/* webpackChunkName: "common" */ "@/components/common/ActionFeedback"))
+Vue.component('rendered-description', () => import(/* webpackChunkName: "common" */ "@/components/common/RenderedDescription"))
+Vue.component('content-form', () => import(/* webpackChunkName: "common" */ "@/components/common/ContentForm"))
+Vue.component('inline-search-bar', () => import(/* webpackChunkName: "common" */ "@/components/common/InlineSearchBar"))
 
 export default {}

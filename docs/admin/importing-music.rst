@@ -15,7 +15,7 @@ You can import those tracks as follows, assuming they are located in
 .. code-block:: bash
 
     export LIBRARY_ID="<your_libary_id>"
-    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/**/*.ogg" --recursive --noinput
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/" --recursive --noinput
 
 When you use docker, the ``/srv/funkwhale/data/music`` is mounted from the host
 to the ``/music`` directory on the container:
@@ -23,14 +23,14 @@ to the ``/music`` directory on the container:
 .. code-block:: bash
 
     export LIBRARY_ID="<your_libary_id>"
-    docker-compose run --rm api python manage.py import_files $LIBRARY_ID "/music/**/*.ogg" --recursive --noinput
+    docker-compose run --rm api python manage.py import_files $LIBRARY_ID "/music/" --recursive --noinput
 
 When you installed Funkwhale via ansible, you need to call a script instead of Python, and the folder path must be adapted accordingly:
 
 .. code-block:: bash
 
     export LIBRARY_ID="<your_libary_id>"
-    /srv/funkwhale/manage import_files $LIBRARY_ID "/srv/funkwhale/data/music/**/**/*.ogg" --recursive --noinput
+    /srv/funkwhale/manage import_files $LIBRARY_ID "/srv/funkwhale/data/music/" --recursive --noinput
 
 .. note::
     You'll have to create a library in the Web UI before to get your library ID. Simply visit
@@ -107,9 +107,9 @@ you can create a symlink like this::
     ln -s /media/mynfsshare /srv/funkwhale/data/music/nfsshare
 
 And import music from this share with this command::
-    
+
     export LIBRARY_ID="<your_libary_id>"
-    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/nfsshare/**/*.ogg" --recursive --noinput --in-place
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/nfsshare/" --recursive --noinput --in-place
 
 On docker setups, it will require a bit more work, because while the ``/srv/funkwhale/data/music`` is mounted
 in containers, symlinked directories are not.

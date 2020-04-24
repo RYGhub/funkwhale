@@ -16,11 +16,14 @@ from funkwhale_api.federation import (
 def test_receive_validates_basic_attributes_and_stores_activity(
     mrf_inbox_registry, factories, now, mocker
 ):
+
     mocker.patch.object(
         activity.InboxRouter, "get_matching_handlers", return_value=True
     )
     mrf_inbox_registry_apply = mocker.spy(mrf_inbox_registry, "apply")
+    serializer_init = mocker.spy(serializers.BaseActivitySerializer, "__init__")
     mocked_dispatch = mocker.patch("funkwhale_api.common.utils.on_commit")
+    inbox_actor = factories["federation.Actor"]()
     local_to_actor = factories["users.User"]().create_actor()
     local_cc_actor = factories["users.User"]().create_actor()
     remote_actor = factories["federation.Actor"]()
@@ -33,7 +36,9 @@ def test_receive_validates_basic_attributes_and_stores_activity(
         "cc": [local_cc_actor.fid, activity.PUBLIC_ADDRESS],
     }
 
-    copy = activity.receive(activity=a, on_behalf_of=remote_actor)
+    copy = activity.receive(
+        activity=a, on_behalf_of=remote_actor, inbox_actor=inbox_actor
+    )
     mrf_inbox_registry_apply.assert_called_once_with(a, sender_id=a["actor"])
 
     assert copy.payload == a
@@ -45,12 +50,45 @@ def test_receive_validates_basic_attributes_and_stores_activity(
         tasks.dispatch_inbox.delay, activity_id=copy.pk
     )
 
-    assert models.InboxItem.objects.count() == 2
-    for actor, t in [(local_to_actor, "to"), (local_cc_actor, "cc")]:
+    assert models.InboxItem.objects.count() == 3
+    for actor, t in [
+        (local_to_actor, "to"),
+        (inbox_actor, "to"),
+        (local_cc_actor, "cc"),
+    ]:
         ii = models.InboxItem.objects.get(actor=actor)
         assert ii.type == t
         assert ii.activity == copy
         assert ii.is_read is False
+
+    assert serializer_init.call_args[1]["context"] == {
+        "actor": remote_actor,
+        "local_recipients": True,
+        "recipients": [inbox_actor],
+    }
+    assert serializer_init.call_args[1]["data"] == a
+
+
+def test_receive_uses_follow_object_if_no_audience_provided(
+    mrf_inbox_registry, factories, now, mocker
+):
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
+    mocker.patch("funkwhale_api.common.utils.on_commit")
+    local_to_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    a = {
+        "@context": [],
+        "actor": remote_actor.fid,
+        "type": "Follow",
+        "id": "https://test.activity",
+        "object": local_to_actor.fid,
+    }
+
+    activity.receive(activity=a, on_behalf_of=remote_actor, inbox_actor=None)
+
+    assert models.InboxItem.objects.filter(actor=local_to_actor, type="to").exists()
 
 
 def test_receive_uses_mrf_returned_payload(mrf_inbox_registry, factories, now, mocker):
@@ -440,6 +478,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         shared_inbox_url=remote_actor1.shared_inbox_url
     )
     remote_actor3 = factories["federation.Actor"](shared_inbox_url=None)
+    remote_actor4 = factories["federation.Actor"]()
 
     library = factories["music.Library"]()
     library_follower_local = factories["federation.LibraryFollow"](
@@ -475,6 +514,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         activity.PUBLIC_ADDRESS,
         {"type": "followers", "target": library},
         {"type": "followers", "target": followed_actor},
+        {"type": "actor_inbox", "actor": remote_actor4},
     ]
 
     inbox_items, deliveries, urls = activity.prepare_deliveries_and_inbox_items(
@@ -495,6 +535,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         [
             models.Delivery(inbox_url=remote_actor1.shared_inbox_url),
             models.Delivery(inbox_url=remote_actor3.inbox_url),
+            models.Delivery(inbox_url=remote_actor4.inbox_url),
             models.Delivery(inbox_url=library_follower_remote.inbox_url),
             models.Delivery(inbox_url=actor_follower_remote.inbox_url),
         ],
@@ -511,6 +552,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         activity.PUBLIC_ADDRESS,
         library.followers_url,
         followed_actor.followers_url,
+        remote_actor4.fid,
     ]
 
     assert urls == expected_urls

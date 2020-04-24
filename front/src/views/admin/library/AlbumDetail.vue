@@ -74,7 +74,7 @@
                 </div>
                 <div class="ui buttons">
                   <dangerous-button
-                    :class="['ui', {loading: isLoading}, 'basic button']"
+                    :class="['ui', {loading: isLoading}, 'basic red button']"
                     :action="remove">
                     <translate translate-context="*/*/*/Verb">Delete</translate>
                     <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this album?</translate></p>
@@ -128,6 +128,12 @@
                     <td>
                       {{ object.domain }}
                     </td>
+                  </tr>
+                  <tr v-if="object.description">
+                    <td>
+                      <translate translate-context="'*/*/*/Noun">Description</translate>
+                    </td>
+                    <td v-html="object.description.html"></td>
                   </tr>
                 </tbody>
               </table>

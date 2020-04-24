@@ -1,5 +1,5 @@
 <template>
-  <div @click="showModal = true" :class="['ui', color, {disabled: disabled}, 'button']" :disabled="disabled">
+  <div @click="showModal = true" :class="[{disabled: disabled}]" role="button" :disabled="disabled">
     <slot></slot>
 
     <modal class="small" :show.sync="showModal">
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="actions">
-        <div class="ui cancel button">
+        <div class="ui basic cancel button">
           <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
         </div>
         <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
@@ -34,8 +34,7 @@ export default {
   props: {
     action: {type: Function, required: false},
     disabled: {type: Boolean, default: false},
-    color: {type: String, default: 'red'},
-    confirmColor: {type: String, default: null, required: false}
+    confirmColor: {type: String, default: "red", required: false}
   },
   components: {
     Modal

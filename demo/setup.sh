@@ -54,7 +54,6 @@ from funkwhale_api.common import preferences
 
 manager = preferences.global_preferences_registry.manager()
 manager['common__api_authentication_required'] = False
-manager['federation__music_needs_approval'] = False
 manager['instance__name'] = "Login: demo / password: demo"
 
 paths = [

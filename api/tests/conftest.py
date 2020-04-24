@@ -87,6 +87,8 @@ def cache():
     """
     yield django_cache
     django_cache.clear()
+    if "service_actor" in actors._CACHE:
+        del actors._CACHE["service_actor"]
 
 
 @pytest.fixture(autouse=True)
@@ -422,3 +424,8 @@ def clear_license_cache(db):
     licenses._cache = None
     yield
     licenses._cache = None
+
+
+@pytest.fixture
+def faker():
+    return factory.Faker._get_faker()

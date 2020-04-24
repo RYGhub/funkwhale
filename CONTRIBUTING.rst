@@ -84,6 +84,18 @@ Visit https://dev.funkwhale.audio/funkwhale/funkwhale and clone the repository u
     git clone ssh://git@dev.funkwhale.audio/funkwhale/funkwhale.git
     cd funkwhale
 
+.. note::
+
+    As of January 2020, the SSH fingerprints of our Gitlab server are the following::
+
+        $ ssh-keyscan dev.funkwhale.audio | ssh-keygen -lf -
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        2048 SHA256:WEZ546nkMhB9yV9lyDZZcEeN/IfriyhU8+mj7Cz/+sU dev.funkwhale.audio (RSA)
+        256 SHA256:dEhAo+1ImjC98hSqVdnkwVleheCulV8xIsV1eKUcig0 dev.funkwhale.audio (ECDSA)
+        256 SHA256:/AxZwOSP74hlNKCHzmu9Trlp9zVGTrsJOV+zet1hYyQ dev.funkwhale.audio (ED25519)
+
 
 A note about branches
 ^^^^^^^^^^^^^^^^^^^^^
@@ -709,3 +721,48 @@ The latter is especially useful when you are debugging failing tests.
 .. note::
 
     The front-end test suite coverage is still pretty low
+
+
+Making a release
+----------------
+
+To make a new 3.4 release::
+
+    # setup
+    export NEXT_RELEASE=3.4  # replace with the next release number
+    export PREVIOUS_RELEASE=3.3  # replace with the previous release number
+
+    # ensure you have an up-to-date repo
+    git checkout develop  # use master if you're doing a hotfix release
+    git pull
+
+    # compile changelog
+    towncrier --version $NEXT_RELEASE --yes
+
+    # polish changelog
+    # - update the date
+    # - look for typos
+    # - add list of contributors via `python3 scripts/get-contributions-stats.py develop $PREVIOUS_RELEASE`
+    nano CHANGELOG
+
+    # Set the `__version__` variable to $NEXT_RELEASE
+    nano nano api/funkwhale_api/__init__.py
+
+    # commit
+    git add .
+    git commit -m "Version bump and changelog for $NEXT_RELEASE"
+
+    # tag
+    git tag $NEXT_RELEASE
+
+    # publish
+    git push --tags && git push
+
+    # if you're doing a hotfix release from master
+    git checkout develop && git merge master && git push
+
+    # if you're doing a non-hotfix release, and a real release (not a real release) from develop
+    git checkout master && git merge develop && git push
+
+Then, visit https://dev.funkwhale.audio/funkwhale/funkwhale/-/tags, copy-paste the changelog on the corresponding
+tag, and announce the good news ;)

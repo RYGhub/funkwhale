@@ -6,10 +6,19 @@ export default {
   methods: {
     uploadHtml5 (file) {
       let form = new window.FormData()
+      let filename = file.file.filename || file.name
       let value
-      for (let key in file.data) {
-        value = file.data[key]
-        if (value && typeof value === 'object' && typeof value.toString !== 'function') {
+      let data = {...file.data}
+      if (data.import_metadata) {
+        data.import_metadata = {...(data.import_metadata || {})}
+        if (data.channel && !data.import_metadata.title) {
+          data.import_metadata.title = filename.replace(/\.[^/.]+$/, "")
+        }
+        data.import_metadata = JSON.stringify(data.import_metadata)
+      }
+      for (let key in data) {
+        value = data[key]
+        if (value &&   typeof value === 'object' && typeof value.toString !== 'function') {
           if (value instanceof File) {
             form.append(key, value, value.name)
           } else {
@@ -19,7 +28,6 @@ export default {
           form.append(key, value)
         }
       }
-      let filename = file.file.filename || file.name
       form.append('source', `upload://${filename}`)
       form.append(this.name, file.file, filename)
       let xhr = new XMLHttpRequest()

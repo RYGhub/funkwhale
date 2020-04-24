@@ -118,7 +118,7 @@ def should_reject(fid, actor_id=None, payload={}):
 
 
 @transaction.atomic
-def receive(activity, on_behalf_of):
+def receive(activity, on_behalf_of, inbox_actor=None):
     from . import models
     from . import serializers
     from . import tasks
@@ -131,7 +131,12 @@ def receive(activity, on_behalf_of):
     # we ensure the activity has the bare minimum structure before storing
     # it in our database
     serializer = serializers.BaseActivitySerializer(
-        data=activity, context={"actor": on_behalf_of, "local_recipients": True}
+        data=activity,
+        context={
+            "actor": on_behalf_of,
+            "local_recipients": True,
+            "recipients": [inbox_actor] if inbox_actor else [],
+        },
     )
     serializer.is_valid(raise_exception=True)
 
@@ -159,16 +164,25 @@ def receive(activity, on_behalf_of):
         )
         return
 
-    local_to_recipients = get_actors_from_audience(activity.get("to", []))
-    local_to_recipients = local_to_recipients.exclude(user=None)
+    local_to_recipients = get_actors_from_audience(
+        serializer.validated_data.get("to", [])
+    )
+    local_to_recipients = local_to_recipients.local()
+    local_to_recipients = local_to_recipients.values_list("pk", flat=True)
+    local_to_recipients = list(local_to_recipients)
+    if inbox_actor:
+        local_to_recipients.append(inbox_actor.pk)
 
-    local_cc_recipients = get_actors_from_audience(activity.get("cc", []))
-    local_cc_recipients = local_cc_recipients.exclude(user=None)
+    local_cc_recipients = get_actors_from_audience(
+        serializer.validated_data.get("cc", [])
+    )
+    local_cc_recipients = local_cc_recipients.local()
+    local_cc_recipients = local_cc_recipients.values_list("pk", flat=True)
 
     inbox_items = []
     for recipients, type in [(local_to_recipients, "to"), (local_cc_recipients, "cc")]:
 
-        for r in recipients.values_list("pk", flat=True):
+        for r in recipients:
             inbox_items.append(models.InboxItem(actor_id=r, type=type, activity=copy))
 
     models.InboxItem.objects.bulk_create(inbox_items)
@@ -447,6 +461,13 @@ def prepare_deliveries_and_inbox_items(recipient_list, type, allowed_domains=Non
                 else:
                     remote_inbox_urls.add(actor.shared_inbox_url or actor.inbox_url)
             urls.append(r["target"].followers_url)
+        elif isinstance(r, dict) and r["type"] == "actor_inbox":
+            actor = r["actor"]
+            urls.append(actor.fid)
+            if actor.is_local:
+                local_recipients.add(actor)
+            else:
+                remote_inbox_urls.add(actor.inbox_url)
 
         elif isinstance(r, dict) and r["type"] == "instances_with_followers":
             # we want to broadcast the activity to other instances service actors
@@ -501,13 +522,6 @@ def prepare_deliveries_and_inbox_items(recipient_list, type, allowed_domains=Non
     return inbox_items, deliveries, urls
 
 
-def join_queries_or(left, right):
-    if left:
-        return left | right
-    else:
-        return right
-
-
 def get_actors_from_audience(urls):
     """
     Given a list of urls such as [
@@ -529,22 +543,24 @@ def get_actors_from_audience(urls):
         if url == PUBLIC_ADDRESS:
             continue
         queries["actors"].append(url)
-        queries["followed"] = join_queries_or(
+        queries["followed"] = funkwhale_utils.join_queries_or(
             queries["followed"], Q(target__followers_url=url)
         )
     final_query = None
     if queries["actors"]:
-        final_query = join_queries_or(final_query, Q(fid__in=queries["actors"]))
+        final_query = funkwhale_utils.join_queries_or(
+            final_query, Q(fid__in=queries["actors"])
+        )
     if queries["followed"]:
         actor_follows = models.Follow.objects.filter(queries["followed"], approved=True)
-        final_query = join_queries_or(
+        final_query = funkwhale_utils.join_queries_or(
             final_query, Q(pk__in=actor_follows.values_list("actor", flat=True))
         )
 
         library_follows = models.LibraryFollow.objects.filter(
             queries["followed"], approved=True
         )
-        final_query = join_queries_or(
+        final_query = funkwhale_utils.join_queries_or(
             final_query, Q(pk__in=library_follows.values_list("actor", flat=True))
         )
     if not final_query:

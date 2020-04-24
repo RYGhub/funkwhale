@@ -7,11 +7,19 @@ from django.utils.translation import gettext_lazy as _
 from rest_auth.serializers import PasswordResetSerializer as PRS
 from rest_auth.registration.serializers import RegisterSerializer as RS, get_adapter
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
+from rest_framework_jwt import serializers as jwt_serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.common import authentication
+from funkwhale_api.common import models as common_models
+from funkwhale_api.common import preferences
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import tasks as moderation_tasks
+from funkwhale_api.moderation import utils as moderation_utils
+
 from . import adapters
 from . import models
 
@@ -27,12 +35,33 @@ class ASCIIUsernameValidator(validators.RegexValidator):
 
 
 username_validators = [ASCIIUsernameValidator()]
+NOOP = object()
+
+
+class JSONWebTokenSerializer(jwt_serializers.JSONWebTokenSerializer):
+    def validate(self, data):
+        try:
+            return super().validate(data)
+        except authentication.UnverifiedEmail as e:
+            authentication.send_email_confirmation(self.context["request"], e.user)
+            raise serializers.ValidationError("Please verify your email address.")
 
 
 class RegisterSerializer(RS):
     invitation = serializers.CharField(
         required=False, allow_null=True, allow_blank=True
     )
+
+    def __init__(self, *args, **kwargs):
+        self.approval_enabled = preferences.get("moderation__signup_approval_enabled")
+        super().__init__(*args, **kwargs)
+        if self.approval_enabled:
+            customization = preferences.get("moderation__signup_form_customization")
+            self.fields[
+                "request_fields"
+            ] = moderation_utils.get_signup_form_additional_fields_serializer(
+                customization
+            )
 
     def validate_invitation(self, value):
         if not value:
@@ -65,11 +94,28 @@ class RegisterSerializer(RS):
 
     def save(self, request):
         user = super().save(request)
+        update_fields = ["actor"]
+        user.actor = models.create_actor(user)
+        user_request = None
+        if self.approval_enabled:
+            # manually approve users
+            user.is_active = False
+            user_request = moderation_models.UserRequest.objects.create(
+                submitter=user.actor,
+                type="signup",
+                metadata=self.validated_data.get("request_fields", None) or None,
+            )
+            update_fields.append("is_active")
         if self.validated_data.get("invitation"):
             user.invitation = self.validated_data.get("invitation")
-            user.save(update_fields=["invitation"])
-        user.actor = models.create_actor(user)
-        user.save(update_fields=["actor"])
+            update_fields.append("invitation")
+        user.save(update_fields=update_fields)
+        if user_request:
+            common_utils.on_commit(
+                moderation_tasks.user_request_handle.delay,
+                user_request_id=user_request.pk,
+                new_status=user_request.status,
+            )
 
         return user
 
@@ -87,17 +133,8 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
-class AvatarField(
-    common_serializers.StripExifImageField, VersatileImageFieldSerializer
-):
-    pass
-
-
-avatar_field = AvatarField(allow_null=True, sizes="square")
-
-
 class UserBasicSerializer(serializers.ModelSerializer):
-    avatar = avatar_field
+    avatar = common_serializers.AttachmentSerializer(source="get_avatar")
 
     class Meta:
         model = models.User
@@ -105,7 +142,16 @@ class UserBasicSerializer(serializers.ModelSerializer):
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
-    avatar = avatar_field
+    summary = common_serializers.ContentSerializer(required=False, allow_null=True)
+    avatar = common_serializers.RelatedField(
+        "uuid",
+        queryset=common_models.Attachment.objects.all().local().attached(False),
+        serializer=None,
+        queryset_filter=lambda qs, context: qs.filter(
+            actor=context["request"].user.actor
+        ),
+        write_only=True,
+    )
 
     class Meta:
         model = models.User
@@ -115,14 +161,37 @@ class UserWriteSerializer(serializers.ModelSerializer):
             "avatar",
             "instance_support_message_display_date",
             "funkwhale_support_message_display_date",
+            "summary",
         ]
+
+    def update(self, obj, validated_data):
+        if not obj.actor:
+            obj.create_actor()
+        summary = validated_data.pop("summary", NOOP)
+        avatar = validated_data.pop("avatar", NOOP)
+
+        obj = super().update(obj, validated_data)
+
+        if summary != NOOP:
+            common_utils.attach_content(obj.actor, "summary_obj", summary)
+        if avatar != NOOP:
+            obj.actor.attachment_icon = avatar
+            obj.actor.save(update_fields=["attachment_icon"])
+        return obj
+
+    def to_representation(self, instance):
+        r = super().to_representation(instance)
+        r["avatar"] = common_serializers.AttachmentSerializer(
+            instance.get_avatar()
+        ).data
+        return r
 
 
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
     full_username = serializers.SerializerMethodField()
-    avatar = avatar_field
+    avatar = common_serializers.AttachmentSerializer(source="get_avatar")
 
     class Meta:
         model = models.User
@@ -150,16 +219,23 @@ class UserReadSerializer(serializers.ModelSerializer):
 
 class MeSerializer(UserReadSerializer):
     quota_status = serializers.SerializerMethodField()
+    summary = serializers.SerializerMethodField()
 
     class Meta(UserReadSerializer.Meta):
         fields = UserReadSerializer.Meta.fields + [
             "quota_status",
             "instance_support_message_display_date",
             "funkwhale_support_message_display_date",
+            "summary",
         ]
 
     def get_quota_status(self, o):
         return o.get_quota_status() if o.actor else 0
+
+    def get_summary(self, o):
+        if not o.actor or not o.actor.summary_obj:
+            return
+        return common_serializers.ContentSerializer(o.actor.summary_obj).data
 
 
 class PasswordResetSerializer(PRS):

@@ -87,24 +87,19 @@ const FETCH_URL = "playlists/"
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
-    defaultQuery: { type: String, required: false, default: "" }
+    defaultQuery: { type: String, required: false, default: "" },
+    scope: { type: String, required: false, default: "all" },
   },
   components: {
     PlaylistCardList,
     Pagination
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [
         ["creation_date", "creation_date"],
         ["modification_date", "modification_date"],
@@ -147,6 +142,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL
       let params = {
+        scope: this.scope,
         page: this.page,
         page_size: this.paginateBy,
         q: this.query,

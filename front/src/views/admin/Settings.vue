@@ -78,8 +78,10 @@ export default {
     groups() {
       // somehow, extraction fails if in the return block directly
       let instanceLabel = this.$pgettext('Content/Admin/Menu','Instance information')
-      let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
+      let signupsLabel = this.$pgettext('*/*/*/Noun', 'Sign-ups')
+      let securityLabel = this.$pgettext('*/*/*/Noun', 'Security')
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
+      let channelsLabel = this.$pgettext('*/*/*', 'Channels')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
       let federationLabel = this.$pgettext('*/*/*', 'Federation')
       let moderationLabel = this.$pgettext('*/Moderation/*', 'Moderation')
@@ -92,76 +94,97 @@ export default {
           label: instanceLabel,
           id: "instance",
           settings: [
-            "instance__name",
-            "instance__short_description",
-            "instance__long_description",
-            "instance__contact_email",
-            "instance__rules",
-            "instance__terms",
-            "instance__banner",
-            "instance__support_message"
+            {name: "instance__name"},
+            {name: "instance__short_description"},
+            {name: "instance__long_description", fieldType: 'markdown', fieldParams: {charLimit: null, permissive: true}},
+            {name: "instance__contact_email"},
+            {name: "instance__rules", fieldType: 'markdown', fieldParams: {charLimit: null, permissive: true}},
+            {name: "instance__terms", fieldType: 'markdown', fieldParams: {charLimit: null, permissive: true}},
+            {name: "instance__banner"},
+            {name: "instance__support_message", fieldType: 'markdown', fieldParams: {charLimit: null, permissive: true}},
           ]
         },
         {
-          label: usersLabel,
-          id: "users",
+          label: signupsLabel,
+          id: "signup",
           settings: [
-            "users__registration_enabled",
-            "common__api_authentication_required",
-            "users__default_permissions",
-            "users__upload_quota"
+            {name: "users__registration_enabled"},
+            {name: "moderation__signup_approval_enabled"},
+            {name: "moderation__signup_form_customization", fieldType: 'formBuilder'},
+          ]
+        },
+        {
+          label: securityLabel,
+          id: "security",
+          settings: [
+            {name: "common__api_authentication_required"},
+            {name: "users__default_permissions"},
+            {name: "users__upload_quota"},
           ]
         },
         {
           label: musicLabel,
           id: "music",
           settings: [
-            "music__transcoding_enabled",
-            "music__transcoding_cache_duration"
+            {name: "music__transcoding_enabled"},
+            {name: "music__transcoding_cache_duration"},
+          ]
+        },
+        {
+          label: channelsLabel,
+          id: "channels",
+          settings: [
+            {name: "audio__channels_enabled"},
+            {name: "audio__max_channels"},
           ]
         },
         {
           label: playlistsLabel,
           id: "playlists",
-          settings: ["playlists__max_tracks"]
+          settings: [
+            {name: "playlists__max_tracks"},
+          ]
         },
         {
           label: moderationLabel,
           id: "moderation",
           settings: [
-            "moderation__allow_list_enabled",
-            "moderation__allow_list_public",
-            "moderation__unauthenticated_report_types",
+            {name: "moderation__allow_list_enabled"},
+            {name: "moderation__allow_list_public"},
+            {name: "moderation__unauthenticated_report_types"},
           ]
         },
         {
           label: federationLabel,
           id: "federation",
           settings: [
-            "federation__enabled",
-            "federation__music_needs_approval",
-            "federation__collection_page_size",
-            "federation__music_cache_duration",
-            "federation__actor_fetch_delay"
+            {name: "federation__enabled"},
+            {name: "federation__collection_page_size"},
+            {name: "federation__music_cache_duration"},
+            {name: "federation__actor_fetch_delay"},
           ]
         },
         {
           label: subsonicLabel,
           id: "subsonic",
-          settings: ["subsonic__enabled"]
+          settings: [
+            {name: "subsonic__enabled"},
+          ]
         },
         {
           label: uiLabel,
           id: "ui",
-          settings: ["ui__custom_css", "instance__funkwhale_support_message_enabled"]
+          settings: [
+            {name: "ui__custom_css"},
+            {name: "instance__funkwhale_support_message_enabled"},
+          ]
         },
         {
           label: statisticsLabel,
           id: "statistics",
           settings: [
-            "instance__nodeinfo_enabled",
-            "instance__nodeinfo_stats_enabled",
-            "instance__nodeinfo_private"
+            {name: "instance__nodeinfo_stats_enabled"},
+            {name: "instance__nodeinfo_private"},
           ]
         }
       ]

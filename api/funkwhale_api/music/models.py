@@ -6,11 +6,14 @@ import tempfile
 import urllib.parse
 import uuid
 
-import pendulum
+import arrow
 import pydub
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
@@ -18,9 +21,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-
 from versatileimagefield.fields import VersatileImageField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import musicbrainz
 from funkwhale_api.common import fields
@@ -42,6 +43,13 @@ MAX_LENGTHS = {
 }
 
 
+ARTIST_CONTENT_CATEGORY_CHOICES = [
+    ("music", "music"),
+    ("podcast", "podcast"),
+    ("other", "other"),
+]
+
+
 def empty_dict():
     return {}
 
@@ -56,10 +64,14 @@ class APIModelMixin(models.Model):
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     import_hooks = []
+    body_text = SearchVectorField(blank=True)
 
     class Meta:
         abstract = True
         ordering = ["-creation_date"]
+        indexes = [
+            GinIndex(fields=["body_text"]),
+        ]
 
     @classmethod
     def get_or_create_from_api(cls, mbid):
@@ -171,7 +183,12 @@ class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 
     def with_albums(self):
         return self.prefetch_related(
-            models.Prefetch("albums", queryset=Album.objects.with_tracks_count())
+            models.Prefetch(
+                "albums",
+                queryset=Album.objects.with_tracks_count().select_related(
+                    "attachment_cover", "attributed_to"
+                ),
+            )
         )
 
     def annotate_playable_by_actor(self, actor):
@@ -217,7 +234,24 @@ class Artist(APIModelMixin):
         content_type_field="object_content_type",
         object_id_field="object_id",
     )
-
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_artist",
+    )
+    content_category = models.CharField(
+        max_length=30,
+        db_index=True,
+        default="music",
+        choices=ARTIST_CONTENT_CATEGORY_CHOICES,
+        null=True,
+    )
+    modification_date = models.DateTimeField(default=timezone.now, db_index=True)
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
 
@@ -235,6 +269,16 @@ class Artist(APIModelMixin):
         kwargs.update({"name": name})
         return cls.objects.get_or_create(name__iexact=name, defaults=kwargs)
 
+    @property
+    def cover(self):
+        return self.attachment_cover
+
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
+
 
 def import_artist(v):
     a = Artist.get_or_create_from_api(mbid=v[0]["artist"]["id"])[0]
@@ -242,7 +286,7 @@ def import_artist(v):
 
 
 def parse_date(v):
-    d = pendulum.parse(v).date()
+    d = arrow.get(v).date()
     return d
 
 
@@ -286,8 +330,16 @@ class Album(APIModelMixin):
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
     release_date = models.DateField(null=True, blank=True, db_index=True)
     release_group_id = models.UUIDField(null=True, blank=True)
+    # XXX: 1.0 clean this uneeded field in favor of attachment_cover
     cover = VersatileImageField(
         upload_to="albums/covers/%Y/%m/%d", null=True, blank=True
+    )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_album",
     )
     TYPE_CHOICES = (("album", "Album"),)
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default="album")
@@ -307,6 +359,10 @@ class Album(APIModelMixin):
         "federation.Fetch",
         content_type_field="object_content_type",
         object_id_field="object_id",
+    )
+
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
     )
 
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
@@ -333,41 +389,9 @@ class Album(APIModelMixin):
     }
     objects = AlbumQuerySet.as_manager()
 
-    def get_image(self, data=None):
-        if data:
-            extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
-            extension = extensions.get(data["mimetype"], "jpg")
-            f = None
-            if data.get("content"):
-                # we have to cover itself
-                f = ContentFile(data["content"])
-            elif data.get("url"):
-                # we can fetch from a url
-                try:
-                    response = session.get_session().get(
-                        data.get("url"),
-                        timeout=3,
-                        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-                    )
-                    response.raise_for_status()
-                except Exception as e:
-                    logger.warn(
-                        "Cannot download cover at url %s: %s", data.get("url"), e
-                    )
-                    return
-                else:
-                    f = ContentFile(response.content)
-            if f:
-                self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
-                self.save(update_fields=["cover"])
-                return self.cover.file
-        if self.mbid:
-            image_data = musicbrainz.api.images.get_front(str(self.mbid))
-            f = ContentFile(image_data)
-            self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
-            self.save(update_fields=["cover"])
-        if self.cover:
-            return self.cover.file
+    @property
+    def cover(self):
+        return self.attachment_cover
 
     def __str__(self):
         return self.title
@@ -377,16 +401,6 @@ class Album(APIModelMixin):
 
     def get_moderation_url(self):
         return "/manage/library/albums/{}".format(self.pk)
-
-    @property
-    def cover_path(self):
-        if not self.cover:
-            return None
-        try:
-            return self.cover.path
-        except NotImplementedError:
-            # external storage
-            return self.cover.name
 
     @classmethod
     def get_or_create_from_title(cls, title, **kwargs):
@@ -415,7 +429,9 @@ def import_album(v):
 
 class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
-        return self.prefetch_related("artist", "album__artist")
+        return self.prefetch_related(
+            "artist", "album__artist", "album__attachment_cover"
+        )
 
     def annotate_playable_by_actor(self, actor):
 
@@ -465,6 +481,7 @@ def get_artist(release_list):
 
 
 class Track(APIModelMixin):
+    mbid = models.UUIDField(db_index=True, null=True, blank=True)
     title = models.CharField(max_length=MAX_LENGTHS["TRACK_TITLE"])
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
     disc_number = models.PositiveIntegerField(null=True, blank=True)
@@ -492,6 +509,17 @@ class Track(APIModelMixin):
     copyright = models.CharField(
         max_length=MAX_LENGTHS["COPYRIGHT"], null=True, blank=True
     )
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_track",
+    )
+    downloads_count = models.PositiveIntegerField(default=0)
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
@@ -518,6 +546,9 @@ class Track(APIModelMixin):
 
     class Meta:
         ordering = ["album", "disc_number", "position"]
+        indexes = [
+            GinIndex(fields=["body_text"]),
+        ]
 
     def __str__(self):
         return self.title
@@ -541,6 +572,10 @@ class Track(APIModelMixin):
             return "{} - {} - {}".format(self.artist.name, self.album.title, self.title)
         except AttributeError:
             return "{} - {}".format(self.artist.name, self.title)
+
+    @property
+    def cover(self):
+        return self.attachment_cover
 
     def get_activity_url(self):
         if self.mbid:
@@ -628,7 +663,10 @@ class UploadQuerySet(common_models.NullsLastQuerySet):
         return self.exclude(library__in=libraries, import_status="finished")
 
     def local(self, include=True):
-        return self.exclude(library__actor__user__isnull=include)
+        query = models.Q(library__actor__domain_id=settings.FEDERATION_HOSTNAME)
+        if not include:
+            query = ~query
+        return self.filter(query)
 
     def for_federation(self):
         return self.filter(import_status="finished", mimetype__startswith="audio/")
@@ -638,6 +676,7 @@ class UploadQuerySet(common_models.NullsLastQuerySet):
 
 
 TRACK_FILE_IMPORT_STATUS_CHOICES = (
+    ("draft", "Draft"),
     ("pending", "Pending"),
     ("finished", "Finished"),
     ("errored", "Errored"),
@@ -713,6 +752,7 @@ class Upload(models.Model):
     from_activity = models.ForeignKey(
         "federation.Activity", null=True, on_delete=models.SET_NULL, blank=True
     )
+    downloads_count = models.PositiveIntegerField(default=0)
 
     objects = UploadQuerySet.as_manager()
 
@@ -729,7 +769,6 @@ class Upload(models.Model):
         return parsed.hostname
 
     def download_audio_from_remote(self, actor):
-        from funkwhale_api.common import session
         from funkwhale_api.federation import signing
 
         if actor:
@@ -743,14 +782,17 @@ class Upload(models.Model):
             stream=True,
             timeout=20,
             headers={"Content-Type": "application/octet-stream"},
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         )
         with remote_response as r:
             remote_response.raise_for_status()
             extension = utils.get_ext_from_type(self.mimetype)
-            title = " - ".join(
-                [self.track.title, self.track.album.title, self.track.artist.name]
-            )
+            title_parts = []
+            title_parts.append(self.track.title)
+            if self.track.album:
+                title_parts.append(self.track.album.title)
+            title_parts.append(self.track.artist.name)
+
+            title = " - ".join(title_parts)
             filename = "{}.{}".format(title, extension)
             tmp_file = tempfile.TemporaryFile()
             for chunk in r.iter_content(chunk_size=512):
@@ -838,6 +880,17 @@ class Upload(models.Model):
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
 
+    def get_listen_url(self, to=None):
+        url = self.listen_url
+        if to:
+            url += "&to={}".format(to)
+        return url
+
+    @property
+    def listen_url_no_download(self):
+        # Not using reverse because this is slow
+        return self.listen_url + "&download=false"
+
     def get_transcoded_version(self, format, max_bitrate=None):
         if format:
             mimetype = utils.EXTENSION_TO_MIMETYPE[format]
@@ -898,6 +951,18 @@ class Upload(models.Model):
         except NotImplementedError:
             # external storage
             return self.audio_file.name
+
+    def get_all_tagged_items(self):
+        track_tags = self.track.tagged_items.all()
+        album_tags = (
+            self.track.album.tagged_items.all()
+            if self.track.album
+            else tags_models.TaggedItem.objects.none()
+        )
+        artist_tags = self.track.artist.tagged_items.all()
+
+        items = (track_tags | album_tags | artist_tags).order_by("tag__name")
+        return items
 
 
 MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]
@@ -1049,6 +1114,12 @@ LIBRARY_PRIVACY_LEVEL_CHOICES = [
 
 
 class LibraryQuerySet(models.QuerySet):
+    def local(self, include=True):
+        query = models.Q(actor__domain_id=settings.FEDERATION_HOSTNAME)
+        if not include:
+            query = ~query
+        return self.filter(query)
+
     def with_follows(self, actor):
         return self.prefetch_related(
             models.Prefetch(
@@ -1059,21 +1130,27 @@ class LibraryQuerySet(models.QuerySet):
         )
 
     def viewable_by(self, actor):
-        from funkwhale_api.federation.models import LibraryFollow
+        from funkwhale_api.federation.models import LibraryFollow, Follow
 
         if actor is None:
-            return Library.objects.filter(privacy_level="everyone")
+            return self.filter(privacy_level="everyone")
 
         me_query = models.Q(privacy_level="me", actor=actor)
         instance_query = models.Q(privacy_level="instance", actor__domain=actor.domain)
         followed_libraries = LibraryFollow.objects.filter(
             actor=actor, approved=True
         ).values_list("target", flat=True)
-        return Library.objects.filter(
+        followed_channels_libraries = (
+            Follow.objects.exclude(target__channel=None)
+            .filter(actor=actor, approved=True,)
+            .values_list("target__channel__library", flat=True)
+        )
+        return self.filter(
             me_query
             | instance_query
             | models.Q(privacy_level="everyone")
             | models.Q(pk__in=followed_libraries)
+            | models.Q(pk__in=followed_channels_libraries)
         )
 
 
@@ -1103,8 +1180,11 @@ class Library(federation_models.FederationMixin):
             reverse("federation:music:libraries-detail", kwargs={"uuid": self.uuid})
         )
 
+    def get_absolute_url(self):
+        return "/library/{}".format(self.uuid)
+
     def save(self, **kwargs):
-        if not self.pk and not self.fid and self.actor.get_user():
+        if not self.pk and not self.fid and self.actor.is_local:
             self.fid = self.get_federation_id()
             self.followers_url = self.fid + "/followers"
 
@@ -1135,6 +1215,12 @@ class Library(federation_models.FederationMixin):
 
         common_utils.on_commit(tasks.start_library_scan.delay, library_scan_id=scan.pk)
         return scan
+
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
 
 
 SCAN_STATUS = [
@@ -1190,7 +1276,11 @@ class TrackActor(models.Model):
         ).values_list("id", "track")
         objs = []
         if library.privacy_level == "me":
-            follow_queryset = library.received_follows.filter(approved=True).exclude(
+            if library.get_channel():
+                follow_queryset = library.channel.actor.received_follows
+            else:
+                follow_queryset = library.received_follows
+            follow_queryset = follow_queryset.filter(approved=True).exclude(
                 actor__user__isnull=True
             )
             if actor_ids:
@@ -1307,13 +1397,3 @@ def update_request_status(sender, instance, created, **kwargs):
         # let's mark the request as imported since the import is over
         instance.import_request.status = "imported"
         return instance.import_request.save(update_fields=["status"])
-
-
-@receiver(models.signals.post_save, sender=Album)
-def warm_album_covers(sender, instance, **kwargs):
-    if not instance.cover or not settings.CREATE_IMAGE_THUMBNAILS:
-        return
-    album_covers_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"
-    )
-    num_created, failed_to_create = album_covers_warmer.warm()

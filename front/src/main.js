@@ -19,7 +19,9 @@ import { sync } from 'vuex-router-sync'
 import locales from '@/locales'
 
 import filters from '@/filters' // eslint-disable-line
+import {parseAPIErrors} from '@/utils'
 import globals from '@/components/globals' // eslint-disable-line
+import './registerServiceWorker'
 
 sync(store, router)
 
@@ -66,6 +68,7 @@ Vue.directive('title', function (el, binding) {
 Vue.directive('dropdown', function (el, binding) {
   jQuery(el).dropdown({
     selectOnKeydown: false,
+    ...(binding.value || {})
   })
 })
 axios.interceptors.request.use(function (config) {
@@ -116,7 +119,7 @@ axios.interceptors.response.use(function (response) {
     store.commit("ui/addMessage", {
       content: message,
       date: new Date(),
-      level: 'error',
+      class: 'error',
     })
     logger.default.error('This client is rate-limited!', rateLimitStatus)
   } else if (error.response.status === 500) {
@@ -126,15 +129,8 @@ axios.interceptors.response.use(function (response) {
       error.backendErrors.push(error.response.data.detail)
     } else {
       error.rawPayload = error.response.data
-      for (var field in error.response.data) {
-        // some views (e.g. v1/playlists/{id}/add) have deeper nested data (e.g. data[field]
-        // is another object), so don't try to unpack non-array fields
-        if (error.response.data.hasOwnProperty(field) && error.response.data[field].forEach) {
-          error.response.data[field].forEach(e => {
-            error.backendErrors.push(e)
-          })
-        }
-      }
+      let parsedErrors = parseAPIErrors(error.response.data)
+      error.backendErrors = [...error.backendErrors, ...parsedErrors]
     }
   }
   if (error.backendErrors.length === 0) {
@@ -156,6 +152,19 @@ store.dispatch('instance/fetchFrontSettings').finally(() => {
     components: { App },
     created () {
       APP = this
+      window.addEventListener('resize', this.handleResize)
+      this.handleResize();
+    },
+    destroyed() {
+      window.removeEventListener('resize', this.handleResize)
+    },
+    methods: {
+      handleResize() {
+        this.$store.commit('ui/window', {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })
+      }
     },
   })
 

@@ -9,6 +9,12 @@ function getDefaultUrl () {
   )
 }
 
+function notifyServiceWorker (registration, message) {
+  if (registration && registration.active) {
+    registration.active.postMessage(message)
+  }
+}
+
 export default {
   namespaced: true,
   state: {
@@ -44,6 +50,12 @@ export default {
           value: 0
         }
       },
+      moderation: {
+        signup_approval_enabled: {
+          value: false,
+        },
+        signup_form_customization: {value: null}
+      },
       subsonic: {
         enabled: {
           value: true
@@ -75,7 +87,7 @@ export default {
         value = value + '/'
       }
       state.instanceUrl = value
-
+      notifyServiceWorker(state.registration, {command: 'serverChosen', serverUrl: state.instanceUrl})
       // append the URL to the list (and remove existing one if needed)
       if (value) {
         let index = state.knownInstances.indexOf(value);
@@ -106,6 +118,12 @@ export default {
 
       let instanceUrl = state.instanceUrl || getDefaultUrl()
       return instanceUrl + relativeUrl
+    },
+    domain: (state) => {
+      let url = state.instanceUrl
+      let parser = document.createElement("a")
+      parser.href = url
+      return parser.hostname
     }
   },
   actions: {

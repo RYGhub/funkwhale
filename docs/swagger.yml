@@ -185,6 +185,8 @@ tags:
       url: https://docs.funkwhale.audio/users/managing.html
   - name: Content curation
     description: Favorites, playlists, radios
+  - name: Other
+    description: Other endpoints that don't fit in the categories above
 
 paths:
   /api/v1/oauth/apps/:
@@ -847,6 +849,89 @@ paths:
         204:
           $ref: "#/responses/204"
 
+  /api/v1/channels/:
+    get:
+      summary: List channels
+      tags:
+        - "Uploads and audio content"
+      parameters:
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+        - $ref: "#/parameters/Scope"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/Channel"
+    post:
+      summary: Create a new channel
+      tags:
+        - "Uploads and audio content"
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/ChannelCreate"
+
+  /api/v1/channels/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve a channel
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Channel"
+    post:
+      summary: Update a channel
+      tags:
+        - "Uploads and audio content"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/ChannelUpdate"
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Channel"
+    delete:
+      summary: Delete a channel and all associated uploads
+      description: |
+        This will delete the channel, all associated uploads, follows, and broadcast
+        the event on the federation.
+      tags:
+        - "Uploads and audio content"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
   /api/v1/uploads/:
     get:
       summary: List owned uploads
@@ -907,6 +992,17 @@ paths:
                 audio_file:
                   type: string
                   format: binary
+                import_status:
+                  type: string
+                  description: "Setting import_status to draft will prevent processing, but allow further modifications to audio and metadata. Once ready, use the PATCH method to set import_status to pending. Default to `pending` if unspecified."
+                  default: "pending"
+                  enum:
+                  - "draft"
+                  - "pending"
+                import_metadata:
+                  required: false
+                  $ref: "#/definitions/ImportMetadata"
+
 
   /api/v1/uploads/{uuid}/:
     parameters:
@@ -926,6 +1022,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/definitions/OwnedUpload"
+    patch:
+      summary: Update a draft upload
+      description: |
+        This will update a draft upload, before it is processed.
+
+        All fields supported for `POST /api/v1/uploads` can be updated here.
+
+        Setting `import_status` to `pending` will trigger processing, and make future
+        modifications impossible.
+
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedUpload"
     delete:
       summary: Delete an upload
       description: |
@@ -936,6 +1050,26 @@ paths:
       responses:
         204:
           $ref: "#/responses/204"
+
+  /api/v1/uploads/{uuid}/audio-file-metadata:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve the tags embedded in the audio file
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties: []
 
   /api/v1/favorites/tracks/:
     get:
@@ -1022,6 +1156,54 @@ paths:
         204:
           $ref: "#/responses/204"
 
+  /api/v1/attachments/:
+    post:
+      tags:
+        - "Other"
+      description:
+        Upload a new file as an attachment that can be later associated with other objects.
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+
+  /api/v1/attachments/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve an attachment
+      tags:
+        - "Other"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Attachment"
+    delete:
+      summary: Delete an attachment
+      tags:
+        - "Other"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
 parameters:
   ObjectId:
     name: id
@@ -1072,6 +1254,17 @@ parameters:
       required: false
       type: "boolean"
 
+  Scope:
+    name: "scope"
+    in: "query"
+    default: "all"
+    description: "Limit the results relative to the user making the request. `me` restrict to owned objects, `all` applies no restriction."
+    schema:
+      required: false
+      type: "string"
+      enum:
+      - "me"
+      - "all"
 responses:
   200:
     description: Success
@@ -1114,15 +1307,23 @@ properties:
       - "audio/mpeg"
       - "audio/x-flac"
       - "audio/flac"
+  image_mimetype:
+    type: string
+    example: "image/png"
+    enum:
+      - "image/png"
+      - "image/jpeg"
   import_status:
     type: string
     example: "finished"
     enum:
+      - "draft"
       - "pending"
       - "finished"
       - "errored"
       - "skipped"
     description: |
+     * `draft`: waiting for further modifications from the owner
      * `pending`: waiting to be processed by the server
      * `finished`: successfully processed by the server
      * `errored`: couldn't be processed by the server (e.g because of a tagging issue)
@@ -1133,6 +1334,13 @@ properties:
     enum:
       - "ogg"
       - "mp3"
+
+  tags:
+    type: array
+    description: A list of hashtags associated with a resource
+    items:
+      type: string
+      example: "Rock"
 
 definitions:
   OAuthApplication:
@@ -1180,28 +1388,33 @@ definitions:
         format: "uri"
         description: "Link to the previous page of results"
 
-
-  Image:
+  Attachment:
     type: "object"
     properties:
-      original:
+      uuid:
+        type: string
+        format: uuid
+      size:
+        type: "integer"
+        format: "int64"
+        example: 2787000
+        description: "Size of the file, in bytes"
+      mimetype:
+        $ref: "#/properties/image_mimetype"
+      creation_date:
         type: "string"
-        description: "URL to the original image"
-        example: "https://mydomain/media/albums/covers/ec2c53aeaac6.jpg"
-      small_square_crop:
-        type: "string"
-        description: "URL to a small, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-50x50-70.jpg"
-
-      medium_square_crop:
-        type: "string"
-        description: "URL to a medium, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-200x200-70.jpg"
-
-      square_crop:
-        type: "string"
-        description: "URL to a large, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-400x400-70.jpg"
+        format: "date-time"
+      urls:
+        type: "object"
+        properties:
+          original:
+            type: "string"
+            description: "URL to the original image"
+            example: "https://mydomain/media/attachments/ec2c53aeaac6.jpg"
+          medium_square_crop:
+            type: "string"
+            description: "URL to a medium, squared thumbnail of the image"
+            example: "https://mydomain/media/__sized__/attachments/ec2c53aeaac6-crop-c0-5__0-5-200x200-70.jpg"
 
   Actor:
     type: object
@@ -1317,7 +1530,7 @@ definitions:
       is_playable:
         type: "boolean"
       cover:
-        $ref: "#/definitions/Image"
+        $ref: "#/definitions/Attachment"
       is_local:
         type: "boolean"
         description: "Indicates if the object was initally created locally or on another server"
@@ -1343,6 +1556,57 @@ definitions:
             type: "integer"
             format: "int64"
             example: 16
+
+  ChannelCreate:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "A short, public name for the channel"
+        maxLength: 255
+      username:
+        type: "string"
+        example: "aliceandbob"
+        description: "The username to associate with the channel, for use over federation. This cannot be changed afterwards."
+      summary:
+        required: false
+        type: "string"
+        example: "A short, public description for the channel"
+        maxLength: 500
+      tags:
+        $ref: "#/properties/tags"
+
+  ChannelUpdate:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "A short, public name for the channel"
+        maxLength: 255
+      summary:
+        required: false
+        type: "string"
+        example: "A short, public description for the channel"
+        maxLength: 500
+      tags:
+        $ref: "#/properties/tags"
+
+  Channel:
+    type: "object"
+    properties:
+      uuid:
+        type: "string"
+        format: "uuid"
+      creation_date:
+        $ref: "#/properties/creation_date"
+      artist:
+        $ref: "#/definitions/BaseArtist"
+      attributed_to:
+        $ref: "#/definitions/Actor"
+        description: User account owning the channel
+      actor:
+        $ref: "#/definitions/Actor"
+        description: Actor representing the channel over federation
   Library:
     type: "object"
     properties:
@@ -1508,7 +1772,7 @@ definitions:
       uuid:
         type: string
         format: uuid
-      size:
+      size:size:
         type: "integer"
         format: "int64"
         example: 278987000
@@ -1540,8 +1804,8 @@ definitions:
   OwnedLibraryCreate:
     type: "object"
     properties:
-      password:
-        type: "name"
+      name:
+        type: "string"
         example: "My new library"
       description:
         required: false
@@ -1596,6 +1860,39 @@ definitions:
           import_reference:
             type: "string"
             example: "Import launched via web UI on 03/18"
+          import_metadata:
+            $ref: "#/definitions/ImportMetadata"
+
+  ImportMetadata:
+    type: "object"
+    description: "Import metadata to override values from ID3/embedded audio tags"
+    properties:
+      title:
+        type: "string"
+        example: "My Track"
+        required: true
+      mbid:
+        $ref: "#/properties/mbid"
+        required: false
+      copyright:
+        type: "string"
+        example: "Alice, 2018"
+        description: "Copyright information"
+        required: false
+      license:
+        type: "string"
+        example: "cc-by-sa-4.0"
+        required: false
+        description: A license code, as returned by /api/v1/licenses
+      tags:
+        $ref: "#/properties/tags"
+        required: false
+      position:
+        description: "Position of the track in the album or channel"
+        type: "number"
+        minimum: 1
+        example: 1
+
   TrackFavorite:
     type: "object"
     properties:
@@ -1712,6 +2009,11 @@ definitions:
         format: "int64"
         description: Storage space occupied by uploads with "pending" import status, in MB
         example: 15
+      draft:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "draft" import status, in MB
+        example: 8
       errored:
         type: "integer"
         format: "int64"

@@ -61,7 +61,7 @@
               :key="currentIndex"
               ref="player"
               class="player"
-              :options="{loadSprite: false, controls: controls, duration: currentTrack.sources[0].duration}">
+              :options="{loadSprite: false, controls: controls, duration: currentTrack.sources[0].duration, autoplay}">
               <audio preload="none">
                 <source v-for="source in currentTrack.sources" :src="source.src" :type="source.type"/>
               </audio>
@@ -103,7 +103,7 @@
             </td>
             <td class="title" :title="track.title" ><div colspan="2" class="ellipsis">{{ track.title }}</div></td>
             <td class="artist" :title="track.artist.name" ><div class="ellipsis">{{ track.artist.name }}</div></td>
-            <td class="album">
+            <td class="album" v-if="track.album">
               <div class="ellipsis " v-if="track.album" :title="track.album.title">{{ track.album.title }}</div>
             </td>
             <td width="50">{{ time.durationFormatted(track.sources[0].duration) }}</td>
@@ -139,12 +139,13 @@ export default {
   data () {
     return {
       time,
-      supportedTypes: ['track', 'album', 'artist', 'playlist'],
+      supportedTypes: ['track', 'album', 'artist', 'playlist', 'channel'],
       baseUrl: '',
       error: null,
       type: null,
       id: null,
       tracks: [],
+      autoplay: false,
       url: null,
       isLoading: true,
       theme: 'dark',
@@ -174,6 +175,8 @@ export default {
     if (!!params.instance) {
       this.baseUrl = params.instance
     }
+
+    this.autoplay = params.autoplay != undefined || params.auto_play != undefined
     this.fetch(this.type, this.id)
   },
   mounted () {
@@ -230,10 +233,13 @@ export default {
         this.fetchTrack(id)
       }
       if (type === 'album') {
-        this.fetchTracks({album: id, playable: true, ordering: ",disc_number,position"})
+        this.fetchTracks({album: id, playable: true, ordering: "disc_number,position"})
+      }
+      if (type === 'channel') {
+        this.fetchTracks({channel: id, playable: true, include_channels: 'true', ordering: "-creation_date"})
       }
       if (type === 'artist') {
-        this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
+        this.fetchTracks({artist: id, playable: true, include_channels: 'true', ordering: "-release_date,disc_number,position"})
       }
       if (type === 'playlist') {
         this.fetchTracks({}, `/api/v1/playlists/${id}/tracks/`)
@@ -312,7 +318,7 @@ export default {
           title: t.title,
           artist: t.artist,
           album: t.album,
-          cover: self.getCover(t.album.cover),
+          cover: self.getCover((t.album || {}).cover),
           sources: self.getSources(t.uploads)
         }
       })

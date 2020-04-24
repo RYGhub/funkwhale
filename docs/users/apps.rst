@@ -1,16 +1,21 @@
 Using Funkwhale from other apps
 ===============================
 
-As of today, the only official client for using Funkwhale is the web client,
-the one you use in your browser.
+The only official client for using Funkwhale is the web client, the one you use in your browser.
 
-While the web client works okay, it's still not ready for some use cases, especially:
+As of 0.21, the web client has seen major improvements as a standalone app
+with changes to player design to make it a more mobile-first experience as
+well as the introduction of `PWA functionality <https://en.wikipedia.org/wiki/Progressive_web_application>`_.
+Using Funkwhale as a PWA gives the following benefits:
 
-- Usage on narrow/touch screens (smartphones, tablets)
-- Usage on the go, with an intermittent connection
+- Allows users to install the web player as a standalone app on mobile and desktop
+- Greatly improves background performance on mobile devices
+- Allows you to interact with the player using media keys on desktop
+- Allows users to perform updates as soon as they roll out on the server
+  at the click of a button
 
-This pages lists alternative clients you can use to connect to your Funkwhale
-instance and enjoy your music.
+In addition to the web player, this page lists alternative clients you can
+use to connect to your Funkwhale instance and enjoy your music.
 
 
 Subsonic-compatible clients

@@ -1,17 +1,20 @@
 <template>
-  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
+  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}, 'play-button']">
     <button
       v-if="!dropdownOnly"
       :title="labels.playNow"
-      @click="addNext(true)"
+      @click.stop.prevent="addNext(true)"
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
-      <template v-if="!discrete && !iconOnly"><slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
+      <template v-if="!discrete && !iconOnly">&nbsp;<slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
     </button>
-    <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
+    <div
+      v-if="!discrete && !iconOnly"
+      @click.prevent="clicked = true"
+      :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])" :title="title" ></i>
-      <div class="menu">
+      <div class="menu" v-if="clicked">
         <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue">
           <i class="plus icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Add to queue</translate>
         </button>
@@ -32,7 +35,7 @@
           <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
         </button>
         <button
-          v-for="obj in getReportableObjs({track, album, artist, playlist, account})"
+          v-for="obj in getReportableObjs({track, album, artist, playlist, account, channel})"
           :key="obj.target.type + obj.target.id"
           class="item basic"
           @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
@@ -65,24 +68,15 @@ export default {
     iconOnly: {type: Boolean, default: false},
     artist: {type: Object, required: false},
     album: {type: Object, required: false},
+    library: {type: Object, required: false},
+    channel: {type: Object, required: false},
     isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
     return {
       isLoading: false,
+      clicked: false
     }
-  },
-  mounted () {
-    let self = this
-    jQuery(this.$el).find('.ui.dropdown').dropdown({
-      selectOnKeydown: false,
-      action: function (text, value, $el) {
-        // used ton ensure focusing the dropdown and clicking via keyboard
-        // works as expected
-        self.$refs[$el.data('ref')].click()
-        jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
-      }
-    })
   },
   computed: {
     labels () {
@@ -110,7 +104,9 @@ export default {
       }
       if (this.track) {
         return this.track.uploads && this.track.uploads.length > 0
-      } else if (this.artist) {
+      } else if (this.artist && this.artist.tracks_count) {
+        return this.artist.tracks_count > 0
+      }  else if (this.artist && this.artist.albums) {
         return this.artist.albums.filter((a) => {
           return a.is_playable === true
         }).length > 0
@@ -197,10 +193,13 @@ export default {
             resolve(tracks)
           })
         } else if (self.artist) {
-          let params = {'artist': self.artist.id, 'ordering': 'album__release_date,position'}
+          let params = {'artist': self.artist.id, include_channels: 'true', 'ordering': 'album__release_date,disc_number,position'}
           self.getTracksPage(1, params, resolve)
         } else if (self.album) {
-          let params = {'album': self.album.id, 'ordering': 'position'}
+          let params = {'album': self.album.id, include_channels: 'true', 'ordering': 'disc_number,position'}
+          self.getTracksPage(1, params, resolve)
+        } else if (self.library) {
+          let params = {'library': self.library.uuid, 'ordering': '-creation_date'}
           self.getTracksPage(1, params, resolve)
         }
       })
@@ -250,6 +249,42 @@ export default {
         date: new Date()
       })
     },
+  },
+  watch: {
+    clicked () {
+
+      let self = this
+      this.$nextTick(() => {
+        jQuery(this.$el).find('.ui.dropdown').dropdown({
+          selectOnKeydown: false,
+          action: function (text, value, $el) {
+            // used ton ensure focusing the dropdown and clicking via keyboard
+            // works as expected
+            self.$refs[$el.data('ref')].click()
+            jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+          },
+        })
+        jQuery(this.$el).find('.ui.dropdown').dropdown('show', function () {
+          // little magic to ensure the menu is always visible in the viewport
+          // By default, try to diplay it on the right if there is enough room
+          let menu = jQuery(self.$el).find('.ui.dropdown').find(".menu")
+          let viewportOffset = menu.get(0).getBoundingClientRect();
+          let left = viewportOffset.left;
+          let viewportWidth = document.documentElement.clientWidth
+          let rightOverflow = viewportOffset.right - viewportWidth
+          let leftOverflow = -viewportOffset.left
+          let offset = 0
+          if (rightOverflow > 0) {
+            offset = -rightOverflow - 5
+            menu.css({cssText: `left: ${offset}px !important;`});
+          }
+          else if (leftOverflow > 0) {
+            offset = leftOverflow  + 5
+            menu.css({cssText: `right: -${offset}px !important;`});
+          }
+        })
+      })
+    }
   }
 }
 </script>

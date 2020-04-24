@@ -26,6 +26,16 @@ sys.path.insert(0, os.path.abspath("../api"))
 
 import funkwhale_api  # NOQA
 
+FUNKWHALE_CONFIG = {
+    "FUNKWHALE_URL": "mypod.funkwhale",
+    "FUNKWHAL_PROTOCOL": "https",
+    "DATABASE_URL": "postgres://localhost:5432/db",
+    "AWS_ACCESS_KEY_ID": 'my_access_key',
+    "AWS_SECRET_ACCESS_KEY": 'my_secret_key',
+    "AWS_STORAGE_BUCKET_NAME": 'my_bucket',
+}
+for key, value in FUNKWHALE_CONFIG.items():
+    os.environ[key] = value
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -35,8 +45,9 @@ import funkwhale_api  # NOQA
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.graphviz"]
-
+extensions = ["sphinx.ext.graphviz", "sphinx.ext.autodoc"]
+autodoc_mock_imports = ["celery", "django_auth_ldap", "ldap"]
+add_module_names = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -95,18 +106,16 @@ html_theme = "sphinx_rtd_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    'gitlab_url': 'https://dev.funkwhale.audio/funkwhale/funkwhale'
-}
+html_theme_options = {"gitlab_url": "https://dev.funkwhale.audio/funkwhale/funkwhale"}
 html_context = {
-  'display_gitlab': True,
-  'gitlab_host': 'dev.funkwhale.audio',
-  'gitlab_repo': 'funkwhale',
-  'gitlab_user': 'funkwhale',
-  'gitlab_version': 'master',
-  'conf_py_path': '/docs/',
+    "display_gitlab": True,
+    "gitlab_host": "dev.funkwhale.audio",
+    "gitlab_repo": "funkwhale",
+    "gitlab_user": "funkwhale",
+    "gitlab_version": "master",
+    "conf_py_path": "/docs/",
 }
-html_logo = 'logo.svg'
+html_logo = "logo.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -173,15 +182,13 @@ texinfo_documents = [
 # Define list of redirect files to be build in the Sphinx build process
 
 redirect_files = [
-
-    ('importing-music.html', 'admin/importing-music.html'),
-    ('architecture.html', 'developers/architecture.html'),
-    ('troubleshooting.html', 'admin/troubleshooting.html'),
-    ('configuration.html', 'admin/configuration.html'),
-    ('upgrading/index.html', '../admin/upgrading.html'),
-    ('upgrading/0.17.html', '../admin/0.17.html'),
-    ('users/django.html', '../admin/django.html'),
-
+    ("importing-music.html", "admin/importing-music.html"),
+    ("architecture.html", "developers/architecture.html"),
+    ("troubleshooting.html", "admin/troubleshooting.html"),
+    ("configuration.html", "admin/configuration.html"),
+    ("upgrading/index.html", "../admin/upgrading.html"),
+    ("upgrading/0.17.html", "../admin/0.17.html"),
+    ("users/django.html", "../admin/django.html"),
 ]
 
 # Generate redirect template
@@ -199,16 +206,17 @@ redirect_template = """\
 
 # Tell Sphinx to copy the files
 
+
 def copy_legacy_redirects(app, docname):
-    if app.builder.name == 'html':
+    if app.builder.name == "html":
         for html_src_path, new in redirect_files:
             page = redirect_template.format(new=new)
-            target_path = app.outdir + '/' + html_src_path
+            target_path = app.outdir + "/" + html_src_path
             if not os.path.exists(os.path.dirname(target_path)):
-               os.makedirs(os.path.dirname(target_path))
-            with open(target_path, 'w') as f:
-               f.write(page)
+                os.makedirs(os.path.dirname(target_path))
+            with open(target_path, "w") as f:
+                f.write(page)
 
 
 def setup(app):
-    app.connect('build-finished', copy_legacy_redirects)
+    app.connect("build-finished", copy_legacy_redirects)

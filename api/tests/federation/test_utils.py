@@ -1,6 +1,8 @@
 from rest_framework import serializers
 import pytest
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from funkwhale_api.federation import exceptions, utils
 
 
@@ -138,3 +140,76 @@ def test_retrieve_with_serializer(db, r_mock):
     result = utils.retrieve_ap_object(fid, actor=None, serializer_class=S)
 
     assert result == {"persisted": "object"}
+
+
+@pytest.mark.parametrize(
+    "factory_name, fids, kwargs, expected_indexes",
+    [
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://local.domain/"],
+            {},
+            [0, 1],
+        ),
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://notlocal.domain/"],
+            {},
+            [0],
+        ),
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://notlocal.domain/"],
+            {"include": False},
+            [1],
+        ),
+    ],
+)
+def test_local_qs(factory_name, fids, kwargs, expected_indexes, factories, settings):
+    settings.FEDERATION_HOSTNAME = "local.domain"
+    objs = [factories[factory_name](fid=fid) for fid in fids]
+
+    qs = objs[0].__class__.objects.all().order_by("id")
+    result = utils.local_qs(qs, **kwargs)
+
+    expected_objs = [obj for i, obj in enumerate(objs) if i in expected_indexes]
+    assert list(result) == expected_objs
+
+
+def test_get_obj_by_fid_not_found():
+    with pytest.raises(ObjectDoesNotExist):
+        utils.get_object_by_fid("http://test")
+
+
+def test_get_obj_by_fid_local_not_found(factories):
+    obj = factories["federation.Actor"](local=False)
+    with pytest.raises(ObjectDoesNotExist):
+        utils.get_object_by_fid(obj.fid, local=True)
+
+
+def test_get_obj_by_fid_local(factories):
+    obj = factories["federation.Actor"](local=True)
+    assert utils.get_object_by_fid(obj.fid, local=True) == obj
+
+
+@pytest.mark.parametrize(
+    "factory_name",
+    [
+        "federation.Actor",
+        "music.Artist",
+        "music.Album",
+        "music.Track",
+        "music.Upload",
+        "music.Library",
+    ],
+)
+def test_get_obj_by_fid(factory_name, factories):
+    obj = factories[factory_name]()
+    factories[factory_name]()
+    assert utils.get_object_by_fid(obj.fid) == obj
+
+
+def test_get_channel_by_fid(factories):
+    obj = factories["audio.Channel"]()
+    factories["audio.Channel"]()
+    assert utils.get_object_by_fid(obj.actor.fid) == obj

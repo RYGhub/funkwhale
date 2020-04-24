@@ -289,6 +289,14 @@ def test_token_view_post(api_client, factories):
     with pytest.raises(grant.DoesNotExist):
         grant.refresh_from_db()
 
+    token = payload["access_token"]
+
+    # Now check we can use the token for auth
+    response = api_client.get(
+        reverse("api:v1:users:users-me"), HTTP_AUTHORIZATION="Bearer {}".format(token)
+    )
+    assert response.status_code == 200
+
 
 def test_revoke_view_post(logged_in_client, factories):
     token = factories["users.AccessToken"]()
@@ -361,3 +369,36 @@ def test_grant_delete(factories, logged_in_api_client, mocker, now):
 
     for t in to_keep:
         t.refresh_from_db()
+
+
+@pytest.mark.parametrize(
+    "setting_value, verified_email, expected_status_code",
+    [
+        ("mandatory", False, 401),
+        ("mandatory", True, 200),
+        ("optional", True, 200),
+        ("optional", False, 200),
+    ],
+)
+def test_token_auth(
+    setting_value,
+    verified_email,
+    expected_status_code,
+    api_client,
+    factories,
+    settings,
+    mailoutbox,
+):
+    sent_emails = len(mailoutbox)
+    user = factories["users.User"](verified_email=verified_email)
+    token = factories["users.AccessToken"](user=user)
+    settings.ACCOUNT_EMAIL_VERIFICATION = setting_value
+    response = api_client.get(
+        reverse("api:v1:users:users-me"),
+        HTTP_AUTHORIZATION="Bearer {}".format(token.token),
+    )
+    assert response.status_code == expected_status_code
+
+    if expected_status_code != 200:
+        # confirmation email should have been sent again
+        assert len(mailoutbox) == sent_emails + 1

@@ -1,6 +1,6 @@
 <template>
   <button
-    @click="$store.commit('playlists/chooseTrack', track)"
+    @click.stop="$store.commit('playlists/chooseTrack', track)"
     v-if="button"
     :class="['ui', 'icon', 'labeled', 'button']">
     <i class="list icon"></i>
@@ -8,8 +8,8 @@
   </button>
   <button
     v-else
-    @click="$store.commit('playlists/chooseTrack', track)"
-    :class="['ui', 'basic', 'circular', 'icon', 'really', 'button']"
+    @click.stop="$store.commit('playlists/chooseTrack', track)"
+    :class="['ui', 'basic', 'circular', 'icon', {'really': !border}, 'button']"
     :aria-label="labels.addToPlaylist"
     :title="labels.addToPlaylist">
     <i :class="['list', 'basic', 'icon']"></i>
@@ -21,7 +21,8 @@
 export default {
   props: {
     track: {type: Object},
-    button: {type: Boolean, default: false}
+    button: {type: Boolean, default: false},
+    border: {type: Boolean, default: false},
   },
   data () {
     return {

@@ -5,6 +5,7 @@ from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from funkwhale_api.common import authentication
 from funkwhale_api.common import preferences
 
 from . import models, serializers, tasks
@@ -26,6 +27,13 @@ class RegisterView(registration_views.RegisterView):
     def is_open_for_signup(self, request):
         return get_adapter().is_open_for_signup(request)
 
+    def perform_create(self, serializer):
+        user = super().perform_create(serializer)
+        if not user.is_active:
+            # manual approval, we need to send the confirmation email by hand
+            authentication.send_email_confirmation(self.request, user)
+        return user
+
 
 class VerifyEmailView(registration_views.VerifyEmailView):
     action = "verify-email"
@@ -44,7 +52,7 @@ class PasswordResetConfirmView(rest_auth_views.PasswordResetConfirmView):
 
 
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = models.User.objects.all()
+    queryset = models.User.objects.all().select_related("actor__attachment_icon")
     serializer_class = serializers.UserWriteSerializer
     lookup_field = "username"
     lookup_value_regex = r"[a-zA-Z0-9-_.]+"

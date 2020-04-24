@@ -42,10 +42,10 @@
       </div>
     </div>
     <div class="ui bottom basic attached buttons">
-      <router-link :to="{name: 'content.libraries.detail.upload', params: {id: library.uuid}}" class="ui button">
+      <router-link :to="{name: 'library.detail.upload', params: {id: library.uuid}}" class="ui button">
         <translate translate-context="Content/Library/Card.Button.Label/Verb">Upload</translate>
       </router-link>
-      <router-link :to="{name: 'content.libraries.detail', params: {id: library.uuid}}" exact class="ui button">
+      <router-link :to="{name: 'library.detail', params: {id: library.uuid}}" exact class="ui button">
         <translate translate-context="Content/Library/Card.Button.Label/Noun">Details</translate>
       </router-link>
     </div>

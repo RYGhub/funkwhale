@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 
 def get_actor_data(actor_url):
     response = session.get_session().get(
-        actor_url,
-        timeout=5,
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-        headers={"Accept": "application/activity+json"},
+        actor_url, headers={"Accept": "application/activity+json"},
     )
     response.raise_for_status()
     try:
@@ -45,21 +42,32 @@ def get_actor(fid, skip_cache=False):
     return serializer.save(last_fetch_date=timezone.now())
 
 
-def get_service_actor():
+_CACHE = {}
+
+
+def get_service_actor(cache=True):
+    if cache and "service_actor" in _CACHE:
+        return _CACHE["service_actor"]
+
     name, domain = (
         settings.FEDERATION_SERVICE_ACTOR_USERNAME,
         settings.FEDERATION_HOSTNAME,
     )
     try:
-        return models.Actor.objects.select_related().get(
+        actor = models.Actor.objects.select_related().get(
             preferred_username=name, domain__name=domain
         )
     except models.Actor.DoesNotExist:
         pass
+    else:
+        _CACHE["service_actor"] = actor
+        return actor
 
     args = users_models.get_actor_data(name)
     private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
     args["type"] = "Service"
-    return models.Actor.objects.create(**args)
+    actor = models.Actor.objects.create(**args)
+    _CACHE["service_actor"] = actor
+    return actor

@@ -63,6 +63,7 @@ class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 
     class Params:
         anonymous = factory.Trait(actor=None, submitter_email=factory.Faker("email"))
+        local = factory.Trait(fid=None)
         assigned = factory.Trait(
             assigned_to=factory.SubFactory(federation_factories.ActorFactory)
         )
@@ -73,3 +74,20 @@ class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
             return
 
         self.target_owner = serializers.get_target_owner(self.target)
+
+
+@registry.register
+class UserRequestFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
+    submitter = factory.SubFactory(federation_factories.ActorFactory, local=True)
+
+    class Meta:
+        model = "moderation.UserRequest"
+
+    class Params:
+        signup = factory.Trait(
+            submitter=factory.SubFactory(federation_factories.ActorFactory, local=True),
+            type="signup",
+        )
+        assigned = factory.Trait(
+            assigned_to=factory.SubFactory(federation_factories.ActorFactory)
+        )

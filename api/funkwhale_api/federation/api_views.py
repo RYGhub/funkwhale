@@ -1,7 +1,8 @@
 import requests.exceptions
 
+from django.conf import settings
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from rest_framework import decorators
 from rest_framework import mixins
@@ -9,7 +10,11 @@ from rest_framework import permissions
 from rest_framework import response
 from rest_framework import viewsets
 
+from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import activity
@@ -19,6 +24,7 @@ from . import filters
 from . import models
 from . import routes
 from . import serializers
+from . import tasks
 from . import utils
 
 
@@ -91,6 +97,26 @@ class LibraryFollowViewSet(
 
         update_follow(follow, approved=False)
         return response.Response(status=204)
+
+    @decorators.action(methods=["get"], detail=False)
+    def all(self, request, *args, **kwargs):
+        """
+        Return all the subscriptions of the current user, with only limited data
+        to have a performant endpoint and avoid lots of queries just to display
+        subscription status in the UI
+        """
+        follows = list(
+            self.get_queryset().values_list("uuid", "target__uuid", "approved")
+        )
+
+        payload = {
+            "results": [
+                {"uuid": str(u[0]), "library": str(u[1]), "approved": u[2]}
+                for u in follows
+            ],
+            "count": len(follows),
+        }
+        return response.Response(payload, status=200)
 
 
 class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -192,8 +218,76 @@ class InboxItemViewSet(
         return response.Response(result, status=200)
 
 
-class FetchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class FetchViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
 
     queryset = models.Fetch.objects.select_related("actor")
     serializer_class = api_serializers.FetchSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttling_scopes = {"create": {"authenticated": "fetch"}}
+
+    def get_queryset(self):
+        return super().get_queryset().filter(actor=self.request.user.actor)
+
+    def perform_create(self, serializer):
+        fetch = serializer.save(actor=self.request.user.actor)
+        if fetch.status == "finished":
+            # a duplicate was returned, no need to fetch again
+            return
+        if settings.FEDERATION_SYNCHRONOUS_FETCH:
+            tasks.fetch(fetch_id=fetch.pk)
+            fetch.refresh_from_db()
+        else:
+            common_utils.on_commit(tasks.fetch.delay, fetch_id=fetch.pk)
+
+
+class DomainViewSet(
+    mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    queryset = models.Domain.objects.order_by("name").external()
+    permission_classes = [ConditionalAuthentication]
+    serializer_class = api_serializers.DomainSerializer
+    ordering_fields = ("creation_date", "name")
+    max_page_size = 100
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.exclude(
+            instance_policy__is_active=True, instance_policy__block_all=True
+        )
+        if preferences.get("moderation__allow_list_enabled"):
+            qs = qs.filter(allowed=True)
+        return qs
+
+
+class ActorViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = models.Actor.objects.select_related(
+        "user", "channel", "summary_obj", "attachment_icon"
+    )
+    permission_classes = [ConditionalAuthentication]
+    serializer_class = api_serializers.FullActorSerializer
+    lookup_field = "full_username"
+    lookup_value_regex = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        username, domain = self.kwargs["full_username"].split("@", 1)
+        return queryset.get(preferred_username=username, domain_id=domain)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.exclude(
+            domain__instance_policy__is_active=True,
+            domain__instance_policy__block_all=True,
+        )
+        if preferences.get("moderation__allow_list_enabled"):
+            query = Q(domain_id=settings.FUNKWHALE_HOSTNAME) | Q(domain__allowed=True)
+            qs = qs.filter(query)
+        return qs
+
+    libraries = decorators.action(methods=["get"], detail=True)(
+        music_views.get_libraries(
+            filter_uploads=lambda o, uploads: uploads.filter(library__actor=o)
+        )
+    )

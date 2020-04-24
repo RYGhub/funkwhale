@@ -49,10 +49,12 @@
             <router-link :to="{name: 'manage.library.tracks.detail', params: {id: scope.obj.id }}">{{ scope.obj.title }}</router-link>
           </td>
           <td>
-            <router-link :to="{name: 'manage.library.albums.detail', params: {id: scope.obj.album.id }}">
-              <i class="wrench icon"></i>
-            </router-link>
-            <span role="button" class="discrete link" @click="addSearchToken('album_id', scope.obj.album.id)" :title="scope.obj.album.title">{{ scope.obj.album.title }}</span>
+            <template v-if="scope.obj.album">
+              <router-link :to="{name: 'manage.library.albums.detail', params: {id: scope.obj.album.id }}">
+                <i class="wrench icon"></i>
+              </router-link>
+              <span role="button" class="discrete link" @click="addSearchToken('album_id', scope.obj.album.id)" :title="scope.obj.album.title">{{ scope.obj.album.title }}</span>
+            </template>
           </td>
           <td>
             <router-link :to="{name: 'manage.library.artists.detail', params: {id: scope.obj.artist.id }}">

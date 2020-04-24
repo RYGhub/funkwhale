@@ -6,9 +6,9 @@ from rest_framework import throttling as rest_throttling
 from django.conf import settings
 
 
-def get_ident(request):
-    if hasattr(request, "user") and request.user.is_authenticated:
-        return {"type": "authenticated", "id": request.user.pk}
+def get_ident(user, request):
+    if user and user.is_authenticated:
+        return {"type": "authenticated", "id": user.pk}
     ident = rest_throttling.BaseThrottle().get_ident(request)
 
     return {"type": "anonymous", "id": ident}
@@ -89,7 +89,7 @@ class FunkwhaleThrottle(rest_throttling.SimpleRateThrottle):
 
     def allow_request(self, request, view):
         self.request = request
-        self.ident = get_ident(request)
+        self.ident = get_ident(getattr(request, "user", None), request)
         action = getattr(view, "action", "*")
         view_scopes = getattr(view, "throttling_scopes", {})
         if view_scopes is None:

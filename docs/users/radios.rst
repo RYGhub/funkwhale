@@ -2,17 +2,12 @@
 Using Radios
 ============
 
-.. note::
-
-   Currently, Funkwhale does not implement tags for use in radios. There is a lot of active disucssion
-   around how to implement them, but in the meantime it is only possible to create artist radios.
-
 Radios are a great way to discover new music, or even just create a dynamic playlist of songs you like.
 By default, all users have access to three build-in radios:
 
-- Favorites - this plays through your :doc:`favorite tracks <favorites>`
-- Random - plays random songs from your :doc:`libraries <upload>` or :doc:`libraries you follow <follow>`
-- Less Listened - plays songs you listen to less frequently
+- **Favorites** - this plays through your :doc:`favorite tracks <favorites>`
+- **Random** - plays random songs from your :doc:`libraries <upload>` or :doc:`libraries you follow <follow>`
+- **Less Listened** - plays songs you listen to less frequently
 
 Creating a New Radio
 --------------------
@@ -31,9 +26,12 @@ To create a new radio:
 - Under "User Radios", click "Create your own radio"
 - Give your radio a name and description
 - If you want to share your radio on your instance, check the "Display publicly" box. Otherwise, uncheck this to keep the radio private
-- To set up the filters for your radio, click on "Select a filter" and select "Artist" from the drop-down menu. Click "Add Filter" to activate the filter
-- To exclude certain artists, toggle the "Exclude" switch so it turns blue and then select the artists from the "Select artists" drop-down menu
-- To only include certain artists, toggle the "Exclude" switch so it turns gray and then select the artists from the "Select artists" drop-down menu
+- To set up the filters for your radio, click on "Select a filter" and select "Artist" or "Tag" from the drop-down menu. Click "Add Filter" 
+  to activate the filter
+- To exclude certain artists or tags, toggle the "Exclude" switch so it turns blue and then select values from the drop-down
+  menu
+- To only include certain artists or tags, toggle the "Exclude" switch so it turns gray and then select values from the 
+  drop-down menu
 - Click "Save" to save your radio
 
 Listening to a Radio

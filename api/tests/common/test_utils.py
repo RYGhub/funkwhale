@@ -1,3 +1,4 @@
+import io
 import pytest
 
 from funkwhale_api.common import utils
@@ -99,3 +100,100 @@ def test_get_updated_fields(conf, mock_args, data, expected, mocker):
 )
 def test_join_url(start, end, expected):
     assert utils.join_url(start, end) == expected
+
+
+@pytest.mark.parametrize(
+    "text, content_type, permissive, expected",
+    [
+        ("hello world", "text/markdown", False, "<p>hello world</p>"),
+        ("hello world", "text/plain", False, "<p>hello world</p>"),
+        (
+            "<strong>hello world</strong>",
+            "text/html",
+            False,
+            "<strong>hello world</strong>",
+        ),
+        # images and other non whitelisted html should be removed
+        ("hello world\n![img](src)", "text/markdown", False, "<p>hello world</p>"),
+        (
+            "hello world\n\n<script></script>\n\n<style></style>",
+            "text/markdown",
+            False,
+            "<p>hello world</p>",
+        ),
+        (
+            "<p>hello world</p><script></script>\n\n<style></style>",
+            "text/html",
+            False,
+            "<p>hello world</p>",
+        ),
+        (
+            '<p class="foo">hello world</p><script></script>\n\n<style></style>',
+            "text/markdown",
+            True,
+            '<p class="foo">hello world</p>',
+        ),
+    ],
+)
+def test_render_html(text, content_type, permissive, expected):
+    result = utils.render_html(text, content_type, permissive=permissive)
+    assert result == expected
+
+
+def test_attach_file_url(factories):
+    album = factories["music.Album"](with_cover=True)
+    existing_attachment = album.attachment_cover
+    assert existing_attachment is not None
+
+    data = {"mimetype": "image/jpeg", "url": "https://example.com/test.jpg"}
+    new_attachment = utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    with pytest.raises(existing_attachment.DoesNotExist):
+        existing_attachment.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert not new_attachment.file
+    assert new_attachment.url == data["url"]
+    assert new_attachment.mimetype == data["mimetype"]
+
+
+def test_attach_file_url_fetch(factories, r_mock):
+    album = factories["music.Album"](with_cover=True)
+
+    data = {"mimetype": "image/jpeg", "url": "https://example.com/test.jpg"}
+    r_mock.get(data["url"], body=io.BytesIO(b"content"))
+    new_attachment = utils.attach_file(album, "attachment_cover", data, fetch=True)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert new_attachment.file.read() == b"content"
+    assert new_attachment.url == data["url"]
+    assert new_attachment.mimetype == data["mimetype"]
+
+
+def test_attach_file_attachment(factories, r_mock):
+    album = factories["music.Album"]()
+
+    data = factories["common.Attachment"]()
+    utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == data
+
+
+def test_attach_file_content(factories, r_mock):
+    album = factories["music.Album"]()
+
+    data = {"mimetype": "image/jpeg", "content": b"content"}
+    new_attachment = utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert new_attachment.file.read() == b"content"
+    assert new_attachment.url is None
+    assert new_attachment.mimetype == data["mimetype"]

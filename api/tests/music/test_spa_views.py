@@ -7,7 +7,13 @@ from funkwhale_api.music import serializers
 
 
 def test_library_track(spa_html, no_api_auth, client, factories, settings):
-    track = factories["music.Upload"](playable=True, track__disc_number=1).track
+    upload = factories["music.Upload"](
+        playable=True,
+        track__disc_number=1,
+        track__attachment_cover=None,
+        track__album__with_cover=True,
+    )
+    track = upload.track
     url = "/library/tracks/{}".format(track.pk)
 
     response = client.get(url)
@@ -49,14 +55,18 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
-            ),
+            "content": track.album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "meta",
             "property": "og:audio",
             "content": utils.join_url(settings.FUNKWHALE_URL, track.listen_url),
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": upload.fid,
         },
         {
             "tag": "link",
@@ -86,7 +96,9 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
 
 
 def test_library_album(spa_html, no_api_auth, client, factories, settings):
-    track = factories["music.Upload"](playable=True, track__disc_number=1).track
+    track = factories["music.Upload"](
+        playable=True, track__disc_number=1, track__album__with_cover=True
+    ).track
     album = track.album
     url = "/library/albums/{}".format(album.pk)
 
@@ -116,9 +128,13 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
-            ),
+            "content": album.attachment_cover.download_url_medium_square_crop,
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": album.fid,
         },
         {
             "tag": "link",
@@ -148,7 +164,7 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
 
 
 def test_library_artist(spa_html, no_api_auth, client, factories, settings):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     factories["music.Upload"](playable=True, track__album=album)
     artist = album.artist
     url = "/library/artists/{}".format(artist.pk)
@@ -166,9 +182,13 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
-            ),
+            "content": album.attachment_cover.download_url_medium_square_crop,
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": artist.fid,
         },
         {
             "tag": "link",
@@ -199,7 +219,9 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
 
 def test_library_playlist(spa_html, no_api_auth, client, factories, settings):
     playlist = factories["playlists.Playlist"](privacy_level="everyone")
-    track = factories["music.Upload"](playable=True).track
+    track = factories["music.Upload"](
+        playable=True, track__album__with_cover=True
+    ).track
     playlist.insert_many([track])
 
     url = "/library/playlists/{}".format(playlist.pk)
@@ -217,9 +239,7 @@ def test_library_playlist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
-            ),
+            "content": track.album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "link",
@@ -263,6 +283,35 @@ def test_library_playlist_empty(spa_html, no_api_auth, client, factories, settin
         },
         {"tag": "meta", "property": "og:title", "content": playlist.name},
         {"tag": "meta", "property": "og:type", "content": "music.playlist"},
+    ]
+
+    metas = utils.parse_meta(response.content.decode())
+
+    # we only test our custom metas, not the default ones
+    assert metas[: len(expected_metas)] == expected_metas
+
+
+def test_library_library(spa_html, no_api_auth, client, factories, settings):
+    library = factories["music.Library"]()
+    url = "/library/{}".format(library.uuid)
+
+    response = client.get(url)
+
+    expected_metas = [
+        {
+            "tag": "meta",
+            "property": "og:url",
+            "content": utils.join_url(settings.FUNKWHALE_URL, url),
+        },
+        {"tag": "meta", "property": "og:type", "content": "website"},
+        {"tag": "meta", "property": "og:title", "content": library.name},
+        {"tag": "meta", "property": "og:description", "content": library.description},
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": library.fid,
+        },
     ]
 
     metas = utils.parse_meta(response.content.decode())

@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="ui hidden divider"></div>
-      <div v-if="result && result.results.length > 0" class="ui three cards">
+      <div v-if="result && result.results.length > 0" class="ui five app-cards cards">
         <div v-if="isLoading" class="ui inverted active dimmer">
           <div class="ui loader"></div>
         </div>
@@ -100,6 +100,7 @@ export default {
   props: {
     defaultQuery: { type: String, required: false, default: "" },
     defaultTags: { type: Array, required: false, default: () => { return [] } },
+    scope: { type: String, required: false, default: "all" },
   },
   components: {
     ArtistCard,
@@ -107,18 +108,12 @@ export default {
     TagsSelector,
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
-      paginateBy: parseInt(this.defaultPaginateBy || 30),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [["creation_date", "creation_date"], ["name", "name"]]
     }
   },
@@ -158,12 +153,14 @@ export default {
       this.isLoading = true
       let url = FETCH_URL
       let params = {
+        scope: this.scope,
         page: this.page,
         page_size: this.paginateBy,
-        name__icontains: this.query,
+        q: this.query,
         ordering: this.getOrderingAsString(),
         playable: "true",
         tag: this.tags,
+        include_channels: "true",
       }
       logger.default.debug("Fetching artists")
       axios.get(
@@ -176,6 +173,9 @@ export default {
         }
       ).then(response => {
         self.result = response.data
+        self.isLoading = false
+      }, error => {
+        self.result = null
         self.isLoading = false
       })
     }, 500),

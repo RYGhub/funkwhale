@@ -3,6 +3,7 @@ import hashlib
 
 from rest_framework import authentication, exceptions
 
+from funkwhale_api.common import authentication as common_authentication
 from funkwhale_api.users.models import User
 
 
@@ -18,25 +19,35 @@ def authenticate(username, password):
         if password.startswith("enc:"):
             password = password.replace("enc:", "", 1)
             password = binascii.unhexlify(password).decode("utf-8")
-        user = User.objects.select_related("actor").get(
-            username__iexact=username, is_active=True, subsonic_api_token=password
+        user = (
+            User.objects.all()
+            .for_auth()
+            .get(username__iexact=username, is_active=True, subsonic_api_token=password)
         )
     except (User.DoesNotExist, binascii.Error):
         raise exceptions.AuthenticationFailed("Wrong username or password.")
+
+    if common_authentication.should_verify_email(user):
+        raise exceptions.AuthenticationFailed("You need to verify your email.")
 
     return (user, None)
 
 
 def authenticate_salt(username, salt, token):
     try:
-        user = User.objects.select_related("actor").get(
-            username=username, is_active=True, subsonic_api_token__isnull=False
+        user = (
+            User.objects.all()
+            .for_auth()
+            .get(username=username, is_active=True, subsonic_api_token__isnull=False)
         )
     except User.DoesNotExist:
         raise exceptions.AuthenticationFailed("Wrong username or password.")
     expected = get_token(salt, user.subsonic_api_token)
     if expected != token:
         raise exceptions.AuthenticationFailed("Wrong username or password.")
+
+    if common_authentication.should_verify_email(user):
+        raise exceptions.AuthenticationFailed("You need to verify your email.")
 
     return (user, None)
 

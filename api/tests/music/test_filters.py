@@ -60,8 +60,8 @@ def test_artist_filter_track_album_artist(factories, mocker, queryset_equal_list
     "factory_name, filterset_class",
     [
         ("music.Track", filters.TrackFilter),
-        ("music.Artist", filters.TrackFilter),
-        ("music.Album", filters.TrackFilter),
+        ("music.Artist", filters.ArtistFilter),
+        ("music.Album", filters.AlbumFilter),
     ],
 )
 def test_track_filter_tag_single(
@@ -110,3 +110,77 @@ def test_track_filter_tag_multiple(
     )
 
     assert filterset.qs == [tagged]
+
+
+def test_channel_filter_track(factories, queryset_equal_list, mocker, anonymous_user):
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
+    upload = factories["music.Upload"](
+        library=channel.library, playable=True, track__artist=channel.artist
+    )
+    factories["music.Track"]()
+    qs = upload.track.__class__.objects.all()
+    filterset = filters.TrackFilter(
+        {"channel": channel.uuid, "include_channels": "true"},
+        request=mocker.Mock(user=anonymous_user, actor=None),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [upload.track]
+
+
+def test_channel_filter_album(factories, queryset_equal_list, mocker, anonymous_user):
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
+    upload = factories["music.Upload"](
+        library=channel.library, playable=True, track__artist=channel.artist
+    )
+    factories["music.Album"]()
+    qs = upload.track.album.__class__.objects.all()
+    filterset = filters.AlbumFilter(
+        {"channel": channel.uuid, "include_channels": "true"},
+        request=mocker.Mock(user=anonymous_user, actor=None),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [upload.track.album]
+
+
+def test_library_filter_track(factories, queryset_equal_list, mocker, anonymous_user):
+    library = factories["music.Library"](privacy_level="everyone")
+    upload = factories["music.Upload"](library=library, playable=True)
+    factories["music.Track"]()
+    qs = upload.track.__class__.objects.all()
+    filterset = filters.TrackFilter(
+        {"library": library.uuid},
+        request=mocker.Mock(user=anonymous_user, actor=None),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [upload.track]
+
+
+def test_library_filter_album(factories, queryset_equal_list, mocker, anonymous_user):
+    library = factories["music.Library"](privacy_level="everyone")
+    upload = factories["music.Upload"](library=library, playable=True)
+    factories["music.Album"]()
+    qs = upload.track.album.__class__.objects.all()
+    filterset = filters.AlbumFilter(
+        {"library": library.uuid},
+        request=mocker.Mock(user=anonymous_user, actor=None),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [upload.track.album]
+
+
+def test_library_filter_artist(factories, queryset_equal_list, mocker, anonymous_user):
+    library = factories["music.Library"](privacy_level="everyone")
+    upload = factories["music.Upload"](library=library, playable=True)
+    factories["music.Artist"]()
+    qs = upload.track.artist.__class__.objects.all()
+    filterset = filters.ArtistFilter(
+        {"library": library.uuid},
+        request=mocker.Mock(user=anonymous_user, actor=None),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [upload.track.artist]

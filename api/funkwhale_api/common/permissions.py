@@ -1,6 +1,8 @@
 import operator
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
+
 from rest_framework.permissions import BasePermission
 
 from funkwhale_api.common import preferences
@@ -46,7 +48,12 @@ class OwnerPermission(BasePermission):
             return True
 
         owner_field = getattr(view, "owner_field", "user")
-        owner = operator.attrgetter(owner_field)(obj)
+        owner_exception = getattr(view, "owner_exception", Http404)
+        try:
+            owner = operator.attrgetter(owner_field)(obj)
+        except ObjectDoesNotExist:
+            raise owner_exception
+
         if not owner or not request.user.is_authenticated or owner != request.user:
-            raise Http404
+            raise owner_exception
         return True

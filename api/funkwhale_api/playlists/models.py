@@ -17,7 +17,8 @@ class PlaylistQuerySet(models.QuerySet):
 
     def with_covers(self):
         album_prefetch = models.Prefetch(
-            "album", queryset=music_models.Album.objects.only("cover", "artist_id")
+            "album",
+            queryset=music_models.Album.objects.select_related("attachment_cover"),
         )
         track_prefetch = models.Prefetch(
             "track",
@@ -29,8 +30,7 @@ class PlaylistQuerySet(models.QuerySet):
         plt_prefetch = models.Prefetch(
             "playlist_tracks",
             queryset=PlaylistTrack.objects.all()
-            .exclude(track__album__cover=None)
-            .exclude(track__album__cover="")
+            .exclude(track__album__attachment_cover=None)
             .order_by("index")
             .only("id", "playlist_id", "track_id")
             .prefetch_related(track_prefetch),
@@ -179,7 +179,9 @@ class Playlist(models.Model):
 class PlaylistTrackQuerySet(models.QuerySet):
     def for_nested_serialization(self, actor=None):
         tracks = music_models.Track.objects.with_playable_uploads(actor)
-        tracks = tracks.select_related("artist", "album__artist")
+        tracks = tracks.select_related(
+            "artist", "album__artist", "album__attachment_cover", "attributed_to"
+        )
         return self.prefetch_related(
             models.Prefetch("track", queryset=tracks, to_attr="_prefetched_track")
         )

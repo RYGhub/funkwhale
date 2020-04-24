@@ -1,3 +1,4 @@
+import logging
 import time
 
 from django.conf import settings
@@ -11,6 +12,8 @@ from rest_framework import response
 from rest_framework import views
 from rest_framework import viewsets
 
+from funkwhale_api.users.oauth import permissions as oauth_permissions
+
 from . import filters
 from . import models
 from . import mutations
@@ -19,6 +22,9 @@ from . import signals
 from . import tasks
 from . import throttling
 from . import utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class SkipFilterForGetObject:
@@ -133,10 +139,74 @@ class RateLimitView(views.APIView):
     throttle_classes = []
 
     def get(self, request, *args, **kwargs):
-        ident = throttling.get_ident(request)
+        ident = throttling.get_ident(getattr(request, "user", None), request)
         data = {
             "enabled": settings.THROTTLING_ENABLED,
             "ident": ident,
             "scopes": throttling.get_status(ident, time.time()),
+        }
+        return response.Response(data, status=200)
+
+
+class AttachmentViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = models.Attachment.objects.all()
+    serializer_class = serializers.AttachmentSerializer
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
+
+    @action(
+        detail=True, methods=["get"], permission_classes=[], authentication_classes=[]
+    )
+    @transaction.atomic
+    def proxy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not settings.EXTERNAL_MEDIA_PROXY_ENABLED:
+            r = response.Response(status=302)
+            r["Location"] = instance.url
+            return r
+
+        size = request.GET.get("next", "original").lower()
+        if size not in ["original", "medium_square_crop"]:
+            size = "original"
+
+        try:
+            tasks.fetch_remote_attachment(instance)
+        except Exception:
+            logger.exception("Error while fetching attachment %s", instance.url)
+            return response.Response(status=500)
+        data = self.serializer_class(instance).data
+        redirect = response.Response(status=302)
+        redirect["Location"] = data["urls"][size]
+        return redirect
+
+    def perform_create(self, serializer):
+        return serializer.save(actor=self.request.user.actor)
+
+    def perform_destroy(self, instance):
+        if instance.actor is None or instance.actor != self.request.user.actor:
+            raise exceptions.PermissionDenied()
+        instance.delete()
+
+
+class TextPreviewView(views.APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        payload = request.data
+        if "text" not in payload:
+            return response.Response({"detail": "Invalid input"}, status=400)
+
+        permissive = payload.get("permissive", False)
+        data = {
+            "rendered": utils.render_html(
+                payload["text"], "text/markdown", permissive=permissive
+            )
         }
         return response.Response(data, status=200)

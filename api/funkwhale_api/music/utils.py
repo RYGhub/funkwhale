@@ -4,7 +4,14 @@ import magic
 import mutagen
 import pydub
 
-from funkwhale_api.common.search import normalize_query, get_query  # noqa
+from django.conf import settings
+from django.core.cache import cache
+from django.db.models import F
+
+from funkwhale_api.common import throttling
+from funkwhale_api.common.search import get_fts_query  # noqa
+from funkwhale_api.common.search import get_query  # noqa
+from funkwhale_api.common.search import normalize_query  # noqa
 
 
 def guess_mimetype(f):
@@ -30,10 +37,14 @@ def compute_status(jobs):
 
 
 AUDIO_EXTENSIONS_AND_MIMETYPE = [
+    # keep the most correct mimetype for each extension at the bottom
+    ("mp3", "audio/mp3"),
+    ("mp3", "audio/mpeg3"),
+    ("mp3", "audio/x-mp3"),
+    ("mp3", "audio/mpeg"),
     ("ogg", "video/ogg"),
     ("ogg", "audio/ogg"),
     ("opus", "audio/opus"),
-    ("mp3", "audio/mpeg"),
     ("aac", "audio/x-m4a"),
     ("m4a", "audio/x-m4a"),
     ("flac", "audio/x-flac"),
@@ -89,3 +100,25 @@ def transcode_file(input, output, input_format, output_format, **kwargs):
 def transcode_audio(audio, output, output_format, **kwargs):
     with output.open("wb"):
         return audio.export(output, format=output_format, **kwargs)
+
+
+def increment_downloads_count(upload, user, wsgi_request):
+    ident = throttling.get_ident(user=user, request=wsgi_request)
+    cache_key = "downloads_count:upload-{}:{}-{}".format(
+        upload.pk, ident["type"], ident["id"]
+    )
+
+    value = cache.get(cache_key)
+    if value:
+        # download already tracked
+        return
+
+    upload.downloads_count = F("downloads_count") + 1
+    upload.track.downloads_count = F("downloads_count") + 1
+
+    upload.save(update_fields=["downloads_count"])
+    upload.track.save(update_fields=["downloads_count"])
+
+    duration = max(upload.duration or 0, settings.MIN_DELAY_BETWEEN_DOWNLOADS_COUNT)
+
+    cache.set(cache_key, 1, duration)

@@ -8,6 +8,42 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
 
+def to_subsonic_date(date):
+    """
+    Subsonic expects this kind of date format: 2012-04-17T19:55:49.000Z
+    """
+
+    if not date:
+        return
+
+    return date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+
+def get_valid_filepart(s):
+    """
+    Return a string suitable for use in a file path. Escape most non-ASCII
+    chars, and truncate the string to a suitable length too.
+    """
+    max_length = 50
+    keepcharacters = " ._()[]-+"
+    final = "".join(
+        c if c.isalnum() or c in keepcharacters else "_" for c in s
+    ).rstrip()
+    return final[:max_length]
+
+
+def get_track_path(track, suffix):
+    parts = []
+    parts.append(get_valid_filepart(track.artist.name))
+    if track.album:
+        parts.append(get_valid_filepart(track.album.title))
+    track_part = get_valid_filepart(track.title) + "." + suffix
+    if track.position:
+        track_part = "{} - {}".format(track.position, track_part)
+    parts.append(track_part)
+    return "/".join(parts)
+
+
 def get_artist_data(artist_values):
     return {
         "id": artist_values["id"],
@@ -52,10 +88,10 @@ class GetArtistSerializer(serializers.Serializer):
                 "artistId": artist.id,
                 "name": album.title,
                 "artist": artist.name,
-                "created": album.creation_date,
+                "created": to_subsonic_date(album.creation_date),
                 "songCount": len(album.tracks.all()),
             }
-            if album.cover:
+            if album.attachment_cover_id:
                 album_data["coverArt"] = "al-{}".format(album.id)
             if album.release_date:
                 album_data["year"] = album.release_date.year
@@ -68,8 +104,8 @@ def get_track_data(album, track, upload):
         "id": track.pk,
         "isDir": "false",
         "title": track.title,
-        "album": album.title,
-        "artist": album.artist.name,
+        "album": album.title if album else "",
+        "artist": track.artist.name,
         "track": track.position or 1,
         "discNumber": track.disc_number or 1,
         # Ugly fallback to mp3 but some subsonic clients fail if the value is empty or null, and we don't always
@@ -81,20 +117,23 @@ def get_track_data(album, track, upload):
             else "audio/mpeg"
         ),
         "suffix": upload.extension or "",
+        "path": get_track_path(track, upload.extension or "mp3"),
         "duration": upload.duration or 0,
-        "created": track.creation_date,
-        "albumId": album.pk,
-        "artistId": album.artist.pk,
+        "created": to_subsonic_date(track.creation_date),
+        "albumId": album.pk if album else "",
+        "artistId": album.artist.pk if album else track.artist.pk,
         "type": "music",
     }
-    if track.album.cover:
-        data["coverArt"] = "al-{}".format(track.album.id)
+    if album and album.attachment_cover_id:
+        data["coverArt"] = "al-{}".format(album.id)
     if upload.bitrate:
         data["bitrate"] = int(upload.bitrate / 1000)
     if upload.size:
         data["size"] = upload.size
     if album.release_date:
         data["year"] = album.release_date.year
+    else:
+        data["year"] = track.creation_date.year
     return data
 
 
@@ -104,9 +143,9 @@ def get_album2_data(album):
         "artistId": album.artist.id,
         "name": album.title,
         "artist": album.artist.name,
-        "created": album.creation_date,
+        "created": to_subsonic_date(album.creation_date),
     }
-    if album.cover:
+    if album.attachment_cover_id:
         payload["coverArt"] = "al-{}".format(album.id)
 
     try:
@@ -162,7 +201,7 @@ def get_starred_tracks_data(favorites):
         except IndexError:
             continue
         td = get_track_data(t.album, t, uploads)
-        td["starred"] = by_track_id[t.pk].creation_date
+        td["starred"] = to_subsonic_date(by_track_id[t.pk].creation_date)
         data.append(td)
     return data
 
@@ -179,7 +218,7 @@ def get_playlist_data(playlist):
         "public": "false",
         "songCount": playlist._tracks_count,
         "duration": 0,
-        "created": playlist.creation_date,
+        "created": to_subsonic_date(playlist.creation_date),
     }
 
 
@@ -201,40 +240,6 @@ def get_playlist_detail_data(playlist):
     return data
 
 
-def get_music_directory_data(artist):
-    tracks = artist.tracks.select_related("album").prefetch_related("uploads")
-    data = {"id": artist.pk, "parent": 1, "name": artist.name, "child": []}
-    for track in tracks:
-        try:
-            upload = [upload for upload in track.uploads.all()][0]
-        except IndexError:
-            continue
-        album = track.album
-        td = {
-            "id": track.pk,
-            "isDir": "false",
-            "title": track.title,
-            "album": album.title,
-            "artist": artist.name,
-            "track": track.position or 1,
-            "year": track.album.release_date.year if track.album.release_date else 0,
-            "contentType": upload.mimetype,
-            "suffix": upload.extension or "",
-            "duration": upload.duration or 0,
-            "created": track.creation_date,
-            "albumId": album.pk,
-            "artistId": artist.pk,
-            "parent": artist.id,
-            "type": "music",
-        }
-        if upload.bitrate:
-            td["bitrate"] = int(upload.bitrate / 1000)
-        if upload.size:
-            td["size"] = upload.size
-        data["child"].append(td)
-    return data
-
-
 def get_folders(user):
     return [
         # Dummy folder ID to match what is returned in the getMusicFolders endpoint
@@ -251,7 +256,7 @@ def get_user_detail_data(user):
         "adminRole": "false",
         "settingsRole": "false",
         "commentRole": "false",
-        "podcastRole": "false",
+        "podcastRole": "true",
         "coverArtRole": "false",
         "shareRole": "false",
         "uploadRole": "true",
@@ -259,7 +264,7 @@ def get_user_detail_data(user):
         "playlistRole": "true",
         "streamRole": "true",
         "jukeboxRole": "true",
-        "folder": [f["id"] for f in get_folders(user)],
+        "folder": [{"value": f["id"]} for f in get_folders(user)],
     }
 
 
@@ -282,4 +287,54 @@ def get_genre_data(tag):
         "songCount": getattr(tag, "_tracks_count", 0),
         "albumCount": getattr(tag, "_albums_count", 0),
         "value": tag.name,
+    }
+
+
+def get_channel_data(channel, uploads):
+    data = {
+        "id": str(channel.uuid),
+        "url": channel.get_rss_url(),
+        "title": channel.artist.name,
+        "description": channel.artist.description.as_plain_text
+        if channel.artist.description
+        else "",
+        "coverArt": "at-{}".format(channel.artist.attachment_cover.uuid)
+        if channel.artist.attachment_cover
+        else "",
+        "originalImageUrl": channel.artist.attachment_cover.url
+        if channel.artist.attachment_cover
+        else "",
+        "status": "completed",
+    }
+    if uploads:
+        data["episode"] = [
+            get_channel_episode_data(upload, channel.uuid) for upload in uploads
+        ]
+
+    return data
+
+
+def get_channel_episode_data(upload, channel_id):
+    return {
+        "id": str(upload.uuid),
+        "channelId": str(channel_id),
+        "streamId": upload.track.id,
+        "title": upload.track.title,
+        "description": upload.track.description.as_plain_text
+        if upload.track.description
+        else "",
+        "coverArt": "at-{}".format(upload.track.attachment_cover.uuid)
+        if upload.track.attachment_cover
+        else "",
+        "isDir": "false",
+        "year": upload.track.creation_date.year,
+        "publishDate": upload.track.creation_date.isoformat(),
+        "created": upload.track.creation_date.isoformat(),
+        "genre": "Podcast",
+        "size": upload.size if upload.size else "",
+        "duration": upload.duration if upload.duration else "",
+        "bitrate": upload.bitrate / 1000 if upload.bitrate else "",
+        "contentType": upload.mimetype or "audio/mpeg",
+        "suffix": upload.extension or "mp3",
+        "status": "completed",
     }

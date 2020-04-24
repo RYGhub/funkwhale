@@ -30,6 +30,7 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
         ),
         ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
         ("copyright", "Someone"),
+        ("comment", "Hello there"),
     ],
 )
 def test_can_get_metadata_from_ogg_file(field, value):
@@ -58,6 +59,7 @@ def test_can_get_metadata_all():
         "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "Someone",
         "genre": "Classical",
+        "comment": "Hello there",
     }
     assert data.all() == expected
 
@@ -81,6 +83,7 @@ def test_can_get_metadata_all():
         ),
         ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
         ("copyright", "Someone"),
+        ("comment", "Hello there"),
     ],
 )
 def test_can_get_metadata_from_opus_file(field, value):
@@ -104,6 +107,7 @@ def test_can_get_metadata_from_opus_file(field, value):
         ("mbid", "124d0150-8627-46bc-bc14-789a3bc960c8"),
         ("musicbrainz_artistid", "c3bc80a6-1f4a-4e17-8cf0-6b1efe8302f1"),
         ("musicbrainz_albumartistid", "c3bc80a6-1f4a-4e17-8cf0-6b1efe8302f1"),
+        ("comment", "Hello there"),
         # somehow, I cannot successfully create an ogg theora file
         # with the proper license field
         # ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
@@ -132,6 +136,7 @@ def test_can_get_metadata_from_ogg_theora_file(field, value):
         ("musicbrainz_albumartistid", "9c6bddde-6228-4d9f-ad0d-03f6fcb19e13"),
         ("license", "https://creativecommons.org/licenses/by-nc-nd/2.5/"),
         ("copyright", "Someone"),
+        ("comment", "Hello there"),
     ],
 )
 def test_can_get_metadata_from_id3_mp3_file(field, value):
@@ -181,6 +186,7 @@ def test_can_get_pictures(name):
         ("musicbrainz_albumartistid", "b7ffd2af-418f-4be2-bdd1-22f8b48613da"),
         ("license", "http://creativecommons.org/licenses/by-nc-sa/3.0/us/"),
         ("copyright", "2008 nin"),
+        ("comment", "Hello there"),
     ],
 )
 def test_can_get_metadata_from_flac_file(field, value):
@@ -210,6 +216,7 @@ def test_can_get_metadata_from_flac_file(field, value):
         ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
         ("copyright", "Someone"),
         ("genre", "Dubstep"),
+        ("comment", "Hello there"),
     ],
 )
 def test_can_get_metadata_from_m4a_file(field, value):
@@ -239,6 +246,8 @@ def test_can_get_metadata_from_flac_file_not_crash_if_empty():
         ("2017-12-31", datetime.date(2017, 12, 31)),
         ("2017-14-01 01:32", datetime.date(2017, 1, 14)),  # deezer format
         ("2017-02", datetime.date(2017, 1, 1)),  # weird format that exists
+        ("0000", None),
+        ("", None),
         ("nonsense", None),
     ],
 )
@@ -293,6 +302,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "license": "https://creativecommons.org/licenses/by-nc-nd/2.5/",
                 "copyright": "Someone",
                 "tags": ["Funk"],
+                "description": {"text": "Hello there", "content_type": "text/plain"},
             },
         ),
         (
@@ -326,6 +336,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
                 "copyright": "Someone",
                 "tags": ["Classical"],
+                "description": {"text": "Hello there", "content_type": "text/plain"},
             },
         ),
         (
@@ -359,6 +370,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
                 "copyright": "Someone",
                 "tags": ["Classical"],
+                "description": {"text": "Hello there", "content_type": "text/plain"},
             },
         ),
         (
@@ -390,6 +402,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 # with the proper license field
                 # ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
                 "copyright": "℗ 2012 JKP GmbH & Co. KG",
+                "description": {"text": "Hello there", "content_type": "text/plain"},
             },
         ),
         (
@@ -419,6 +432,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/",
                 "copyright": "2008 nin",
                 "tags": ["Industrial"],
+                "description": {"text": "Hello there", "content_type": "text/plain"},
             },
         ),
     ],
@@ -427,7 +441,7 @@ def test_track_metadata_serializer(path, expected, mocker):
     path = os.path.join(DATA_DIR, path)
     data = metadata.Metadata(path)
     get_picture = mocker.patch.object(data, "get_picture")
-    expected["cover_data"] = get_picture.return_value
+    expected["album"]["cover_data"] = get_picture.return_value
 
     serializer = metadata.TrackMetadataSerializer(data=data)
     assert serializer.is_valid(raise_exception=True) is True
@@ -527,10 +541,12 @@ def test_fake_metadata_with_serializer():
         "musicbrainz_albumartistid": "013c8e5b-d72a-4cd3-8dee-6c64d6125823;5b4d7d2d-36df-4b38-95e3-a964234f520f",
         "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "Someone",
+        "comment": "hello there",
     }
 
     expected = {
         "title": "Peer Gynt Suite no. 1, op. 46: I. Morning",
+        "description": {"text": "hello there", "content_type": "text/plain"},
         "artists": [
             {
                 "name": "Edvard Grieg",
@@ -551,13 +567,13 @@ def test_fake_metadata_with_serializer():
                     "mbid": uuid.UUID("5b4d7d2d-36df-4b38-95e3-a964234f520f"),
                 },
             ],
+            "cover_data": None,
         },
         "position": 1,
         "disc_number": 1,
         "mbid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
         "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "Someone",
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -579,8 +595,8 @@ def test_serializer_album_artist_missing():
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -607,8 +623,8 @@ def test_serializer_album_default_title_when_missing_or_empty(data):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -634,12 +650,40 @@ def test_serializer_empty_fields(field_name):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
     assert serializer.validated_data == expected
+
+
+def test_serializer_strict_mode_false():
+    data = {}
+    expected = {
+        "artists": [{"name": None, "mbid": None}],
+        "album": {
+            "title": "[Unknown Album]",
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+            "cover_data": None,
+        },
+    }
+    serializer = metadata.TrackMetadataSerializer(
+        data=metadata.FakeMetadata(data), context={"strict": False}
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
+
+
+def test_serializer_strict_mode_true():
+    data = {}
+    serializer = metadata.TrackMetadataSerializer(
+        data=metadata.FakeMetadata(data), context={"strict": True}
+    )
+    with pytest.raises(metadata.serializers.ValidationError):
+        assert serializer.is_valid(raise_exception=True)
 
 
 def test_artist_field_featuring():
@@ -686,8 +730,8 @@ def test_acquire_tags_from_genre(genre, expected_tags):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     if expected_tags:
         expected["tags"] = expected_tags

@@ -7,16 +7,21 @@ import requests
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q, F
+from django.db.models.deletion import Collector
 from django.utils import timezone
 from dynamic_preferences.registries import global_preferences_registry
 from requests.exceptions import RequestException
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.common import preferences
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.moderation import mrf
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
+from . import activity
 from . import actors
 from . import jsonld
 from . import keys
@@ -24,6 +29,7 @@ from . import models, signing
 from . import serializers
 from . import routes
 from . import utils
+from . import webfinger
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +94,7 @@ def dispatch_inbox(activity, call_handlers=True):
         context={
             "activity": activity,
             "actor": activity.actor,
-            "inbox_items": activity.inbox_items.filter(is_read=False),
+            "inbox_items": activity.inbox_items.filter(is_read=False).order_by("id"),
         },
         call_handlers=call_handlers,
     )
@@ -142,8 +148,6 @@ def deliver_to_remote(delivery):
             auth=auth,
             json=delivery.activity.payload,
             url=delivery.inbox_url,
-            timeout=5,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
         )
         logger.debug("Remote answered with %s", response.status_code)
@@ -163,9 +167,7 @@ def deliver_to_remote(delivery):
 def fetch_nodeinfo(domain_name):
     s = session.get_session()
     wellknown_url = "https://{}/.well-known/nodeinfo".format(domain_name)
-    response = s.get(
-        url=wellknown_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
-    )
+    response = s.get(url=wellknown_url)
     response.raise_for_status()
     serializer = serializers.NodeInfoSerializer(data=response.json())
     serializer.is_valid(raise_exception=True)
@@ -175,9 +177,7 @@ def fetch_nodeinfo(domain_name):
             nodeinfo_url = link["href"]
             break
 
-    response = s.get(
-        url=nodeinfo_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
-    )
+    response = s.get(url=nodeinfo_url)
     response.raise_for_status()
     return response.json()
 
@@ -258,8 +258,11 @@ def handle_purge_actors(ids, only=[]):
 
     # purge audio content
     if not only or "media" in only:
+        delete_qs(common_models.Attachment.objects.filter(actor__in=ids))
         delete_qs(models.LibraryFollow.objects.filter(actor_id__in=ids))
         delete_qs(models.Follow.objects.filter(target_id__in=ids))
+        delete_qs(audio_models.Channel.objects.filter(attributed_to__in=ids))
+        delete_qs(audio_models.Channel.objects.filter(actor__in=ids))
         delete_qs(music_models.Upload.objects.filter(library__actor_id__in=ids))
         delete_qs(music_models.Library.objects.filter(actor_id__in=ids))
 
@@ -291,26 +294,46 @@ def rotate_actor_key(actor):
 @celery.app.task(name="federation.fetch")
 @transaction.atomic
 @celery.require_instance(
-    models.Fetch.objects.filter(status="pending").select_related("actor"), "fetch"
+    models.Fetch.objects.filter(status="pending").select_related("actor"),
+    "fetch_obj",
+    "fetch_id",
 )
-def fetch(fetch):
-    actor = fetch.actor
-    auth = signing.get_auth(actor.private_key, actor.private_key_id)
-
+def fetch(fetch_obj):
     def error(code, **kwargs):
-        fetch.status = "errored"
-        fetch.fetch_date = timezone.now()
-        fetch.detail = {"error_code": code}
-        fetch.detail.update(kwargs)
-        fetch.save(update_fields=["fetch_date", "status", "detail"])
+        fetch_obj.status = "errored"
+        fetch_obj.fetch_date = timezone.now()
+        fetch_obj.detail = {"error_code": code}
+        fetch_obj.detail.update(kwargs)
+        fetch_obj.save(update_fields=["fetch_date", "status", "detail"])
 
+    url = fetch_obj.url
+    mrf_check_url = url
+    if not mrf_check_url.startswith("webfinger://"):
+        payload, updated = mrf.inbox.apply({"id": mrf_check_url})
+        if not payload:
+            return error("blocked", message="Blocked by MRF")
+
+    actor = fetch_obj.actor
+    if settings.FEDERATION_AUTHENTIFY_FETCHES:
+        auth = signing.get_auth(actor.private_key, actor.private_key_id)
+    else:
+        auth = None
+    auth = None
     try:
+        if url.startswith("webfinger://"):
+            # we first grab the correpsonding webfinger representation
+            # to get the ActivityPub actor ID
+            webfinger_data = webfinger.get_resource(
+                "acct:" + url.replace("webfinger://", "")
+            )
+            url = webfinger.get_ap_url(webfinger_data["links"])
+            if not url:
+                return error("webfinger", message="Invalid or missing webfinger data")
+            payload, updated = mrf.inbox.apply({"id": url})
+            if not payload:
+                return error("blocked", message="Blocked by MRF")
         response = session.get_session().get(
-            auth=auth,
-            url=fetch.url,
-            timeout=5,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-            headers={"Content-Type": "application/activity+json"},
+            auth=auth, url=url, headers={"Accept": "application/activity+json"},
         )
         logger.debug("Remote answered with %s", response.status_code)
         response.raise_for_status()
@@ -328,7 +351,18 @@ def fetch(fetch):
     try:
         payload = response.json()
     except json.decoder.JSONDecodeError:
+        # we attempt to extract a <link rel=alternate> that points
+        # to an activity pub resource, if possible, and retry with this URL
+        alternate_url = utils.find_alternate(response.text)
+        if alternate_url:
+            fetch_obj.url = alternate_url
+            fetch_obj.save(update_fields=["url"])
+            return fetch(fetch_id=fetch_obj.pk)
         return error("invalid_json")
+
+    payload, updated = mrf.inbox.apply(payload)
+    if not payload:
+        return error("blocked", message="Blocked by MRF")
 
     try:
         doc = jsonld.expand(payload)
@@ -340,13 +374,13 @@ def fetch(fetch):
     except IndexError:
         return error("missing_jsonld_type")
     try:
-        serializer_class = fetch.serializers[type]
-        model = serializer_class.Meta.model
+        serializer_classes = fetch_obj.serializers[type]
+        model = serializer_classes[0].Meta.model
     except (KeyError, AttributeError):
-        fetch.status = "skipped"
-        fetch.fetch_date = timezone.now()
-        fetch.detail = {"reason": "unhandled_type", "type": type}
-        return fetch.save(update_fields=["fetch_date", "status", "detail"])
+        fetch_obj.status = "skipped"
+        fetch_obj.fetch_date = timezone.now()
+        fetch_obj.detail = {"reason": "unhandled_type", "type": type}
+        return fetch_obj.save(update_fields=["fetch_date", "status", "detail"])
     try:
         id = doc.get("@id")
     except IndexError:
@@ -354,15 +388,216 @@ def fetch(fetch):
     else:
         existing = model.objects.filter(fid=id).first()
 
-    serializer = serializer_class(existing, data=payload)
-    if not serializer.is_valid():
+    serializer = None
+    for serializer_class in serializer_classes:
+        serializer = serializer_class(existing, data=payload)
+        if not serializer.is_valid():
+            continue
+        else:
+            break
+    if serializer.errors:
         return error("validation", validation_errors=serializer.errors)
     try:
-        serializer.save()
+        obj = serializer.save()
     except Exception as e:
         error("save", message=str(e))
         raise
 
-    fetch.status = "finished"
-    fetch.fetch_date = timezone.now()
-    return fetch.save(update_fields=["fetch_date", "status"])
+    # special case for channels
+    # when obj is an actor, we check if the actor has a channel associated with it
+    # if it is the case, we consider the fetch obj to be a channel instead
+    # and also trigger a fetch on the channel outbox
+    if isinstance(obj, models.Actor) and obj.get_channel():
+        obj = obj.get_channel()
+        if obj.actor.outbox_url:
+            try:
+                # first page fetch is synchronous, so that at least some data is available
+                # in the UI after subscription
+                result = fetch_collection(
+                    obj.actor.outbox_url, channel_id=obj.pk, max_pages=1,
+                )
+            except Exception:
+                logger.exception(
+                    "Error while fetching actor outbox: %s", obj.actor.outbox.url
+                )
+            else:
+                if result.get("next_page"):
+                    # additional pages are fetched in the background
+                    result = fetch_collection.delay(
+                        result["next_page"],
+                        channel_id=obj.pk,
+                        max_pages=settings.FEDERATION_COLLECTION_MAX_PAGES - 1,
+                        is_page=True,
+                    )
+
+    fetch_obj.object = obj
+    fetch_obj.status = "finished"
+    fetch_obj.fetch_date = timezone.now()
+    return fetch_obj.save(
+        update_fields=["fetch_date", "status", "object_id", "object_content_type"]
+    )
+
+
+class PreserveSomeDataCollector(Collector):
+    """
+    We need to delete everything related to an actor. Well… Almost everything.
+    But definitely not the Delete Activity we send to announce the actor is deleted.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.creation_date = timezone.now()
+        super().__init__(*args, **kwargs)
+
+    def related_objects(self, related, *args, **kwargs):
+        qs = super().related_objects(related, *args, **kwargs)
+        if related.name == "outbox_activities":
+            # exclude the delete activity can be broadcasted properly
+            qs = qs.exclude(type="Delete", creation_date__gte=self.creation_date)
+
+        return qs
+
+
+@celery.app.task(name="federation.remove_actor")
+@transaction.atomic
+@celery.require_instance(
+    models.Actor.objects.all(), "actor",
+)
+def remove_actor(actor):
+    # Then we broadcast the info over federation. We do this *before* deleting objects
+    # associated with the actor, otherwise follows are removed and we don't know where
+    # to broadcast
+    logger.info("Broadcasting deletion to federation…")
+    collector = PreserveSomeDataCollector(using="default")
+    routes.outbox.dispatch(
+        {"type": "Delete", "object": {"type": actor.type}}, context={"actor": actor}
+    )
+
+    # then we delete any object associated with the actor object, but *not* the actor
+    # itself. We keep it for auditability and sending the Delete ActivityPub message
+    logger.info(
+        "Prepare deletion of objects associated with account %s…",
+        actor.preferred_username,
+    )
+    collector.collect([actor])
+    for model, instances in collector.data.items():
+        if issubclass(model, actor.__class__):
+            # we skip deletion of the actor itself
+            continue
+
+        to_delete = model.objects.filter(pk__in=[instance.pk for instance in instances])
+        logger.info(
+            "Deleting %s objects associated with account %s…",
+            len(instances),
+            actor.preferred_username,
+        )
+        to_delete.delete()
+
+    # Finally, we update the actor itself and mark it as removed
+    logger.info("Marking actor as Tombsone…")
+    actor.type = "Tombstone"
+    actor.name = None
+    actor.summary = None
+    actor.save(update_fields=["type", "name", "summary"])
+
+
+COLLECTION_ACTIVITY_SERIALIZERS = [
+    (
+        {"type": "Create", "object.type": "Audio"},
+        serializers.ChannelCreateUploadSerializer,
+    )
+]
+
+
+def match_serializer(payload, conf):
+    return [
+        serializer_class
+        for route, serializer_class in conf
+        if activity.match_route(route, payload)
+    ]
+
+
+@celery.app.task(name="federation.fetch_collection")
+@celery.require_instance(
+    audio_models.Channel.objects.all(), "channel", allow_null=True,
+)
+def fetch_collection(url, max_pages, channel, is_page=False):
+    actor = actors.get_service_actor()
+    results = {
+        "items": [],
+        "skipped": 0,
+        "errored": 0,
+        "seen": 0,
+        "total": 0,
+    }
+    if is_page:
+        # starting immediatly from a page, no need to fetch the wrapping collection
+        logger.debug("Fetch collection page immediatly at %s", url)
+        results["next_page"] = url
+    else:
+        logger.debug("Fetching collection object at %s", url)
+        collection = utils.retrieve_ap_object(
+            url,
+            actor=actor,
+            serializer_class=serializers.PaginatedCollectionSerializer,
+        )
+        results["next_page"] = collection["first"]
+        results["total"] = collection.get("totalItems")
+
+    seen_pages = 0
+    context = {}
+    if channel:
+        context["channel"] = channel
+
+    for i in range(max_pages):
+        page_url = results["next_page"]
+        logger.debug("Handling page %s on max %s, at %s", i + 1, max_pages, page_url)
+        page = utils.retrieve_ap_object(page_url, actor=actor, serializer_class=None,)
+        try:
+            items = page["orderedItems"]
+        except KeyError:
+            try:
+                items = page["items"]
+            except KeyError:
+                logger.error("Invalid collection page at %s", page_url)
+                break
+
+        for item in items:
+            results["seen"] += 1
+
+            matching_serializer = match_serializer(
+                item, COLLECTION_ACTIVITY_SERIALIZERS
+            )
+            if not matching_serializer:
+                results["skipped"] += 1
+                logger.debug("Skipping unhandled activity %s", item.get("type"))
+                continue
+
+            s = matching_serializer[0](data=item, context=context)
+            if not s.is_valid():
+                logger.warn("Skipping invalid activity: %s", s.errors)
+                results["errored"] += 1
+                continue
+
+            results["items"].append(s.save())
+
+        seen_pages += 1
+        results["next_page"] = page.get("next", None) or None
+        if not results["next_page"]:
+            logger.debug("No more pages to fetch")
+            break
+
+    logger.info(
+        "Finished fetch of collection pages at %s. Results:\n"
+        "  Total in collection: %s\n"
+        "  Seen: %s\n"
+        "  Handled: %s\n"
+        "  Skipped: %s\n"
+        "  Errored: %s",
+        url,
+        results.get("total"),
+        results["seen"],
+        len(results["items"]),
+        results["skipped"],
+        results["errored"],
+    )
+    return results

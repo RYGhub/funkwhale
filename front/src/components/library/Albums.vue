@@ -13,16 +13,16 @@
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
+            <label><translate translate-context="*/*/*/Noun">Tags</translate></label>
+            <tags-selector v-model="tags"></tags-selector>
+          </div>
+          <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
               </option>
             </select>
-          </div>
-          <div class="field">
-            <label><translate translate-context="*/*/*/Noun">Tags</translate></label>
-            <tags-selector v-model="tags"></tags-selector>
           </div>
           <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering direction</translate></label>
@@ -51,10 +51,8 @@
         class="ui stackable three column doubling grid">
         <div
           v-if="result.results.length > 0"
-          class="ui cards">
+          class="ui app-cards cards">
           <album-card
-            :mode="'simple'"
-            v-masonry-tile
             v-for="album in result.results"
             :key="album.id"
             :album="album"></album-card>
@@ -112,6 +110,7 @@ export default {
   props: {
     defaultQuery: { type: String, required: false, default: "" },
     defaultTags: { type: Array, required: false, default: () => { return [] } },
+    scope: { type: String, required: false, default: "all" },
   },
   components: {
     AlbumCard,
@@ -119,19 +118,13 @@ export default {
     TagsSelector,
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
-      paginateBy: parseInt(this.defaultPaginateBy || 25),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
-      orderingOptions: [["creation_date", "creation_date"], ["title", "album_title"]]
+      orderingOptions: [["creation_date", "creation_date"], ["title", "album_title"],["release_date","release_date"]]
     }
   },
   created() {
@@ -170,6 +163,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL
       let params = {
+        scope: this.scope,
         page: this.page,
         page_size: this.paginateBy,
         q: this.query,
@@ -188,6 +182,9 @@ export default {
         }
       ).then(response => {
         self.result = response.data
+        self.isLoading = false
+      }, error => {
+        self.result = null
         self.isLoading = false
       })
     }, 500),

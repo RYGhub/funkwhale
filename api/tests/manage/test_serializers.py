@@ -1,7 +1,8 @@
 import pytest
 
-from funkwhale_api.manage import serializers
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import tasks as federation_tasks
+from funkwhale_api.manage import serializers
 
 
 def test_manage_upload_action_delete(factories):
@@ -175,7 +176,8 @@ def test_manage_domain_action_purge(factories, mocker):
 
     s.handle_purge(domains[0].__class__.objects.all())
     on_commit.assert_called_once_with(
-        federation_tasks.purge_actors.delay, domains=[d.pk for d in domains]
+        federation_tasks.purge_actors.delay,
+        domains=[d.pk for d in sorted(domains, key=lambda d: d.name)],
     )
 
 
@@ -284,9 +286,12 @@ def test_instance_policy_serializer_purges_target_actor(
 
 
 def test_manage_artist_serializer(factories, now, to_api_date):
-    artist = factories["music.Artist"](attributed=True)
-    track = factories["music.Track"](artist=artist)
-    album = factories["music.Album"](artist=artist)
+    artist = factories["music.Artist"](attributed=True, with_cover=True)
+    channel = factories["audio.Channel"](artist=artist)
+    # put channel in cache
+    artist.get_channel()
+    setattr(artist, "_tracks_count", 12)
+    setattr(artist, "_albums_count", 13)
     expected = {
         "id": artist.id,
         "domain": artist.domain_name,
@@ -295,12 +300,15 @@ def test_manage_artist_serializer(factories, now, to_api_date):
         "name": artist.name,
         "mbid": artist.mbid,
         "creation_date": to_api_date(artist.creation_date),
-        "albums": [serializers.ManageNestedAlbumSerializer(album).data],
-        "tracks": [serializers.ManageNestedTrackSerializer(track).data],
+        "tracks_count": 12,
+        "albums_count": 13,
         "attributed_to": serializers.ManageBaseActorSerializer(
             artist.attributed_to
         ).data,
         "tags": [],
+        "channel": str(channel.uuid),
+        "content_category": artist.content_category,
+        "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
     }
     s = serializers.ManageArtistSerializer(artist)
 
@@ -328,7 +336,7 @@ def test_manage_nested_track_serializer(factories, now, to_api_date):
 
 
 def test_manage_nested_album_serializer(factories, now, to_api_date):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     setattr(album, "tracks_count", 44)
     expected = {
         "id": album.id,
@@ -339,12 +347,7 @@ def test_manage_nested_album_serializer(factories, now, to_api_date):
         "mbid": album.mbid,
         "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "tracks_count": 44,
     }
     s = serializers.ManageNestedAlbumSerializer(album)
@@ -369,7 +372,7 @@ def test_manage_nested_artist_serializer(factories, now, to_api_date):
 
 
 def test_manage_album_serializer(factories, now, to_api_date):
-    album = factories["music.Album"](attributed=True)
+    album = factories["music.Album"](attributed=True, with_cover=True)
     track = factories["music.Track"](album=album)
     expected = {
         "id": album.id,
@@ -380,12 +383,7 @@ def test_manage_album_serializer(factories, now, to_api_date):
         "mbid": album.mbid,
         "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "artist": serializers.ManageNestedArtistSerializer(album.artist).data,
         "tracks": [serializers.ManageNestedTrackSerializer(track).data],
         "attributed_to": serializers.ManageBaseActorSerializer(
@@ -399,7 +397,7 @@ def test_manage_album_serializer(factories, now, to_api_date):
 
 
 def test_manage_track_serializer(factories, now, to_api_date):
-    track = factories["music.Track"](attributed=True)
+    track = factories["music.Track"](attributed=True, with_cover=True)
     setattr(track, "uploads_count", 44)
     expected = {
         "id": track.id,
@@ -420,6 +418,7 @@ def test_manage_track_serializer(factories, now, to_api_date):
         ).data,
         "uploads_count": 44,
         "tags": [],
+        "cover": common_serializers.AttachmentSerializer(track.attachment_cover).data,
     }
     s = serializers.ManageTrackSerializer(track)
 
@@ -566,5 +565,47 @@ def test_manage_note_serializer(factories, to_api_date):
         "target": {"type": "account", "full_username": actor.full_username},
     }
     s = serializers.ManageNoteSerializer(note)
+
+    assert s.data == expected
+
+
+def test_manage_user_request_serializer(factories, to_api_date):
+    user_request = factories["moderation.UserRequest"](
+        signup=True, metadata={"foo": "bar"}, assigned=True
+    )
+    expected = {
+        "id": user_request.id,
+        "uuid": str(user_request.uuid),
+        "creation_date": to_api_date(user_request.creation_date),
+        "handled_date": None,
+        "status": user_request.status,
+        "type": user_request.type,
+        "submitter": serializers.ManageBaseActorSerializer(user_request.submitter).data,
+        "assigned_to": serializers.ManageBaseActorSerializer(
+            user_request.assigned_to
+        ).data,
+        "metadata": {"foo": "bar"},
+        "notes": [],
+    }
+    s = serializers.ManageUserRequestSerializer(user_request)
+
+    assert s.data == expected
+
+
+def test_manage_channel_serializer(factories, now, to_api_date):
+    channel = factories["audio.Channel"]()
+    expected = {
+        "id": channel.id,
+        "uuid": channel.uuid,
+        "artist": serializers.ManageArtistSerializer(channel.artist).data,
+        "actor": serializers.ManageBaseActorSerializer(channel.actor).data,
+        "attributed_to": serializers.ManageBaseActorSerializer(
+            channel.attributed_to
+        ).data,
+        "creation_date": to_api_date(channel.creation_date),
+        "rss_url": channel.get_rss_url(),
+        "metadata": channel.metadata,
+    }
+    s = serializers.ManageChannelSerializer(channel)
 
     assert s.data == expected

@@ -11,6 +11,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from . import models
+from . import utils
 
 
 class RelatedField(serializers.RelatedField):
@@ -23,9 +24,11 @@ class RelatedField(serializers.RelatedField):
         self.related_field_name = related_field_name
         self.serializer = serializer
         self.filters = kwargs.pop("filters", None)
-        kwargs["queryset"] = kwargs.pop(
-            "queryset", self.serializer.Meta.model.objects.all()
-        )
+        self.queryset_filter = kwargs.pop("queryset_filter", None)
+        try:
+            kwargs["queryset"] = kwargs.pop("queryset")
+        except KeyError:
+            kwargs["queryset"] = self.serializer.Meta.model.objects.all()
         super().__init__(**kwargs)
 
     def get_filters(self, data):
@@ -34,10 +37,16 @@ class RelatedField(serializers.RelatedField):
             filters.update(self.filters(self.context))
         return filters
 
+    def filter_queryset(self, queryset):
+        if self.queryset_filter:
+            queryset = self.queryset_filter(queryset, self.context)
+        return queryset
+
     def to_internal_value(self, data):
         try:
             queryset = self.get_queryset()
             filters = self.get_filters(data)
+            queryset = self.filter_queryset(queryset)
             return queryset.get(**filters)
         except ObjectDoesNotExist:
             self.fail(
@@ -68,6 +77,7 @@ class RelatedField(serializers.RelatedField):
                     self.display_value(item),
                 )
                 for item in queryset
+                if self.serializer
             ]
         )
 
@@ -210,7 +220,7 @@ class StripExifImageField(serializers.ImageField):
         with io.BytesIO() as output:
             image_without_exif.save(
                 output,
-                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1]],
+                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1].lower()],
                 quality=100,
             )
             content = output.getvalue()
@@ -272,3 +282,60 @@ class APIMutationSerializer(serializers.ModelSerializer):
         if value not in self.context["registry"]:
             raise serializers.ValidationError("Invalid mutation type {}".format(value))
         return value
+
+
+class AttachmentSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    size = serializers.IntegerField(read_only=True)
+    mimetype = serializers.CharField(read_only=True)
+    creation_date = serializers.DateTimeField(read_only=True)
+    file = StripExifImageField(write_only=True)
+    urls = serializers.SerializerMethodField()
+
+    def get_urls(self, o):
+        urls = {}
+        urls["source"] = o.url
+        urls["original"] = o.download_url_original
+        urls["medium_square_crop"] = o.download_url_medium_square_crop
+        return urls
+
+    def to_representation(self, o):
+        repr = super().to_representation(o)
+        # XXX: BACKWARD COMPATIBILITY
+        # having the attachment urls in a nested JSON obj is better,
+        # but we can't do this without breaking clients
+        # So we extract the urls and include these in the parent payload
+        repr.update({k: v for k, v in repr["urls"].items() if k != "source"})
+        # also, our legacy images had lots of variations (400x400, 200x200, 50x50)
+        # but we removed some of these, so we emulate these by hand (by redirecting)
+        # to actual, existing attachment variations
+        repr["square_crop"] = repr["medium_square_crop"]
+        repr["small_square_crop"] = repr["medium_square_crop"]
+        return repr
+
+    def create(self, validated_data):
+        return models.Attachment.objects.create(
+            file=validated_data["file"], actor=validated_data["actor"]
+        )
+
+
+class ContentSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=models.CONTENT_TEXT_MAX_LENGTH)
+    content_type = serializers.ChoiceField(choices=models.CONTENT_TEXT_SUPPORTED_TYPES,)
+    html = serializers.SerializerMethodField()
+
+    def get_html(self, o):
+        return utils.render_html(o.text, o.content_type)
+
+
+class NullToEmptDict(object):
+    def get_attribute(self, o):
+        attr = super().get_attribute(o)
+        if attr is None:
+            return {}
+        return attr
+
+    def to_representation(self, v):
+        if not v:
+            return v
+        return super().to_representation(v)

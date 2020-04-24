@@ -1,15 +1,8 @@
 <template>
-  <div
-    v-if="playlists.length > 0"
-    v-masonry
-    transition-duration="0"
-    item-selector=".card"
-    percent-position="true"
-    stagger="0">
-    <div class="ui cards">
+  <div v-if="playlists.length > 0">
+    <div class="ui app-cards cards">
       <playlist-card
         :playlist="playlist"
-        v-masonry-tile
         v-for="playlist in playlists"
         :key="playlist.id"
       ></playlist-card>
