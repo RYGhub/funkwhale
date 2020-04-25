@@ -9,7 +9,7 @@ export default {
     errorCount: 0,
     playing: false,
     isLoadingAudio: false,
-    volume: 0.5,
+    volume: 1,
     tempVolume: 0.5,
     duration: 0,
     currentTime: 0,
@@ -88,7 +88,7 @@ export default {
       return time.parse(Math.round(state.currentTime))
     },
     progress: state => {
-      return Math.round(state.currentTime / state.duration * 100)
+      return Math.round((state.currentTime / state.duration * 100) * 10) / 10
     }
   },
   actions: {
@@ -127,7 +127,6 @@ export default {
       })
     },
     trackEnded ({dispatch, rootState}, track) {
-      dispatch('trackListened', track)
       let queueState = rootState.queue
       if (queueState.currentIndex === queueState.tracks.length - 1) {
         // we've reached last track of queue, trigger a reload

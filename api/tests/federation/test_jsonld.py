@@ -67,6 +67,95 @@ def test_expand_no_external_request():
     assert doc == expected
 
 
+def test_expand_no_external_request_pleroma():
+    payload = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://pleroma.example/schemas/litepub-0.1.jsonld",
+            {"@language": "und"},
+        ],
+        "endpoints": {
+            "oauthAuthorizationEndpoint": "https://pleroma.example/oauth/authorize",
+            "oauthRegistrationEndpoint": "https://pleroma.example/api/v1/apps",
+            "oauthTokenEndpoint": "https://pleroma.example/oauth/token",
+            "sharedInbox": "https://pleroma.example/inbox",
+            "uploadMedia": "https://pleroma.example/api/ap/upload_media",
+        },
+        "followers": "https://pleroma.example/internal/fetch/followers",
+        "following": "https://pleroma.example/internal/fetch/following",
+        "id": "https://pleroma.example/internal/fetch",
+        "inbox": "https://pleroma.example/internal/fetch/inbox",
+        "invisible": True,
+        "manuallyApprovesFollowers": False,
+        "name": "Pleroma",
+        "preferredUsername": "internal.fetch",
+        "publicKey": {
+            "id": "https://pleroma.example/internal/fetch#main-key",
+            "owner": "https://pleroma.example/internal/fetch",
+            "publicKeyPem": "PEM",
+        },
+        "summary": "An internal service actor for this Pleroma instance.  No user-serviceable parts inside.",
+        "type": "Application",
+        "url": "https://pleroma.example/internal/fetch",
+    }
+
+    expected = {
+        contexts.AS.endpoints: [
+            {
+                contexts.AS.sharedInbox: [{"@id": "https://pleroma.example/inbox"}],
+                contexts.AS.oauthAuthorizationEndpoint: [
+                    {"@id": "https://pleroma.example/oauth/authorize"}
+                ],
+                contexts.LITEPUB.oauthRegistrationEndpoint: [
+                    {"@id": "https://pleroma.example/api/v1/apps"}
+                ],
+                contexts.AS.oauthTokenEndpoint: [
+                    {"@id": "https://pleroma.example/oauth/token"}
+                ],
+                contexts.AS.uploadMedia: [
+                    {"@id": "https://pleroma.example/api/ap/upload_media"}
+                ],
+            },
+        ],
+        contexts.AS.followers: [
+            {"@id": "https://pleroma.example/internal/fetch/followers"}
+        ],
+        contexts.AS.following: [
+            {"@id": "https://pleroma.example/internal/fetch/following"}
+        ],
+        "@id": "https://pleroma.example/internal/fetch",
+        "http://www.w3.org/ns/ldp#inbox": [
+            {"@id": "https://pleroma.example/internal/fetch/inbox"}
+        ],
+        contexts.LITEPUB.invisible: [{"@value": True}],
+        contexts.AS.manuallyApprovesFollowers: [{"@value": False}],
+        contexts.AS.name: [{"@language": "und", "@value": "Pleroma"}],
+        contexts.AS.summary: [
+            {
+                "@language": "und",
+                "@value": "An internal service actor for this Pleroma instance.  No user-serviceable parts inside.",
+            }
+        ],
+        contexts.AS.url: [{"@id": "https://pleroma.example/internal/fetch"}],
+        contexts.AS.preferredUsername: [
+            {"@language": "und", "@value": "internal.fetch"}
+        ],
+        contexts.SEC.publicKey: [
+            {
+                "@id": "https://pleroma.example/internal/fetch#main-key",
+                contexts.SEC.owner: [{"@id": "https://pleroma.example/internal/fetch"}],
+                contexts.SEC.publicKeyPem: [{"@language": "und", "@value": "PEM"}],
+            }
+        ],
+        "@type": [contexts.AS.Application],
+    }
+
+    doc = jsonld.expand(payload)
+
+    assert doc[contexts.AS.endpoints] == expected[contexts.AS.endpoints]
+    assert doc == expected
+
+
 def test_expand_remote_doc(r_mock):
     url = "https://noop/federation/actors/demo"
     payload = {

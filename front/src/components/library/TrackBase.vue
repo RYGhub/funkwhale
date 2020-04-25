@@ -1,67 +1,49 @@
 <template>
   <main>
-    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="labels.title">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
       <section
-        :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']"
-        :style="headerStyle"
+        :class="['ui', 'head', 'vertical', 'center', 'aligned', 'stripe', 'segment']"
         v-title="track.title"
       >
-        <div class="segment-content">
-          <h2 class="ui center aligned icon header">
-            <i class="circular inverted music orange icon"></i>
-            <div class="content">
-              {{ track.title }}
-              <div class="sub header" v-html="subtitle"></div>
+        <div class="ui basic padded segment">
+          <div class="ui stackable grid row container">
+            <div class="eight wide left aligned column">
+              <h1 class="ui header">
+                {{ track.title }}
+                <div class="sub header" v-html="subtitle"></div>
+              </h1>
             </div>
-          </h2>
-          <tags-list v-if="track.tags && track.tags.length > 0" :tags="track.tags"></tags-list>
-          <div class="ui hidden divider"></div>
-          <div class="header-buttons">
-            <div class="ui buttons">
+            <div class="eight wide right aligned column button-group">
               <play-button class="orange" :track="track">
                 <translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate>
               </play-button>
-            </div>
-            <div class="ui buttons">
-              <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
-            </div>
-            <div class="ui buttons">
-              <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
-            </div>
-
-            <div class="ui buttons">
-              <a v-if="upload" :href="downloadUrl" target="_blank" class="ui icon labeled button">
+              &nbsp;
+              <track-favorite-icon v-if="$store.state.auth.authenticated" :border="true" :track="track"></track-favorite-icon>
+              <track-playlist-icon class="circular" v-if="$store.state.auth.authenticated" :border="true" :track="track"></track-playlist-icon>
+              <a v-if="upload" :href="downloadUrl" target="_blank" class="ui basic circular icon button" :title="labels.download">
                 <i class="download icon"></i>
-                <translate translate-context="Content/Track/Link/Verb">Download</translate>
               </a>
-            </div>
-
-            <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
-              <div class="header">
-                <translate translate-context="Popup/Track/Title">Embed this track on your website</translate>
-              </div>
-              <div class="content">
-                <div class="description">
-                  <embed-wizard type="track" :id="track.id" />
-
+              <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
+                <div class="header">
+                  <translate translate-context="Popup/Track/Title">Embed this track on your website</translate>
                 </div>
-              </div>
-              <div class="actions">
-                <div class="ui deny button">
-                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
+                <div class="content">
+                  <div class="description">
+                    <embed-wizard type="track" :id="track.id" />
+                  </div>
                 </div>
-              </div>
-            </modal>
-            <div class="ui buttons">
-              <button class="ui button" @click="$refs.dropdown.click()">
-                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
-              </button>
-              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
-                <i class="dropdown icon"></i>
-                <div class="menu">
+                <div class="actions">
+                  <div class="ui basic deny button">
+                    <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
+                  </div>
+                </div>
+              </modal>
+              <div class="ui floating dropdown circular icon basic button" :title="labels.more" v-dropdown="{direction: 'downward'}">
+                <i class="ellipsis vertical icon"></i>
+                <div class="menu" style="right: 0; left: auto">
                   <div
                     role="button"
                     v-if="publicLibraries.length > 0"
@@ -74,14 +56,10 @@
                     <i class="wikipedia w icon"></i>
                     <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
                   </a>
-                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                  <a v-if="discogsUrl ":href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
                     <i class="external icon"></i>
-                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
+                    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
                   </a>
-		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
-		    <i class="external icon"></i>
-		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
-		  </a>
                   <router-link
                     v-if="track.is_local"
                     :to="{name: 'library.tracks.edit', params: {id: track.id }}"
@@ -89,6 +67,18 @@
                     <i class="edit icon"></i>
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
+                  <dangerous-button
+                    :class="['ui', {loading: isLoading}, 'item']"
+                    v-if="artist && $store.state.auth.authenticated && artist.channel && artist.attributed_to.full_username === $store.state.auth.fullUsername"
+                    @confirm="remove()">
+                    <i class="ui trash icon"></i>
+                    <translate translate-context="*/*/*/Verb">Delete…</translate>
+                    <p slot="modal-header"><translate translate-context="Popup/Channel/Title">Delete this track?</translate></p>
+                    <div slot="modal-content">
+                      <p><translate translate-context="Content/Moderation/Paragraph">The track will be deleted, as well as any related files and data. This action is irreversible.</translate></p>
+                    </div>
+                    <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
+                  </dangerous-button>
                   <div class="divider"></div>
                   <div
                     role="button"
@@ -132,10 +122,22 @@ import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import Modal from '@/components/semantic/Modal'
 import EmbedWizard from "@/components/audio/EmbedWizard"
-import TagsList from "@/components/tags/List"
 import ReportMixin from '@/components/mixins/Report'
+import {momentFormat} from '@/filters'
 
 const FETCH_URL = "tracks/"
+
+
+
+function escapeHtml(unsafe) {
+  return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 
 export default {
   props: ["id"],
@@ -146,13 +148,13 @@ export default {
     TrackFavoriteIcon,
     Modal,
     EmbedWizard,
-    TagsList,
   },
   data() {
     return {
       time,
-      isLoadingTrack: true,
+      isLoading: true,
       track: null,
+      artist: null,
       showEmbedModal: false,
       libraries: []
     }
@@ -163,14 +165,29 @@ export default {
   methods: {
     fetchData() {
       var self = this
-      this.isLoadingTrack = true
+      this.isLoading = true
       let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching track "' + this.id + '"')
       axios.get(url, {params: {refresh: 'true'}}).then(response => {
         self.track = response.data
-        self.isLoadingTrack = false
+        axios.get(`artists/${response.data.artist.id}/`).then(response => {
+          self.artist = response.data
+        })
+        self.isLoading = false
       })
     },
+    remove () {
+      let self = this
+      self.isLoading = true
+      axios.delete(`tracks/${this.track.id}`).then((response) => {
+        self.isLoading = false
+        self.$emit('deleted')
+        self.$router.push({name: 'library.artists.detail', params: {id: this.artist.id}})
+      }, error => {
+        self.isLoading = false
+        self.errors = error.backendErrors
+      })
+    }
   },
   computed: {
     publicLibraries () {
@@ -185,7 +202,9 @@ export default {
     },
     labels() {
       return {
-        title: this.$pgettext('*/*/*/Noun', "Track")
+        title: this.$pgettext('*/*/*/Noun', "Track"),
+        download: this.$pgettext('Content/Track/Link/Verb', "Download"),
+        more: this.$pgettext('*/*/Button.Label/Noun', "More…"),
       }
     },
     wikipediaUrl() {
@@ -194,18 +213,16 @@ export default {
         encodeURI(this.track.title + " " + this.track.artist.name)
       )
     },
-    musicbrainzUrl() {
-      if (this.track.mbid) {
-        return "https://musicbrainz.org/recording/" + this.track.mbid
-      }
-    },
     discogsUrl() {
-      return (
-        "https://discogs.com/search/?type=release&title=" +
-	encodeURI(this.track.album.title) + "&artist=" +
-	encodeURI(this.track.artist.name) + "&track=" +
-	encodeURI(this.track.title)
-      )
+      if (this.track.album) {
+        return (
+          "https://discogs.com/search/?type=release&title=" +
+    encodeURI(this.track.album.title) + "&artist=" +
+    encodeURI(this.track.artist.name) + "&track=" +
+    encodeURI(this.track.title)
+        )
+
+      }
     },
     downloadUrl() {
       let u = this.$store.getters["instance/absoluteUrl"](
@@ -220,8 +237,15 @@ export default {
       }
       return u
     },
-    cover() {
-      return null
+    attributedToUrl () {
+      let route = this.$router.resolve({
+        name: 'profile.full.overview',
+        params: {
+          username: this.track.attributed_to.preferred_username,
+          domain: this.track.attributed_to.domain
+        }
+      })
+      return route.href
     },
     albumUrl () {
       let route = this.$router.resolve({name: 'library.albums.detail', params: {id: this.track.album.id }})
@@ -232,18 +256,32 @@ export default {
       return route.href
     },
     headerStyle() {
-      if (!this.cover) {
+      if (!this.cover || !this.cover.original) {
         return ""
       }
       return (
         "background-image: url(" +
-        this.$store.getters["instance/absoluteUrl"](this.cover) +
+        this.$store.getters["instance/absoluteUrl"](this.cover.original) +
         ")"
       )
     },
     subtitle () {
-      let msg = this.$pgettext('Content/Track/Paragraph', 'From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a>')
-      return this.$gettextInterpolate(msg, {album: this.track.album.title, artist: this.track.artist.name, albumUrl: this.albumUrl, artistUrl: this.artistUrl})
+      let msg
+      if (this.track.attributed_to) {
+        msg = this.$pgettext('Content/Track/Paragraph', 'Uploaded by <a class="internal" href="%{ uploaderUrl }">%{ uploader }</a> on <time title="%{ date }" datetime="%{ date }">%{ prettyDate }</time>')
+        return this.$gettextInterpolate(msg, {
+          uploaderUrl: this.attributedToUrl,
+          uploader: escapeHtml(`@${this.track.attributed_to.full_username}`),
+          date: escapeHtml(this.track.creation_date),
+          prettyDate: escapeHtml(momentFormat(this.track.creation_date, 'LL')),
+        })
+      } else {
+        msg = this.$pgettext('Content/Track/Paragraph', 'Uploaded on <time title="%{ date }" datetime="%{ date }">%{ prettyDate }</time>')
+        return this.$gettextInterpolate(msg, {
+          date: escapeHtml(this.track.creation_date),
+          prettyDate: escapeHtml(momentFormat(this.track.creation_date, 'LL')),
+        })
+      }
     }
   },
   watch: {

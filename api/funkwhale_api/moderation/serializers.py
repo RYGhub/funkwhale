@@ -6,6 +6,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import persisting_theory
 from rest_framework import serializers
 
+from funkwhale_api.audio import models as audio_models
 from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import models as federation_models
@@ -61,20 +62,36 @@ class UserFilterSerializer(serializers.ModelSerializer):
 state_serializers = persisting_theory.Registry()
 
 
+class DescriptionStateMixin(object):
+    def get_description(self, o):
+        if o.description:
+            return o.description.text
+
+
 TAGS_FIELD = serializers.ListField(source="get_tags")
 
 
 @state_serializers.register(name="music.Artist")
-class ArtistStateSerializer(serializers.ModelSerializer):
+class ArtistStateSerializer(DescriptionStateMixin, serializers.ModelSerializer):
     tags = TAGS_FIELD
 
     class Meta:
         model = music_models.Artist
-        fields = ["id", "name", "mbid", "fid", "creation_date", "uuid", "tags"]
+        fields = [
+            "id",
+            "name",
+            "mbid",
+            "fid",
+            "creation_date",
+            "uuid",
+            "tags",
+            "content_category",
+            "description",
+        ]
 
 
 @state_serializers.register(name="music.Album")
-class AlbumStateSerializer(serializers.ModelSerializer):
+class AlbumStateSerializer(DescriptionStateMixin, serializers.ModelSerializer):
     tags = TAGS_FIELD
     artist = ArtistStateSerializer()
 
@@ -90,11 +107,12 @@ class AlbumStateSerializer(serializers.ModelSerializer):
             "artist",
             "release_date",
             "tags",
+            "description",
         ]
 
 
 @state_serializers.register(name="music.Track")
-class TrackStateSerializer(serializers.ModelSerializer):
+class TrackStateSerializer(DescriptionStateMixin, serializers.ModelSerializer):
     tags = TAGS_FIELD
     artist = ArtistStateSerializer()
     album = AlbumStateSerializer()
@@ -115,6 +133,7 @@ class TrackStateSerializer(serializers.ModelSerializer):
             "license",
             "copyright",
             "tags",
+            "description",
         ]
 
 
@@ -156,6 +175,36 @@ class ActorStateSerializer(serializers.ModelSerializer):
         ]
 
 
+@state_serializers.register(name="audio.Channel")
+class ChannelStateSerializer(serializers.ModelSerializer):
+    rss_url = serializers.CharField(source="get_rss_url")
+    name = serializers.CharField(source="artist.name")
+    full_username = serializers.CharField(source="actor.full_username")
+    domain = serializers.CharField(source="actor.domain_id")
+    description = serializers.SerializerMethodField()
+    tags = serializers.ListField(source="artist.get_tags")
+    content_category = serializers.CharField(source="artist.content_category")
+
+    class Meta:
+        model = audio_models.Channel
+        fields = [
+            "uuid",
+            "name",
+            "rss_url",
+            "metadata",
+            "full_username",
+            "description",
+            "domain",
+            "creation_date",
+            "tags",
+            "content_category",
+        ]
+
+    def get_description(self, o):
+        if o.artist.description:
+            return o.artist.description.text
+
+
 def get_actor_query(attr, value):
     data = federation_utils.get_actor_data_from_username(value)
     return federation_utils.get_actor_from_username_data_query(None, data)
@@ -163,6 +212,7 @@ def get_actor_query(attr, value):
 
 def get_target_owner(target):
     mapping = {
+        audio_models.Channel: lambda t: t.attributed_to,
         music_models.Artist: lambda t: t.attributed_to,
         music_models.Album: lambda t: t.attributed_to,
         music_models.Track: lambda t: t.attributed_to,
@@ -175,6 +225,11 @@ def get_target_owner(target):
 
 
 TARGET_CONFIG = {
+    "channel": {
+        "queryset": audio_models.Channel.objects.all(),
+        "id_attr": "uuid",
+        "id_field": serializers.UUIDField(),
+    },
     "artist": {"queryset": music_models.Artist.objects.all()},
     "album": {"queryset": music_models.Album.objects.all()},
     "track": {"queryset": music_models.Track.objects.all()},
@@ -192,6 +247,27 @@ TARGET_CONFIG = {
     },
 }
 TARGET_FIELD = common_fields.GenericRelation(TARGET_CONFIG)
+
+
+def get_target_state(target):
+    state = {}
+    target_state_serializer = state_serializers[target._meta.label]
+
+    state = target_state_serializer(target).data
+    # freeze target type/id in JSON so even if the corresponding object is deleted
+    # we can have the info and display it in the frontend
+    target_data = TARGET_FIELD.to_representation(target)
+    state["_target"] = json.loads(json.dumps(target_data, cls=DjangoJSONEncoder))
+
+    if "fid" in state:
+        state["domain"] = urllib.parse.urlparse(state["fid"]).hostname
+
+    state["is_local"] = (
+        state.get("domain", settings.FEDERATION_HOSTNAME)
+        == settings.FEDERATION_HOSTNAME
+    )
+
+    return state
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -234,29 +310,7 @@ class ReportSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        target_state_serializer = state_serializers[
-            validated_data["target"]._meta.label
-        ]
-
-        validated_data["target_state"] = target_state_serializer(
-            validated_data["target"]
-        ).data
-        # freeze target type/id in JSON so even if the corresponding object is deleted
-        # we can have the info and display it in the frontend
-        target_data = self.fields["target"].to_representation(validated_data["target"])
-        validated_data["target_state"]["_target"] = json.loads(
-            json.dumps(target_data, cls=DjangoJSONEncoder)
-        )
-
-        if "fid" in validated_data["target_state"]:
-            validated_data["target_state"]["domain"] = urllib.parse.urlparse(
-                validated_data["target_state"]["fid"]
-            ).hostname
-
-        validated_data["target_state"]["is_local"] = (
-            validated_data["target_state"].get("domain", settings.FEDERATION_HOSTNAME)
-            == settings.FEDERATION_HOSTNAME
-        )
+        validated_data["target_state"] = get_target_state(validated_data["target"])
         validated_data["target_owner"] = get_target_owner(validated_data["target"])
         r = super().create(validated_data)
         tasks.signals.report_created.send(sender=None, report=r)

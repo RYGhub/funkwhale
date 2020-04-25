@@ -6,6 +6,9 @@
         :to="{name: 'manage.library.edits'}"><translate translate-context="*/Admin/*/Noun">Edits</translate></router-link>
       <router-link
         class="ui item"
+        :to="{name: 'manage.channels'}"><translate translate-context="*/*/*">Channels</translate></router-link>
+      <router-link
+        class="ui item"
         :to="{name: 'manage.library.artists'}"><translate translate-context="*/*/*/Noun">Artists</translate></router-link>
       <router-link
         class="ui item"

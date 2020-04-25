@@ -53,20 +53,37 @@
             <td>{{ field.id }}</td>
 
             <td v-if="field.diff">
-              <span v-if="!part.added" v-for="part in field.diff" :class="['diff', {removed: part.removed}]">
-                {{ part.value }}
-              </span>
+              <template v-if="field.config.type === 'attachment' && field.oldRepr">
+                <img class="ui image" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${field.oldRepr}/proxy?next=medium_square_crop`)" />
+              </template>
+              <template v-else>
+                <span v-if="!part.added" v-for="part in field.diff" :class="['diff', {removed: part.removed}]">
+                  {{ part.value }}
+                </span>
+              </template>
             </td>
             <td v-else>
               <translate translate-context="*/*/*">N/A</translate>
             </td>
 
             <td v-if="field.diff" :title="field.newRepr">
-              <span v-if="!part.removed" v-for="part in field.diff" :class="['diff', {added: part.added}]">
-                {{ part.value }}
-              </span>
+              <template v-if="field.config.type === 'attachment' && field.newRepr">
+                <img class="ui image" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${field.newRepr}/proxy?next=medium_square_crop`)" />
+              </template>
+              <template v-else>
+                <span v-if="!part.removed" v-for="part in field.diff" :class="['diff', {added: part.added}]">
+                  {{ part.value }}
+                </span>
+              </template>
             </td>
-            <td v-else :title="field.newRepr">{{ field.newRepr }}</td>
+            <td v-else :title="field.newRepr">
+              <template v-if="field.config.type === 'attachment' && field.newRepr">
+                <img class="ui image" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${field.newRepr}/proxy?next=medium_square_crop`)" />
+              </template>
+              <template v-else>
+                {{ field.newRepr }}
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -89,7 +106,7 @@
       </button>
       <dangerous-button
         v-if="canDelete"
-        :class="['ui', {loading: isLoading}, 'basic button']"
+        :class="['ui', {loading: isLoading}, 'basic red button']"
         :action="remove">
         <translate translate-context="*/*/*/Verb">Delete</translate>
         <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this suggestion?</translate></p>
@@ -171,6 +188,7 @@ export default {
         let getValueRepr = fieldConfig.getValueRepr || dummyRepr
         let d = {
           id: f,
+          config: fieldConfig
         }
         if (previousState && previousState[f]) {
           d.old = previousState[f]

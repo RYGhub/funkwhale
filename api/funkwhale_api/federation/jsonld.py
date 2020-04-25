@@ -17,6 +17,10 @@ def cached_contexts(loader):
         for cached in contexts.CONTEXTS:
             if url == cached["documentUrl"]:
                 return cached
+            if cached["shortId"] == "LITEPUB" and "/schemas/litepub-" in url:
+                # XXX UGLY fix for pleroma because they host their schema
+                # under each instance domain, which makes caching harder
+                return cached
         return loader(url, *args, **kwargs)
 
     return load
@@ -29,18 +33,19 @@ def get_document_loader():
     return cached_contexts(loader)
 
 
-def expand(doc, options=None, insert_fw_context=True):
+def expand(doc, options=None, default_contexts=["AS", "FW", "SEC"]):
     options = options or {}
     options.setdefault("documentLoader", get_document_loader())
     if isinstance(doc, str):
         doc = options["documentLoader"](doc)["document"]
-    if insert_fw_context:
-        fw = contexts.CONTEXTS_BY_ID["FW"]["documentUrl"]
+    for context_name in default_contexts:
+        ctx = contexts.CONTEXTS_BY_ID[context_name]["documentUrl"]
         try:
-            insert_context(fw, doc)
+            insert_context(ctx, doc)
         except KeyError:
             # probably an already expanded document
             pass
+
     result = pyld.jsonld.expand(doc, options=options)
     try:
         # jsonld.expand returns a list, which is useless for us
@@ -167,7 +172,7 @@ def prepare_for_serializer(payload, config, fallbacks={}):
                 attr=field_config.get("attr"),
             )
         except (IndexError, KeyError):
-            aliases = field_config.get("aliases", [])
+            aliases = field_config.get("aliases", {})
             noop = object()
             value = noop
             if not aliases:
@@ -176,9 +181,7 @@ def prepare_for_serializer(payload, config, fallbacks={}):
             for a in aliases:
                 try:
                     value = get_value(
-                        payload[a],
-                        keep=field_config.get("keep"),
-                        attr=field_config.get("attr"),
+                        payload[a["property"]], keep=a.get("keep"), attr=a.get("attr"),
                     )
                 except (IndexError, KeyError):
                     continue
@@ -214,27 +217,34 @@ def get_ids(v):
 
 
 def get_default_context():
-    return ["https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1", {}]
-
-
-def get_default_context_fw():
     return [
         "https://www.w3.org/ns/activitystreams",
         "https://w3id.org/security/v1",
-        {},
         "https://funkwhale.audio/ns",
+        {
+            "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+            "Hashtag": "as:Hashtag",
+        },
     ]
 
 
 class JsonLdSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        self.jsonld_expand = kwargs.pop("jsonld_expand", True)
+        super().__init__(*args, **kwargs)
+        self.jsonld_context = []
+
     def run_validation(self, data=empty):
-        if data and data is not empty and self.context.get("expand", True):
-            try:
-                data = expand(data)
-            except ValueError:
-                raise serializers.ValidationError(
-                    "{} is not a valid jsonld document".format(data)
-                )
+        if data and data is not empty:
+
+            self.jsonld_context = data.get("@context", [])
+            if self.context.get("expand", self.jsonld_expand):
+                try:
+                    data = expand(data)
+                except ValueError as e:
+                    raise serializers.ValidationError(
+                        "{} is not a valid jsonld document: {}".format(data, e)
+                    )
             try:
                 config = self.Meta.jsonld_mapping
             except AttributeError:
@@ -243,6 +253,7 @@ class JsonLdSerializer(serializers.Serializer):
                 fallbacks = self.Meta.jsonld_fallbacks
             except AttributeError:
                 fallbacks = {}
+
             data = prepare_for_serializer(data, config, fallbacks=fallbacks)
             dereferenced_fields = [
                 k
@@ -285,3 +296,15 @@ def first_obj(property, aliases=[]):
 
 def raw(property, aliases=[]):
     return {"property": property, "aliases": aliases}
+
+
+def is_present_recursive(data, key):
+    if isinstance(data, (dict, list)):
+        for v in data:
+            if is_present_recursive(v, key):
+                return True
+    else:
+        if data == key:
+            return True
+
+    return False

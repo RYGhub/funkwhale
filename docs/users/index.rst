@@ -1,5 +1,5 @@
 User Documentation
-=====================================
+==================
 
 This documentation is targeted at Funkwhale users. In here you'll find guides for interacting with
 Funkwhale, uploading your music, and building a musical social network.
@@ -13,6 +13,7 @@ Getting Started
    create
    tagging
    upload
+   editing
 
 
 Using Funkwhale
@@ -24,9 +25,11 @@ Using Funkwhale
    account
    queue
    managing
+   channels
    playlists
    favorites
    radios
+   followchannel
    follow
    apps
    reports

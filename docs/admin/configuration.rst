@@ -1,13 +1,18 @@
 Instance configuration
 ======================
 
-General configuration is achieved using two type of settings.
+General configuration is achieved using two type of settings:
+:ref:`environment variables <environment-variables>` and
+:ref:`instance settings <instance-settings>`.
+
+.. _environment-variables:
 
 Environment variables
 ---------------------
 
 Those are located in your ``.env`` file, which you should have created
-during installation.
+during installation. A full list of available variables can be seen
+:ref:`below <environment-variables>`.
 
 Options from this file are heavily commented, and usually target lower level
 and technical aspects of your instance, such as database credentials.
@@ -18,12 +23,22 @@ and technical aspects of your instance, such as database credentials.
     on environment variables.
 
 
+.. note::
+
+    Some characters are unsafe to use in configuration variables that are URLs,
+    such as the user and password in the database and SMTP sections.
+    If those variables contain such characters, they must be urlencoded, for
+    instance using the following command:
+    ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("p@ssword"))``
+
+    cf. https://github.com/joke2k/django-environ#using-unsafe-characters-in-urls
+
 .. _instance-settings:
 
 Instance settings
 -----------------
 
-Those settings are stored in database and do not require a restart of your
+These settings are stored in the database and do not require a restart of your
 instance after modification. They typically relate to higher level configuration,
 such your instance description, signup policy and so on.
 
@@ -32,7 +47,7 @@ you have the required permissions. The URL is ``/manage/settings``, and
 you will also find a link to this page in the sidebar.
 
 If you plan to use acoustid and external imports
-(e.g. with the youtube backends), you should edit the corresponding
+(e.g. with the YouTube backends), you should edit the corresponding
 settings in this interface.
 
 .. note::
@@ -48,91 +63,114 @@ settings in this interface.
 Configuration reference
 -----------------------
 
-.. _setting-EMAIL_CONFIG:
+Pod
+^^^
 
-``EMAIL_CONFIG``
-^^^^^^^^^^^^^^^^
+.. autodata:: config.settings.common.FUNKWHALE_HOSTNAME
+    :annotation:
+.. autodata:: config.settings.common.FUNKWHALE_PROTOCOL
 
-Determine how emails are sent.
+Database and redis
+^^^^^^^^^^^^^^^^^^
 
-Default: ``consolemail://``
+.. autodata:: config.settings.common.DATABASE_URL
+    :annotation:
+.. autodata:: config.settings.common.DB_CONN_MAX_AGE
+.. autodata:: config.settings.common.CACHE_URL
+    :annotation:
+.. autodata:: config.settings.common.CELERY_BROKER_URL
+    :annotation:
 
-Possible values:
+Accounts and registration
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- ``consolemail://``: Output sent emails to stdout
-- ``dummymail://``: Completely discard sent emails
-- ``smtp://user:password@youremail.host:25``: Send emails via SMTP via youremail.host on port 25, without encryption, authenticating as user "user" with password "password"
-- ``smtp+ssl://user:password@youremail.host:465``: Send emails via SMTP via youremail.host on port 465, using SSL encryption, authenticating as user "user" with password "password"
-- ``smtp+tls://user:password@youremail.host:587``: Send emails via SMTP via youremail.host on port 587, using TLS encryption, authenticating as user "user" with password "password"
+.. autodata:: config.settings.common.ACCOUNT_EMAIL_VERIFICATION_ENFORCE
+    :annotation:
+.. autodata:: config.settings.common.USERS_INVITATION_EXPIRATION_DAYS
+    :annotation:
+.. autodata:: config.settings.common.DISABLE_PASSWORD_VALIDATORS
+    :annotation:
+.. autodata:: config.settings.common.ACCOUNT_USERNAME_BLACKLIST
+    :annotation:
+.. autodata:: config.settings.common.AUTH_LDAP_ENABLED
+    :annotation:
 
-.. _setting-DEFAULT_FROM_EMAIL:
+Media storage and serving
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``DEFAULT_FROM_EMAIL``
-^^^^^^^^^^^^^^^^^^^^^^
+.. autodata:: config.settings.common.MEDIA_URL
+    :annotation: = https://mypod.audio/media/
+.. autodata:: config.settings.common.MEDIA_ROOT
+    :annotation: = /srv/funkwhale/data/media
+.. autodata:: config.settings.common.PROXY_MEDIA
+    :annotation: = true
+.. autodata:: config.settings.common.EXTERNAL_MEDIA_PROXY_ENABLED
+.. autodata:: config.settings.common.ATTACHMENTS_UNATTACHED_PRUNE_DELAY
+    :annotation: = true
+.. autodata:: config.settings.common.REVERSE_PROXY_TYPE
+.. autodata:: config.settings.common.PROTECT_FILES_PATH
 
-The email address to use to send email.
+Audio acquisition
+^^^^^^^^^^^^^^^^^
 
-Default: ``Funkwhale <noreply@yourdomain>``
+.. autodata:: config.settings.common.MUSIC_DIRECTORY_PATH
+.. autodata:: config.settings.common.MUSIC_DIRECTORY_SERVE_PATH
 
-.. note::
+S3 Storage
+^^^^^^^^^^
 
-    Both the forms ``Funkwhale <noreply@yourdomain>`` and
-    ``noreply@yourdomain`` work.
+.. autodata:: config.settings.common.AWS_QUERYSTRING_AUTH
+.. autodata:: config.settings.common.AWS_QUERYSTRING_EXPIRE
+.. autodata:: config.settings.common.AWS_ACCESS_KEY_ID
+.. autodata:: config.settings.common.AWS_SECRET_ACCESS_KEY
+.. autodata:: config.settings.common.AWS_STORAGE_BUCKET_NAME
+.. autodata:: config.settings.common.AWS_S3_CUSTOM_DOMAIN
+.. autodata:: config.settings.common.AWS_S3_ENDPOINT_URL
+.. autodata:: config.settings.common.AWS_S3_REGION_NAME
+.. autodata:: config.settings.common.AWS_LOCATION
 
+API configuration
+^^^^^^^^^^^^^^^^^
 
-.. _setting-MUSIC_DIRECTORY_PATH:
+.. autodata:: config.settings.common.THROTTLING_ENABLED
+.. autodata:: config.settings.common.THROTTLING_RATES
+.. autodata:: config.settings.common.ADMIN_URL
+.. autodata:: config.settings.common.EXTERNAL_REQUESTS_VERIFY_SSL
+.. autodata:: config.settings.common.EXTERNAL_REQUESTS_TIMEOUT
 
-``MUSIC_DIRECTORY_PATH``
-^^^^^^^^^^^^^^^^^^^^^^^^
+Federation
+^^^^^^^^^^
 
-Default: ``None``
+.. autodata:: config.settings.common.FEDERATION_OBJECT_FETCH_DELAY
+.. autodata:: config.settings.common.FEDERATION_DUPLICATE_FETCH_DELAY
 
-The path on your server where Funkwhale can import files using :ref:`in-place import
-<in-place-import>`. It must be readable by the webserver and Funkwhale
-api and worker processes.
+Metadata
+^^^^^^^^
 
-On docker installations, we recommend you use the default of ``/music``
-for this value. For non-docker installation, you can use any absolute path.
-``/srv/funkwhale/data/music`` is a safe choice if you don't know what to use.
+.. autodata:: config.settings.common.TAGS_MAX_BY_OBJ
+.. autodata:: config.settings.common.MUSICBRAINZ_HOSTNAME
+.. autodata:: config.settings.common.MUSICBRAINZ_CACHE_DURATION
 
-.. note:: This path should not include any trailing slash
+Channels and podcasts
+^^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
+.. autodata:: config.settings.common.PODCASTS_RSS_FEED_REFRESH_DELAY
+.. autodata:: config.settings.common.PODCASTS_RSS_FEED_MAX_ITEMS
+.. autodata:: config.settings.common.PODCASTS_THIRD_PARTY_VISIBILITY
 
-   You need to adapt your :ref:`reverse-proxy configuration<reverse-proxy-setup>` to
-   serve the directory pointed by ``MUSIC_DIRECTORY_PATH`` on
-   ``/_protected/music`` URL.
+Subsonic
+^^^^^^^^
 
-.. _setting-MUSIC_DIRECTORY_SERVE_PATH:
+.. autodata:: config.settings.common.SUBSONIC_DEFAULT_TRANSCODING_FORMAT
 
-``MUSIC_DIRECTORY_SERVE_PATH``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Other settings
+^^^^^^^^^^^^^^
 
-Default: :ref:`setting-MUSIC_DIRECTORY_PATH`
-
-When using Docker, the value of :ref:`setting-MUSIC_DIRECTORY_PATH` in your containers
-may differ from the real path on your host. Assuming you have the following directive
-in your :file:`docker-compose.yml` file::
-
-    volumes:
-      - /srv/funkwhale/data/music:/music:ro
-
-Then, the value of :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH` should be
-``/srv/funkwhale/data/music``. This must be readable by the webserver.
-
-On non-docker setup, you don't need to configure this setting.
-
-.. note:: This path should not include any trailing slash
-
-.. _setting-REVERSE_PROXY_TYPE:
-
-``REVERSE_PROXY_TYPE``
-^^^^^^^^^^^^^^^^^^^^^^
-
-Default: ``nginx``
-
-The type of reverse-proxy behind which Funkwhale is served. Either ``apache2``
-or ``nginx``. This is only used if you are using in-place import.
+.. autodata:: config.settings.common.INSTANCE_SUPPORT_MESSAGE_DELAY
+.. autodata:: config.settings.common.FUNKWHALE_SUPPORT_MESSAGE_DELAY
+.. autodata:: config.settings.common.MIN_DELAY_BETWEEN_DOWNLOADS_COUNT
+.. autodata:: config.settings.common.MARKDOWN_EXTENSIONS
+.. autodata:: config.settings.common.LINKIFIER_SUPPORTED_TLDS
 
 User permissions
 ----------------
@@ -162,7 +200,7 @@ to users at ``/api/admin/users/user/``.
 Front-end settings
 ------------------
 
-We offer a basic mechanism to customize the behaviour and look and feel of Funkwhale's Web UI.
+We offer a basic mechanism to customize the behavior and look and feel of Funkwhale's Web UI.
 To use any of the options below, you will need to create a custom JSON configuration file and serve it
 on ``https://yourinstanceurl/settings.json``.
 
@@ -264,7 +302,7 @@ On nginx, add the following snippet to your vhost config::
         alias /srv/funkwhale/custom;
     }
 
-On apache, use the following one::
+On apache, use the following::
 
     Alias /custom /srv/funkwhale/custom
 

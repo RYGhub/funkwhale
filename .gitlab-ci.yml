@@ -20,7 +20,7 @@ stages:
 review_front:
   interruptible: true
   stage: review
-  image: node:11
+  image: node:12-buster
   when: manual
   allow_failure: true
   variables:
@@ -71,7 +71,7 @@ review_docs:
     - cd docs
     - apt-get update
     - apt-get install -y graphviz
-    - pip install sphinx sphinx_rtd_theme
+    - pip install sphinx sphinx_rtd_theme django-environ django
   script:
     - ./build_docs.sh
   cache:
@@ -120,7 +120,7 @@ test_api:
   interruptible: true
   services:
     - postgres:11
-    - redis:3
+    - redis:5
   stage: test
   image: funkwhale/funkwhale:develop
   cache:
@@ -131,12 +131,12 @@ test_api:
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
     FUNKWHALE_URL: "https://funkwhale.ci"
     DJANGO_SETTINGS_MODULE: config.settings.local
+    POSTGRES_HOST_AUTH_METHOD: trust
   only:
     - branches
   before_script:
-    - apk add make
+    - apk add make git gcc python3-dev musl-dev
     - cd api
-    - sed -i '/Pillow/d' requirements/base.txt
     - pip3 install -r requirements/base.txt
     - pip3 install -r requirements/local.txt
     - pip3 install -r requirements/test.txt
@@ -148,7 +148,7 @@ test_api:
 test_front:
   interruptible: true
   stage: test
-  image: node:11
+  image: node:12-buster
   before_script:
     - cd front
   only:
@@ -170,7 +170,7 @@ test_front:
 
 build_front:
   stage: build
-  image: node:11
+  image: node:12-buster
   before_script:
     - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
     - chmod +x /usr/local/bin/jq

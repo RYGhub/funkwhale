@@ -274,6 +274,16 @@
                       {{ stats.reports }}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.moderation.requests.list', query: {q: getQuery('submitter', `${object.full_username}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Requests</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.requests }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </section>
@@ -333,7 +343,16 @@
                       {{ stats.media_total_size | humanSize }}
                     </td>
                   </tr>
-
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.channels', query: {q: getQuery('account', object.full_username) }}">
+                        <translate translate-context="*/*/*">Channels</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.channels }}
+                    </td>
+                  </tr>
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('account', object.full_username) }}">

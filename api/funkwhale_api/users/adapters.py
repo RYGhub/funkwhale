@@ -22,3 +22,10 @@ class FunkwhaleAccountAdapter(DefaultAccountAdapter):
     def send_mail(self, template_prefix, email, context):
         context.update(get_email_context())
         return super().send_mail(template_prefix, email, context)
+
+    def get_login_redirect_url(self, request):
+        return "noop"
+
+    def add_message(self, *args, **kwargs):
+        # disable message sending
+        return

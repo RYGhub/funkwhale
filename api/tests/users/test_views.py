@@ -1,6 +1,9 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.moderation import tasks as moderation_tasks
 from funkwhale_api.users.models import User
 
 
@@ -105,7 +108,12 @@ def test_can_fetch_data_from_api(api_client, factories):
     # login required
     assert response.status_code == 401
 
-    user = factories["users.User"](permission_library=True)
+    user = factories["users.User"](permission_library=True, with_actor=True)
+    summary = {"content_type": "text/plain", "text": "Hello"}
+    summary_obj = common_utils.attach_content(user.actor, "summary_obj", summary)
+    avatar = factories["common.Attachment"]()
+    user.actor.attachment_icon = avatar
+    user.actor.save()
     api_client.login(username=user.username, password="test")
     response = api_client.get(url)
     assert response.status_code == 200
@@ -115,6 +123,13 @@ def test_can_fetch_data_from_api(api_client, factories):
     assert response.data["email"] == user.email
     assert response.data["name"] == user.name
     assert response.data["permissions"] == user.get_permissions()
+    assert (
+        response.data["avatar"] == common_serializers.AttachmentSerializer(avatar).data
+    )
+    assert (
+        response.data["summary"]
+        == common_serializers.ContentSerializer(summary_obj).data
+    )
 
 
 def test_can_get_token_via_api(api_client, factories):
@@ -202,6 +217,20 @@ def test_user_can_patch_his_own_settings(logged_in_api_client):
     assert user.privacy_level == "me"
 
 
+def test_user_can_patch_description(logged_in_api_client):
+    user = logged_in_api_client.user
+    payload = {"summary": {"content_type": "text/markdown", "text": "hello"}}
+    url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
+
+    response = logged_in_api_client.patch(url, payload, format="json")
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+
+    assert user.actor.summary_obj.content_type == payload["summary"]["content_type"]
+    assert user.actor.summary_obj.text == payload["summary"]["text"]
+
+
 def test_user_can_request_new_subsonic_token(logged_in_api_client):
     user = logged_in_api_client.user
     user.subsonic_api_token = "test"
@@ -278,18 +307,19 @@ def test_user_cannot_patch_another_user(method, logged_in_api_client, factories)
     assert response.status_code == 403
 
 
-def test_user_can_patch_their_own_avatar(logged_in_api_client, avatar):
+def test_user_can_patch_their_own_avatar(logged_in_api_client, factories):
     user = logged_in_api_client.user
+    actor = user.create_actor()
+    attachment = factories["common.Attachment"](actor=actor)
     url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
-    content = avatar.read()
-    avatar.seek(0)
-    payload = {"avatar": avatar}
+    payload = {"avatar": attachment.uuid}
     response = logged_in_api_client.patch(url, payload)
 
     assert response.status_code == 200
     user.refresh_from_db()
 
-    assert user.avatar.read() == content
+    assert user.actor.attachment_icon == attachment
+    assert "avatar" in response.data
 
 
 def test_creating_user_creates_actor_as_well(
@@ -387,3 +417,104 @@ def test_username_with_existing_local_account_are_invalid(
 
     assert response.status_code == 400
     assert "username" in response.data
+
+
+def test_signup_with_approval_enabled(
+    preferences, factories, api_client, mocker, mailoutbox, settings
+):
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
+        "request_fields": {"field1": "Value 1", "field2": "Value 2", "noop": "Noop"},
+    }
+    preferences["users__registration_enabled"] = True
+    preferences["moderation__signup_approval_enabled"] = True
+    preferences["moderation__signup_form_customization"] = {
+        "fields": [
+            {"label": "field1", "input_type": "short_text"},
+            {"label": "field2", "input_type": "short_text"},
+        ]
+    }
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == 201
+    u = User.objects.get(email="test1@test.com")
+    assert u.username == "test1"
+    assert u.is_active is False
+    user_request = u.actor.requests.latest("id")
+    assert user_request.type == "signup"
+    assert user_request.status == "pending"
+    assert user_request.metadata == {
+        "field1": "Value 1",
+        "field2": "Value 2",
+    }
+
+    on_commit.assert_any_call(
+        moderation_tasks.user_request_handle.delay,
+        user_request_id=user_request.pk,
+        new_status="pending",
+    )
+
+    confirmation_message = mailoutbox[-1]
+    assert "confirm" in confirmation_message.body
+    assert settings.FUNKWHALE_HOSTNAME in confirmation_message.body
+
+
+def test_signup_with_approval_enabled_validation_error(
+    preferences, factories, api_client
+):
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
+        "request_fields": {"field1": "Value 1"},
+    }
+    preferences["users__registration_enabled"] = True
+    preferences["moderation__signup_approval_enabled"] = True
+    preferences["moderation__signup_form_customization"] = {
+        "fields": [
+            {"label": "field1", "input_type": "short_text"},
+            {"label": "field2", "input_type": "short_text"},
+        ]
+    }
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == 400
+
+
+def test_user_login_jwt(factories, api_client):
+    user = factories["users.User"]()
+    data = {
+        "username": user.username,
+        "password": "test",
+    }
+    url = reverse("api:v1:token")
+    response = api_client.post(url, data)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "setting_value, verified_email, expected_status_code",
+    [
+        ("mandatory", False, 400),
+        ("mandatory", True, 200),
+        ("optional", False, 200),
+        ("optional", True, 200),
+    ],
+)
+def test_user_login_jwt_honor_email_verification(
+    setting_value, verified_email, expected_status_code, settings, factories, api_client
+):
+    settings.ACCOUNT_EMAIL_VERIFICATION = setting_value
+    user = factories["users.User"](verified_email=verified_email)
+    data = {
+        "username": user.username,
+        "password": "test",
+    }
+    url = reverse("api:v1:token")
+    response = api_client.post(url, data)
+    assert response.status_code == expected_status_code

@@ -34,17 +34,17 @@ def test_get_track_favorites(mocker):
 
 
 def test_get_tracks(mocker):
-    mocker.patch("funkwhale_api.music.models.Track.objects.count", return_value=42)
+    mocker.patch("funkwhale_api.music.models.TrackQuerySet.count", return_value=42)
     assert stats.get_tracks() == 42
 
 
 def test_get_albums(mocker):
-    mocker.patch("funkwhale_api.music.models.Album.objects.count", return_value=42)
+    mocker.patch("funkwhale_api.music.models.AlbumQuerySet.count", return_value=42)
     assert stats.get_albums() == 42
 
 
 def test_get_artists(mocker):
-    mocker.patch("funkwhale_api.music.models.Artist.objects.count", return_value=42)
+    mocker.patch("funkwhale_api.music.models.ArtistQuerySet.count", return_value=42)
     assert stats.get_artists() == 42
 
 
@@ -57,6 +57,7 @@ def test_get(mocker):
         "track_favorites",
         "listenings",
         "music_duration",
+        "downloads",
     ]
     [
         mocker.patch.object(stats, "get_{}".format(k), return_value=i)

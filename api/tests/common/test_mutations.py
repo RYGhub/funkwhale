@@ -63,11 +63,12 @@ def test_db_serialize_update_mutation(factories, mutations_registry, mocker):
     user = factories["users.User"](email="hello@test.email", with_actor=True)
 
     class S(mutations.UpdateMutationSerializer):
-        serialized_relations = {"actor": "full_username"}
-
         class Meta:
             model = user.__class__
             fields = ["actor"]
+
+        def get_serialized_relations(self):
+            return {"actor": "full_username"}
 
     expected = {"actor": user.actor.full_username}
     assert S().db_serialize({"actor": user.actor}) == expected

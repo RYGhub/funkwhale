@@ -21,7 +21,7 @@ class SignatureAuthFactory(factory.Factory):
     key = factory.LazyFunction(lambda: keys.get_key_pair()[0])
     key_id = factory.Faker("url")
     use_auth_header = False
-    headers = ["(request-target)", "user-agent", "host", "date", "content-type"]
+    headers = ["(request-target)", "user-agent", "host", "date", "accept"]
 
     class Meta:
         model = requests_http_signature.HTTPSignatureAuth
@@ -42,7 +42,7 @@ class SignedRequestFactory(factory.Factory):
             "User-Agent": "Test",
             "Host": "test.host",
             "Date": http_date(timezone.now().timestamp()),
-            "Content-Type": "application/activity+json",
+            "Accept": "application/activity+json",
         }
         if extracted:
             default_headers.update(extracted)
@@ -86,6 +86,17 @@ class DomainFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         return self.service_actor
 
 
+_CACHE = {}
+
+
+def get_cached_key_pair():
+    try:
+        return _CACHE["keys"]
+    except KeyError:
+        _CACHE["keys"] = keys.get_key_pair()
+    return _CACHE["keys"]
+
+
 @registry.register
 class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     public_key = None
@@ -111,10 +122,13 @@ class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
             o.domain.name, o.preferred_username
         )
     )
-    keys = factory.LazyFunction(keys.get_key_pair)
+    keys = factory.LazyFunction(get_cached_key_pair)
 
     class Meta:
         model = models.Actor
+
+    class Params:
+        with_real_keys = factory.Trait(keys=factory.LazyFunction(keys.get_key_pair),)
 
     @factory.post_generation
     def local(self, create, extracted, **kwargs):
@@ -125,7 +139,8 @@ class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
         self.domain = models.Domain.objects.get_or_create(
             name=settings.FEDERATION_HOSTNAME
         )[0]
-        self.save(update_fields=["domain"])
+        self.fid = "https://{}/actors/{}".format(self.domain, self.preferred_username)
+        self.save(update_fields=["domain", "fid"])
         if not create:
             if extracted and hasattr(extracted, "pk"):
                 extracted.actor = self
@@ -166,7 +181,9 @@ class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         model = "music.Library"
 
     class Params:
-        local = factory.Trait(actor=factory.SubFactory(ActorFactory, local=True))
+        local = factory.Trait(
+            fid=None, actor=factory.SubFactory(ActorFactory, local=True)
+        )
 
 
 @registry.register

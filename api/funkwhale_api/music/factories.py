@@ -4,6 +4,7 @@ import factory
 
 from funkwhale_api.factories import registry, NoUpdateOnCreate
 
+from funkwhale_api.common import factories as common_factories
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
 from funkwhale_api.tags import factories as tags_factories
@@ -72,6 +73,9 @@ class ArtistFactory(
             attributed_to=factory.SubFactory(federation_factories.ActorFactory)
         )
         local = factory.Trait(fid=factory.Faker("federation_url", local=True))
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
+        )
 
 
 @registry.register
@@ -81,7 +85,6 @@ class AlbumFactory(
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
-    cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
@@ -97,6 +100,9 @@ class AlbumFactory(
 
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), artist__local=True
+        )
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
         )
 
 
@@ -121,6 +127,9 @@ class TrackFactory(
 
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), album__local=True
+        )
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
         )
 
     @factory.post_generation
@@ -174,6 +183,16 @@ class UploadFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         in_place = factory.Trait(audio_file=None, mimetype=None)
         playable = factory.Trait(
             import_status="finished", library__privacy_level="everyone"
+        )
+
+    @factory.post_generation
+    def channel(self, created, extracted, **kwargs):
+        if not extracted:
+            return
+        from funkwhale_api.audio import factories as audio_factories
+
+        audio_factories.ChannelFactory(
+            library=self.library, artist=self.track.artist, **kwargs
         )
 
 

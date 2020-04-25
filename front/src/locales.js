@@ -50,12 +50,32 @@ export default {
       "label": "Galego"
     },
     {
+      "code": "hu",
+      "label": "Magyar"
+    },
+    {
       "code": "it",
       "label": "Italiano"
     },
     {
+      "code": "ja_JP",
+      "label": "日本語"
+    },
+    {
+      "code": "kab_DZ",
+      "label": "Taqbaylit"
+    },
+    {
+      "code": "ko_KR",
+      "label": "한국어"
+    },
+    {
       "code": "nb_NO",
       "label": "Bokmål"
+    },
+    {
+      "code": "nn_NO",
+      "label": "Nynorsk"
     },
     {
       "code": "nl",

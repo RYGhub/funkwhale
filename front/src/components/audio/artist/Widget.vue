@@ -4,22 +4,27 @@
       <slot name="title"></slot>
       <span class="ui tiny circular label">{{ count }}</span>
     </h3>
-    <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
-    <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
-    <button v-if="controls" @click="fetchData('artists/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
+    <inline-search-bar v-model="query" v-if="search" @search="objects = []; fetchData()"></inline-search-bar>
     <div class="ui hidden divider"></div>
-    <div class="ui three cards">
+    <div class="ui five app-cards cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>
       </div>
       <artist-card :artist="artist" v-for="artist in objects" :key="artist.id"></artist-card>
     </div>
-    <div v-if="!isLoading && objects.length === 0">No results matching your query.</div>
+    <slot v-if="!isLoading && objects.length === 0" name="empty-state">
+      <empty-state @refresh="fetchData" :refresh="true"></empty-state>
+    </slot>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
 <script>
-import _ from '@/lodash'
 import axios from 'axios'
 import ArtistCard from "@/components/audio/artist/Card"
 
@@ -28,6 +33,7 @@ export default {
     filters: {type: Object, required: true},
     controls: {type: Boolean, default: true},
     header: {type: Boolean, default: true},
+    search: {type: Boolean, default: false},
   },
   components: {
     ArtistCard,
@@ -40,27 +46,26 @@ export default {
       isLoading: false,
       errors: null,
       previousPage: null,
-      nextPage: null
+      nextPage: null,
+      query: '',
     }
   },
   created () {
-    this.fetchData('artists/')
+    this.fetchData()
   },
   methods: {
     fetchData (url) {
-      if (!url) {
-        return
-      }
+      url = url || 'artists/'
       this.isLoading = true
       let self = this
-      let params = _.clone(this.filters)
+      let params = {q: this.query, ...this.filters}
       params.page_size = this.limit
       params.offset = this.offset
       axios.get(url, {params: params}).then((response) => {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.objects = response.data.results
+        self.objects = [...self.objects, ...response.data.results]
         self.count = response.data.count
       }, error => {
         self.isLoading = false
@@ -80,7 +85,7 @@ export default {
       this.fetchData()
     },
     "$store.state.moderation.lastUpdate": function () {
-      this.fetchData('objects/')
+      this.fetchData()
     }
   }
 }

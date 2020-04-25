@@ -1,7 +1,10 @@
 import html
+import logging
 import io
-import requests
+import os
+import re
 import time
+import urllib.parse
 import xml.sax.saxutils
 
 from django import http
@@ -10,11 +13,16 @@ from django.core.cache import caches
 from django import urls
 from rest_framework import views
 
+from funkwhale_api.federation import utils as federation_utils
+
 from . import preferences
+from . import session
 from . import throttling
 from . import utils
 
 EXCLUDED_PATHS = ["/api", "/federation", "/.well-known"]
+
+logger = logging.getLogger(__name__)
 
 
 def should_fallback_to_spa(path):
@@ -26,6 +34,13 @@ def should_fallback_to_spa(path):
 def serve_spa(request):
     html = get_spa_html(settings.FUNKWHALE_SPA_HTML_ROOT)
     head, tail = html.split("</head>", 1)
+    if settings.FUNKWHALE_SPA_REWRITE_MANIFEST:
+        new_url = (
+            settings.FUNKWHALE_SPA_REWRITE_MANIFEST_URL
+            or federation_utils.full_url(urls.reverse("api:v1:instance:spa-manifest"))
+        )
+        head = replace_manifest_url(head, new_url)
+
     if not preferences.get("common__api_authentication_required"):
         try:
             request_tags = get_request_head_tags(request) or []
@@ -66,20 +81,34 @@ def serve_spa(request):
     return http.HttpResponse(head + tail)
 
 
+MANIFEST_LINK_REGEX = re.compile(r"<link [^>]*rel=(?:'|\")?manifest(?:'|\")?[^>]*>")
+
+
+def replace_manifest_url(head, new_url):
+    replacement = '<link rel=manifest href="{}">'.format(new_url)
+    head = MANIFEST_LINK_REGEX.sub(replacement, head)
+    return head
+
+
 def get_spa_html(spa_url):
+    return get_spa_file(spa_url, "index.html")
+
+
+def get_spa_file(spa_url, name):
     if spa_url.startswith("/"):
+        # XXX: spa_url is an absolute path to index.html, on the local disk.
+        # However, we may want to access manifest.json or other files as well, so we
+        # strip the filename
+        path = os.path.join(os.path.dirname(spa_url), name)
         # we try to open a local file
-        with open(spa_url) as f:
-            return f.read()
-    cache_key = "spa-html:{}".format(spa_url)
+        with open(path, "rb") as f:
+            return f.read().decode("utf-8")
+    cache_key = "spa-file:{}:{}".format(spa_url, name)
     cached = caches["local"].get(cache_key)
     if cached:
         return cached
 
-    response = requests.get(
-        utils.join_url(spa_url, "index.html"),
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-    )
+    response = session.get_session().get(utils.join_url(spa_url, name),)
     response.raise_for_status()
     content = response.text
     caches["local"].set(cache_key, content, settings.FUNKWHALE_SPA_HTML_CACHE_DURATION)
@@ -135,8 +164,16 @@ def render_tags(tags):
 
 
 def get_request_head_tags(request):
+    accept_header = request.headers.get("Accept") or None
+    redirect_to_ap = (
+        False
+        if not accept_header
+        else not federation_utils.should_redirect_ap_to_html(accept_header)
+    )
     match = urls.resolve(request.path, urlconf=settings.SPA_URLCONF)
-    return match.func(request, *match.args, **match.kwargs)
+    return match.func(
+        request, *match.args, redirect_to_ap=redirect_to_ap, **match.kwargs
+    )
 
 
 def get_custom_css():
@@ -147,6 +184,31 @@ def get_custom_css():
     return xml.sax.saxutils.escape(css)
 
 
+class ApiRedirect(Exception):
+    def __init__(self, url):
+        self.url = url
+
+
+def get_api_response(request, url):
+    """
+    Quite ugly but we have no choice. When Accept header is set to application/activity+json
+    some clients expect to get a JSON payload (instead of the HTML we return). Since
+    redirecting to the URL does not work (because it makes the signature verification fail),
+    we grab the internal view corresponding to the URL, call it and return this as the
+    response
+    """
+    path = urllib.parse.urlparse(url).path
+
+    try:
+        match = urls.resolve(path)
+    except urls.exceptions.Resolver404:
+        return http.HttpResponseNotFound()
+    response = match.func(request, *match.args, **match.kwargs)
+    if hasattr(response, "render"):
+        response.render()
+    return response
+
+
 class SPAFallbackMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -155,7 +217,10 @@ class SPAFallbackMiddleware:
         response = self.get_response(request)
 
         if response.status_code == 404 and should_fallback_to_spa(request.path):
-            return serve_spa(request)
+            try:
+                return serve_spa(request)
+            except ApiRedirect as e:
+                return get_api_response(request, e.url)
 
         return response
 
@@ -242,6 +307,17 @@ class ThrottleStatusMiddleware:
                 response["X-RateLimit-Reset"] = str(now + remaining)
                 response["X-RateLimit-ResetSeconds"] = str(remaining)
 
+        return response
+
+
+class VerboseBadRequestsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if response.status_code == 400:
+            logger.warning("Bad request: %s", response.content)
         return response
 
 

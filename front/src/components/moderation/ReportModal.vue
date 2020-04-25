@@ -44,8 +44,22 @@
           <p>
             <translate translate-context="*/*/Field,Help">Use this field to provide additional context to the moderator that will handle your report.</translate>
           </p>
-          <textarea name="report-summary" id="report-summary" rows="8" v-model="summary"></textarea>
+          <content-form field-id="report-summary" :rows="8" v-model="summary"></content-form>
         </div>
+        <div class="ui field" v-if="!isLocal">
+          <div class="ui checkbox">
+            <input id="report-forward" v-model="forward" type="checkbox">
+            <label for="report-forward">
+              <strong>
+                <translate :translate-params="{domain: targetDomain}" translate-context="*/*/Field.Label/Verb">Forward to %{ domain} </translate>
+              </strong>
+              <p>
+                <translate translate-context="*/*/Field,Help">Forward an anonymized copy of your report to the server hosting this element.</translate>
+              </p>
+            </label>
+          </div>
+        </div>
+        <div class="ui hidden divider"></div>
       </form>
       <div v-else-if="isLoadingReportTypes" class="ui inline active loader">
 
@@ -57,7 +71,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
+      <div class="ui basic cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
       <button
         v-if="canSubmit"
         :class="['ui', 'green', {loading: isLoading}, 'button']"
@@ -74,13 +88,17 @@ import axios from 'axios'
 import {mapState} from 'vuex'
 
 import logger from '@/logging'
-import Modal from '@/components/semantic/Modal'
-import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
+
+function urlDomain(data) {
+  var    a      = document.createElement('a');
+         a.href = data;
+  return a.hostname;
+}
 
 export default {
   components: {
-    Modal,
-    ReportCategoryDropdown,
+    ReportCategoryDropdown:  () => import(/* webpackChunkName: "reports" */ "@/components/moderation/ReportCategoryDropdown"),
+    Modal:  () => import(/* webpackChunkName: "modal" */ "@/components/semantic/Modal"),
   },
   data () {
     return {
@@ -92,6 +110,7 @@ export default {
       submitterEmail: '',
       category: null,
       reportTypes: [],
+      forward: false,
     }
   },
   computed: {
@@ -115,6 +134,22 @@ export default {
       }
 
       return this.allowedCategories.length > 0
+    },
+    targetDomain () {
+      if (!this.target._obj) {
+        return
+      }
+      let fid = this.target._obj.fid
+      if (this.target.type === 'channel' && this.target._obj.actor ) {
+        fid = this.target._obj.actor.fid
+      }
+      if (!fid) {
+        return this.$store.getters['instance/domain']
+      }
+      return urlDomain(fid)
+    },
+    isLocal () {
+      return this.$store.getters['instance/domain'] === this.targetDomain
     }
   },
   methods: {
@@ -126,9 +161,10 @@ export default {
       let self = this
       self.isLoading = true
       let payload = {
-        target: this.target,
+        target: {...this.target, _obj: null},
         summary: this.summary,
         type: this.category,
+        forward: this.forward,
       }
       if (!this.$store.state.auth.authenticated) {
         payload.submitter_email = this.submitterEmail

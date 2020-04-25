@@ -8,6 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 logger = logging.getLogger(__name__)
 channel_layer = get_channel_layer()
 group_add = async_to_sync(channel_layer.group_add)
+group_discard = async_to_sync(channel_layer.group_discard)
 
 
 def group_send(group, event):

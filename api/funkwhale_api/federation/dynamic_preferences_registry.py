@@ -53,15 +53,3 @@ class ActorFetchDelay(preferences.DefaultFromSettingMixin, types.IntPreference):
         "request authentication."
     )
     field_kwargs = {"required": False}
-
-
-@global_preferences_registry.register
-class MusicNeedsApproval(preferences.DefaultFromSettingMixin, types.BooleanPreference):
-    section = federation
-    name = "music_needs_approval"
-    setting = "FEDERATION_MUSIC_NEEDS_APPROVAL"
-    verbose_name = "Federation music needs approval"
-    help_text = (
-        "When true, other federation actors will need your approval"
-        " before being able to browse your library."
-    )

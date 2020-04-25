@@ -1,12 +1,7 @@
 <template>
-  <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: actor.full_username}}" v-if="admin" :title="actor.full_username">
-    <actor-avatar v-if="avatar" :actor="actor" />
-    &nbsp;{{ actor.full_username | truncate(30) }}
+  <router-link :to="url" :title="actor.full_username">
+    <template v-if="avatar"><actor-avatar :actor="actor" /><span>&nbsp;</span></template><slot>{{ repr | truncate(truncateLength) }}</slot>
   </router-link>
-  <span v-else :title="actor.full_username">
-    <actor-avatar v-if="avatar" :actor="actor" />
-    &nbsp;{{ actor.full_username | truncate(30) }}
-  </span>
 </template>
 
 <script>
@@ -17,6 +12,27 @@ export default {
     actor: {type: Object},
     avatar: {type: Boolean, default: true},
     admin: {type: Boolean, default: false},
+    displayName: {type: Boolean, default: false},
+    truncateLength: {type: Number, default: 30},
+  },
+  computed: {
+    url () {
+      if (this.admin) {
+        return {name: 'manage.moderation.accounts.detail', params: {id: this.actor.full_username}}
+      }
+      if (this.actor.is_local) {
+        return {name: 'profile.overview', params: {username: this.actor.preferred_username}}
+      } else {
+        return {name: 'profile.full.overview', params: {username: this.actor.preferred_username, domain: this.actor.domain}}
+      }
+    },
+    repr () {
+      if (this.displayName || this.actor.is_local) {
+        return this.actor.preferred_username
+      } else {
+        return this.actor.full_username
+      }
+    }
   }
 }
 </script>

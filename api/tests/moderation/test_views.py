@@ -56,3 +56,22 @@ def test_create_report_anonymous(factories, api_client, no_api_auth):
     assert response.status_code == 201
     report = models.Report.objects.latest("id")
     assert report.submitter_email == data["submitter_email"]
+
+
+def test_create_report_and_forward(factories, api_client, no_api_auth, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    target = factories["music.Artist"](attributed=True)
+    url = reverse("api:v1:moderation:reports-list")
+    data = {
+        "target": {"type": "artist", "id": target.pk},
+        "summary": "Test report",
+        "type": "illegal_content",
+        "submitter_email": "test@example.test",
+        "forward": True,
+    }
+    response = api_client.post(url, data, format="json")
+
+    assert response.status_code == 201
+    report = models.Report.objects.latest("id")
+
+    dispatch.assert_called_once_with({"type": "Flag"}, context={"report": report})

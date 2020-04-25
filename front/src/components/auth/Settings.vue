@@ -23,6 +23,7 @@
             <select v-if="f.type === 'dropdown'" class="ui dropdown" v-model="f.value">
               <option :value="c" v-for="c in f.choices">{{ sharedLabels.fields[f.id].choices[c] }}</option>
             </select>
+            <content-form v-if="f.type === 'content'" v-model="f.value.text"></content-form>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
             <translate translate-context="Content/Settings/Button.Label/Verb">Update settings</translate>
@@ -41,25 +42,15 @@
               <li v-for="error in avatarErrors">{{ error }}</li>
             </ul>
           </div>
-          <div class="ui stackable grid">
-            <div class="ui ten wide column">
-              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Verb">Upload a new avatar</translate></h3>
-              <p><translate translate-context="Content/Settings/Paragraph">PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
-              <input class="ui input" ref="avatar" type="file" />
-              <div class="ui hidden divider"></div>
-              <button @click="submitAvatar" :class="['ui', {'loading': isLoadingAvatar}, 'button']">
-                <translate translate-context="Content/Settings/Button.Label/Verb">Update avatar</translate>
-              </button>
-            </div>
-            <div class="ui six wide column">
-              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Noun">Current avatar</translate></h3>
-              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
-              <div class="ui hidden divider"></div>
-              <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
-                <translate translate-context="Content/Settings/Button.Label/Verb">Remove avatar</translate>
-              </button>
-            </div>
-          </div>
+          {{ }}
+          <attachment-input
+            :value="avatar.uuid"
+            @input="submitAvatar($event)"
+            :initial-value="initialAvatar"
+            :required="false"
+            @delete="avatar = {uuid: null}">
+            <translate translate-context="Content/Channel/*" slot="label">Avatar</translate>
+            </attachment-input>
         </div>
       </section>
 
@@ -90,8 +81,7 @@
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button
-            color="yellow"
-            :class="['ui', {'loading': isLoading}, 'button']"
+            :class="['ui', {'loading': isLoading}, 'yellow', 'button']"
             :action="submitPassword">
             <translate translate-context="Content/Settings/Button.Label">Change password</translate>
             <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Change your password?</translate></p>
@@ -188,7 +178,7 @@
               </td>
               <td>
                 <dangerous-button
-                  class="ui tiny basic button"
+                  class="ui tiny basic red button"
                   @confirm="revokeApp(app.client_id)">
                   <translate translate-context="*/*/*/Verb">Revoke</translate>
                   <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Revoke access for application "%{ application }"?</p>
@@ -247,7 +237,7 @@
                   <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                 </router-link>
                 <dangerous-button
-                  class="ui tiny basic button"
+                  class="ui tiny basic red button"
                   @confirm="deleteApp(app.client_id)">
                   <translate translate-context="*/*/*/Verb">Delete</translate>
                   <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Delete application "%{ application }"?</p>
@@ -293,7 +283,7 @@
             <password-input required v-model="password" />
           </div>
           <dangerous-button
-            :class="['ui', {'loading': isDeletingAccount}, {disabled: !password}, 'button']"
+            :class="['ui', {'loading': isDeletingAccount}, {disabled: !password}, 'red', 'button']"
             :action="deleteAccount">
             <translate translate-context="*/*/Button.Label">Delete my account…</translate>
             <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Do you want to delete your account?</translate></p>
@@ -315,12 +305,14 @@ import logger from "@/logging"
 import PasswordInput from "@/components/forms/PasswordInput"
 import SubsonicTokenForm from "@/components/auth/SubsonicTokenForm"
 import TranslationsMixin from "@/components/mixins/Translations"
+import AttachmentInput from '@/components/common/AttachmentInput'
 
 export default {
   mixins: [TranslationsMixin],
   components: {
     PasswordInput,
-    SubsonicTokenForm
+    SubsonicTokenForm,
+    AttachmentInput
   },
   data() {
     let d = {
@@ -328,7 +320,7 @@ export default {
       // properties that will be used in it
       old_password: "",
       new_password: "",
-      currentAvatar: this.$store.state.auth.profile.avatar,
+      avatar: {...(this.$store.state.auth.profile.avatar || {uuid: null})},
       passwordError: "",
       password: "",
       isLoading: false,
@@ -336,14 +328,17 @@ export default {
       isDeletingAccount: false,
       accountDeleteErrors: [],
       avatarErrors: [],
-      avatar: null,
       apps: [],
       ownedApps: [],
       settings: {
         success: false,
         errors: [],
-        order: ["privacy_level"],
+        order: ["summary", "privacy_level"],
         fields: {
+          summary: {
+            type: "content",
+            initial: this.$store.state.auth.profile.summary || {text: '', content_type: 'text/markdown'},
+          },
           privacy_level: {
             type: "dropdown",
             initial: this.$store.state.auth.profile.privacy_level,
@@ -352,6 +347,7 @@ export default {
         }
       }
     }
+    d.initialAvatar = d.avatar.uuid
     d.settings.order.forEach(id => {
       d.settings.fields[id].value = d.settings.fields[id].initial
       d.settings.fields[id].id = id
@@ -437,44 +433,17 @@ export default {
         }
       )
     },
-    submitAvatar() {
+    submitAvatar(uuid) {
       this.isLoadingAvatar = true
       this.avatarErrors = []
       let self = this
-      this.avatar = this.$refs.avatar.files[0]
-      let formData = new FormData()
-      formData.append("avatar", this.avatar)
       axios
-        .patch(`users/users/${this.$store.state.auth.username}/`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        })
+        .patch(`users/users/${this.$store.state.auth.username}/`, {avatar: uuid})
         .then(
           response => {
             this.isLoadingAvatar = false
-            self.currentAvatar = response.data.avatar
-            self.$store.commit("auth/avatar", self.currentAvatar)
-          },
-          error => {
-            self.isLoadingAvatar = false
-            self.avatarErrors = error.backendErrors
-          }
-        )
-    },
-    removeAvatar() {
-      this.isLoadingAvatar = true
-      let self = this
-      this.avatar = null
-      axios
-        .patch(`users/users/${this.$store.state.auth.username}/`, {
-          avatar: null
-        })
-        .then(
-          response => {
-            this.isLoadingAvatar = false
-            self.currentAvatar = {}
-            self.$store.commit("auth/avatar", self.currentAvatar)
+            self.avatar = response.data.avatar
+            self.$store.commit("auth/avatar", response.data.avatar)
           },
           error => {
             self.isLoadingAvatar = false
@@ -496,7 +465,7 @@ export default {
         response => {
           logger.default.info("Password successfully changed")
           self.$router.push({
-            name: "profile",
+            name: "profile.overview",
             params: {
               username: self.$store.state.auth.username
             }
@@ -556,6 +525,9 @@ export default {
       this.settings.order.forEach(setting => {
         let conf = self.settings.fields[setting]
         s[setting] = conf.value
+        if (setting === 'summary' && !conf.value.text) {
+          s[setting] = null
+        }
       })
       return s
     }

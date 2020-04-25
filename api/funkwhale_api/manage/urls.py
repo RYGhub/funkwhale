@@ -18,6 +18,7 @@ moderation_router.register(
     r"instance-policies", views.ManageInstancePolicyViewSet, "instance-policies"
 )
 moderation_router.register(r"reports", views.ManageReportViewSet, "reports")
+moderation_router.register(r"requests", views.ManageUserRequestViewSet, "requests")
 moderation_router.register(r"notes", views.ManageNoteViewSet, "notes")
 
 users_router = routers.OptionalSlashRouter()
@@ -26,6 +27,7 @@ users_router.register(r"invitations", views.ManageInvitationViewSet, "invitation
 
 other_router = routers.OptionalSlashRouter()
 other_router.register(r"accounts", views.ManageActorViewSet, "accounts")
+other_router.register(r"channels", views.ManageChannelViewSet, "channels")
 other_router.register(r"tags", views.ManageTagViewSet, "tags")
 
 urlpatterns = [

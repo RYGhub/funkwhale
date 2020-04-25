@@ -21,8 +21,8 @@
       <h2>
         <translate translate-context="Content/Artist/Title">Albums by this artist</translate>
       </h2>
-      <div class="ui cards">
-        <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in allAlbums"></album-card>
+      <div class="ui cards app-cards">
+        <album-card :album="album" :key="album.id" v-for="album in allAlbums"></album-card>
       </div>
       <div class="ui hidden divider"></div>
       <button :class="['ui', {loading: isLoadingMoreAlbums}, 'button']" v-if="nextAlbumsUrl && loadMoreAlbumsUrl" @click="loadMoreAlbums(loadMoreAlbumsUrl)">
@@ -50,7 +50,6 @@
 import _ from "@/lodash"
 import axios from "axios"
 import logger from "@/logging"
-import backend from "@/audio/backend"
 import AlbumCard from "@/components/audio/album/Card"
 import TrackTable from "@/components/audio/track/Table"
 import LibraryWidget from "@/components/federation/LibraryWidget"

@@ -5,6 +5,7 @@ from django_filters import rest_framework as filters
 
 USER_FILTER_CONFIG = {
     "ARTIST": {"target_artist": ["pk"]},
+    "CHANNEL": {"target_artist": ["artist__pk"]},
     "ALBUM": {"target_artist": ["artist__pk"]},
     "TRACK": {"target_artist": ["artist__pk", "album__artist__pk"]},
     "LISTENING": {"target_artist": ["track__album__artist__pk", "track__artist__pk"]},

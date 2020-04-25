@@ -7,14 +7,12 @@ export default {
     tracks: [],
     currentIndex: -1,
     ended: true,
-    previousQueue: null
   },
   mutations: {
     reset (state) {
       state.tracks = []
       state.currentIndex = -1
       state.ended = true
-      state.previousQueue = null
     },
     currentIndex (state, value) {
       state.currentIndex = value
@@ -55,6 +53,9 @@ export default {
     },
     hasNext: state => {
       return state.currentIndex < state.tracks.length - 1
+    },
+    hasPrevious: state => {
+      return state.currentIndex > 0 && state.tracks.length > 1
     },
     isEmpty: state => state.tracks.length === 0
   },
@@ -139,7 +140,6 @@ export default {
     currentIndex ({commit, state, rootState, dispatch}, index) {
       commit('ended', false)
       commit('player/currentTime', 0, {root: true})
-      commit('player/playing', true, {root: true})
       commit('currentIndex', index)
       if (state.tracks.length - index <= 2 && rootState.radios.running) {
         dispatch('radios/populateQueue', null, {root: true})

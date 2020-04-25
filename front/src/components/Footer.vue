@@ -3,8 +3,11 @@
     <div class="ui container">
       <div class="ui stackable equal height stackable grid">
         <section class="four wide column">
-          <h4 class="ui header">
-            <translate translate-context="Footer/About/Title" :translate-params="{instanceName: instanceHostname}" >About %{instanceName}</translate>
+          <h4 v-if="podName" class="ui header ellipsis">
+            <translate translate-context="Footer/About/Title" :translate-params="{instanceName: podName}" >About %{instanceName}</translate>
+          </h4>
+          <h4 v-else class="ui header ellipsis">
+            <translate translate-context="Footer/About/Title" :translate-params="{instanceUrl: instanceHostname}" >About %{instanceUrl}</translate>
           </h4>
           <div class="ui link list">
             <router-link class="item" to="/about">
@@ -71,13 +74,18 @@
 import Vue from "vue"
 import { mapState } from "vuex"
 import axios from 'axios'
+import _ from '@/lodash'
 
 export default {
   props: ["version"],
   computed: {
     ...mapState({
-      messages: state => state.ui.messages
+      messages: state => state.ui.messages,
+      nodeinfo: state => state.instance.nodeinfo,
     }),
+    podName() {
+      return _.get(this.nodeinfo, 'metadata.nodeName')
+    },
     instanceHostname() {
       let url = this.$store.state.instance.instanceUrl
       let parser = document.createElement("a")

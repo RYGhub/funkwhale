@@ -1,5 +1,7 @@
 import pytest
 
+from django.urls import reverse
+
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
@@ -10,6 +12,7 @@ from funkwhale_api.music import utils as music_utils
 def test_nodeinfo_dump(preferences, mocker, avatar):
     preferences["instance__banner"] = avatar
     preferences["instance__nodeinfo_stats_enabled"] = True
+    preferences["common__api_authentication_required"] = False
     preferences["moderation__unauthenticated_report_types"] = [
         "takedown_request",
         "other",
@@ -24,6 +27,7 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
         "track_favorites": 5,
         "music_duration": 6,
         "listenings": 7,
+        "downloads": 42,
     }
     mocker.patch("funkwhale_api.instance.stats.get", return_value=stats)
 
@@ -47,9 +51,6 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
             "banner": federation_utils.full_url(preferences["instance__banner"].url),
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
-                "federationNeedsApproval": preferences[
-                    "federation__music_needs_approval"
-                ],
                 "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
@@ -61,6 +62,7 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
             "usage": {
                 "favorites": {"tracks": {"total": stats["track_favorites"]}},
                 "listenings": {"total": stats["listenings"]},
+                "downloads": {"total": stats["downloads"]},
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
             "allowList": {"enabled": False, "domains": None},
@@ -91,6 +93,9 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
                 "instance__funkwhale_support_message_enabled"
             ],
             "instanceSupportMessage": preferences["instance__support_message"],
+            "knownNodesListUrl": federation_utils.full_url(
+                reverse("api:v1:federation:domains-list")
+            ),
         },
     }
     assert nodeinfo.get() == expected
@@ -123,9 +128,6 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "banner": None,
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
-                "federationNeedsApproval": preferences[
-                    "federation__music_needs_approval"
-                ],
                 "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
@@ -159,6 +161,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 "instance__funkwhale_support_message_enabled"
             ],
             "instanceSupportMessage": preferences["instance__support_message"],
+            "knownNodesListUrl": None,
         },
     }
     assert nodeinfo.get() == expected

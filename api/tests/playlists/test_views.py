@@ -25,6 +25,18 @@ def test_serializer_includes_tracks_count(factories, logged_in_api_client):
     assert response.data["tracks_count"] == 1
 
 
+def test_serializer_includes_tracks_count_986(factories, logged_in_api_client):
+    playlist = factories["playlists.Playlist"]()
+    plt = factories["playlists.PlaylistTrack"](playlist=playlist)
+    factories["music.Upload"].create_batch(
+        3, track=plt.track, library__privacy_level="everyone", import_status="finished"
+    )
+    url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
+    response = logged_in_api_client.get(url)
+
+    assert response.data["tracks_count"] == 1
+
+
 def test_serializer_includes_is_playable(factories, logged_in_api_client):
     playlist = factories["playlists.Playlist"]()
     factories["playlists.PlaylistTrack"](playlist=playlist)

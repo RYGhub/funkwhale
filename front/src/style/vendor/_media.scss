@@ -31,6 +31,9 @@
 /// @example scss - Creates a single breakpoint with the label `phone`
 ///  $breakpoints: ('phone': 320px);
 ///
+
+// IMPORTANT: if you modify these breakpoints, also modify the values in
+// store/ui.js#windowSize
 $breakpoints: (
   'phone': 320px,
   'tablet': 768px,

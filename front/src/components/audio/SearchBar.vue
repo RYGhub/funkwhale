@@ -1,7 +1,7 @@
 <template>
   <div class="ui fluid category search">
     <slot></slot><div class="ui icon input">
-      <input class="prompt" ref="search" name="search" :placeholder="labels.placeholder" type="text" @keydown.esc="$event.target.blur()">
+      <input ref="search" class="prompt" name="search" :placeholder="labels.placeholder" type="text" @keydown.esc="$event.target.blur()">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
@@ -15,6 +15,7 @@
 <script>
 import jQuery from 'jquery'
 import router from '@/router'
+import lodash from '@/lodash'
 import GlobalEvents from "@/components/utils/global-events"
 
 export default {
@@ -49,12 +50,20 @@ export default {
     jQuery(this.$el).search({
       type: 'category',
       minCharacters: 3,
+      showNoResults: true,
+      error: {
+        noResultsHeader: this.$pgettext('Sidebar/Search/Error', 'No matches found'),
+        noResults: this.$pgettext('Sidebar/Search/Error.Label', 'Sorry, there are no results for this search')
+      },
       onSelect (result, response) {
+        jQuery(self.$el).search("set value", searchQuery)
         router.push(result.routerUrl)
+        jQuery(self.$el).search("hide results")
+        return false
       },
       onSearchQuery (query) {
         self.$emit('search')
-        searchQuery = query;
+        searchQuery = query
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
@@ -65,8 +74,18 @@ export default {
           return xhrObject
         },
         onResponse: function (initialResponse) {
-          var results = {}
+          let objId = self.extractObjId(searchQuery)
+          let results = {}
+          let isEmptyResults = true
           let categories = [
+            {
+              code: 'federation',
+              name: self.$pgettext('*/*/*', 'Federation'),
+            },
+            {
+              code: 'podcasts',
+              name: self.$pgettext('*/*/*', 'Podcasts'),
+            },
             {
               code: 'artists',
               route: 'library.artists.detail',
@@ -103,7 +122,11 @@ export default {
                 return r.title
               },
               getDescription (r) {
-                return `${r.album.artist.name} - ${r.album.title}`
+                if (r.album) {
+                  return `${r.album.artist.name} - ${r.album.title}`
+                } else {
+                  return r.artist.name
+                }
               },
               getId (t) {
                 return t.id
@@ -129,22 +152,65 @@ export default {
               name: category.name,
               results: []
             }
-            initialResponse[category.code].forEach(result => {
-              let id = category.getId(result)
-              results[category.code].results.push({
-                title: category.getTitle(result),
-                id,
-                routerUrl: {
-                  name: category.route,
-                  params: {
-                    id
-                  }
-                },
-                description: category.getDescription(result)
+            if (category.code === 'federation') {
+
+              if (objId) {
+                isEmptyResults = false
+                let searchMessage = self.$pgettext('Search/*/*', 'Search on the fediverse')
+                results['federation'] = {
+                  name: self.$pgettext('*/*/*', 'Federation'),
+                  results: [{
+                    title: searchMessage,
+                    routerUrl: {
+                      name: 'search',
+                      query: {
+                        id: objId,
+                      }
+                    }
+                  }]
+                }
+              }
+            }
+            else if (category.code === 'podcasts') {
+              if (objId) {
+                isEmptyResults = false
+                let searchMessage = self.$pgettext('Search/*/*', 'Subscribe to podcast via RSS')
+                results['podcasts'] = {
+                  name: self.$pgettext('*/*/*', 'Podcasts'),
+                  results: [{
+                    title: searchMessage,
+                    routerUrl: {
+                      name: 'search',
+                      query: {
+                        id: objId,
+                        type: "rss"
+                      }
+                    }
+                  }]
+                }
+              }
+            }
+            else {
+              initialResponse[category.code].forEach(result => {
+                isEmptyResults = false
+                let id = category.getId(result)
+                results[category.code].results.push({
+                  title: category.getTitle(result),
+                  id,
+                  routerUrl: {
+                    name: category.route,
+                    params: {
+                      id
+                    }
+                  },
+                  description: category.getDescription(result)
+                })
               })
-            })
+            }
           })
-          return {results: results}
+          return {
+            results: isEmptyResults ? {} : results
+          }
         },
         url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }
@@ -154,6 +220,19 @@ export default {
     focusSearch () {
       this.$refs.search.focus()
     },
+    extractObjId (query) {
+      query = lodash.trim(query)
+      query = lodash.trim(query, '@')
+      if (query.indexOf(' ') > -1) {
+        return
+      }
+      if (query.startsWith('http://') || query.startsWith('https://')) {
+        return query
+      }
+      if (query.split('@').length > 1) {
+        return query
+      }
+    }
   }
 }
 </script>

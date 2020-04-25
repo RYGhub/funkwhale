@@ -5,10 +5,6 @@
     </h3>
     <p v-if="!isLoading && libraries.length > 0" class="ui subtitle"><slot name="subtitle"></slot></p>
     <p v-if="!isLoading && libraries.length === 0" class="ui subtitle"><translate translate-context="Content/Federation/Paragraph">No matching library.</translate></p>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'angle left', 'icon']">
-    </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'angle right', 'icon']">
-    </i>
     <div class="ui hidden divider"></div>
     <div class="ui cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -16,12 +12,18 @@
       </div>
       <library-card
         :display-scan="false"
-        :display-follow="$store.state.auth.authenticated"
+        :display-follow="$store.state.auth.authenticated && library.actor.full_username != $store.state.auth.fullUsername"
         :library="library"
         :display-copy-fid="true"
         v-for="library in libraries"
         :key="library.uuid"></library-card>
     </div>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
@@ -48,20 +50,20 @@ export default {
     }
   },
   created () {
-    this.fetchData()
+    this.fetchData(this.url)
   },
   methods: {
-    fetchData () {
+    fetchData (url) {
       this.isLoading = true
       let self = this
       let params = _.clone({})
       params.page_size = this.limit
       params.offset = this.offset
-      axios.get(this.url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.libraries = response.data.results
+        self.libraries = [...self.libraries, ...response.data.results]
         self.$emit('loaded', self.libraries)
       }, error => {
         self.isLoading = false

@@ -1,5 +1,6 @@
 <template>
-  <span :style="defaultAvatarStyle" class="ui avatar circular label">{{ actor.preferred_username[0]}}</span>
+  <img v-if="actor.icon && actor.icon.original" :src="actor.icon.small_square_crop" class="ui avatar circular image" />
+  <span v-else :style="defaultAvatarStyle" class="ui avatar circular label">{{ actor.preferred_username[0]}}</span>
 </template>
 
 <script>
@@ -19,3 +20,10 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.ui.circular.avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 1em !important;
+}
+</style>

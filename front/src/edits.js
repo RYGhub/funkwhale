@@ -5,8 +5,33 @@ function getTagsValueRepr (val) {
   return val.slice().sort().join('\n')
 }
 
+function getContentValueRepr (val) {
+  return val.text
+}
+
 export default {
   getConfigs () {
+    const description = {
+      id: 'description',
+      type: 'content',
+      required: true,
+      label: this.$pgettext('*/*/*/Noun', 'Description'),
+      getValue: (obj) => { return obj.description || {text: null, content_type: 'text/markdown'}},
+      getValueRepr: getContentValueRepr
+    }
+    const cover = {
+      id: 'cover',
+      type: 'attachment',
+      required: false,
+      label: this.$pgettext('Content/*/*/Noun', 'Cover'),
+      getValue: (obj) => {
+        if (obj.cover) {
+          return obj.cover.uuid
+        } else {
+          return null
+        }
+      }
+    }
     return {
       artist: {
         fields: [
@@ -17,6 +42,8 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Name'),
             getValue: (obj) => { return obj.name }
           },
+          description,
+          cover,
           {
             id: 'tags',
             type: 'tags',
@@ -24,7 +51,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Tags'),
             getValue: (obj) => { return obj.tags },
             getValueRepr: getTagsValueRepr
-          }
+          },
         ]
       },
       album: {
@@ -36,6 +63,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
+          description,
           {
             id: 'release_date',
             type: 'text',
@@ -43,6 +71,7 @@ export default {
             label: this.$pgettext('Content/*/*/Noun', 'Release date'),
             getValue: (obj) => { return obj.release_date }
           },
+          cover,
           {
             id: 'tags',
             type: 'tags',
@@ -62,6 +91,8 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
+          description,
+          cover,
           {
             id: 'position',
             type: 'text',

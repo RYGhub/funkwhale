@@ -187,14 +187,6 @@ def test_track_get_file_size_in_place(factories):
     assert upload.get_file_size() == 297745
 
 
-def test_album_get_image_content(factories):
-    album = factories["music.Album"]()
-    album.get_image(data={"content": b"test", "mimetype": "image/jpeg"})
-    album.refresh_from_db()
-
-    assert album.cover.read() == b"test"
-
-
 def test_library(factories):
     now = timezone.now()
     actor = factories["federation.Actor"]()
@@ -435,6 +427,13 @@ def test_upload_listen_url(factories):
     expected = upload.track.listen_url + "?upload={}".format(upload.uuid)
 
     assert upload.listen_url == expected
+
+
+def test_upload_listen_url_no_download(factories):
+    upload = factories["music.Upload"]()
+    expected = upload.track.listen_url + "?upload={}&download=false".format(upload.uuid)
+
+    assert upload.listen_url_no_download == expected
 
 
 def test_library_schedule_scan(factories, now, mocker):

@@ -1,35 +1,33 @@
 <template>
   <div v-if="object">
-    <template v-if="discs && discs.length > 1">
-      <section v-for="(tracks, disc_number) in discs" class="ui vertical stripe segment">
+    <h2 class="ui header">
+      <translate key="1" v-if="isSerie" translate-context="Content/Channels/*">Episodes</translate>
+      <translate key="2" v-else translate-context="*/*/*">Tracks</translate>
+    </h2>
+    <channel-entries v-if="artist.channel && isSerie" :limit="50" :filters="{channel: artist.channel.uuid, ordering: '-creation_date'}">
+    </channel-entries>
+    <template v-else-if="discs && discs.length > 1">
+      <div v-for="(tracks, discNumber) in discs" :key="discNumber">
+        <div class="ui hidden divider"></div>
         <translate
-          tag="h2"
-          class="left floated"
-          :translate-params="{number: disc_number + 1}"
+          tag="h3"
+          :translate-params="{number: discNumber + 1}"
           translate-context="Content/Album/"
         >Volume %{ number }</translate>
-        <play-button class="right floated orange" :tracks="tracks">
-          <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
-        </play-button>
-        <track-table :artist="object.artist" :display-position="true" :tracks="tracks"></track-table>
-      </section>
+        <album-entries :tracks="tracks"></album-entries>
+      </div>
     </template>
     <template v-else>
-      <section class="ui vertical stripe segment">
-        <h2>
-          <translate translate-context="*/*/*">Tracks</translate>
-        </h2>
-        <track-table v-if="object" :artist="object.artist" :display-position="true" :tracks="object.tracks"></track-table>
-      </section>
+      <album-entries :tracks="object.tracks"></album-entries>
     </template>
-    <section class="ui vertical stripe segment">
+    <template v-if="!artist.channel && !isSerie">
       <h2>
         <translate translate-context="Content/*/Title/Noun">User libraries</translate>
       </h2>
       <library-widget @loaded="$emit('libraries-loaded', $event)" :url="'albums/' + object.id + '/libraries/'">
         <translate slot="subtitle" translate-context="Content/Album/Paragraph">This album is present in the following libraries:</translate>
       </library-widget>
-    </section>
+    </template>
   </div>
 </template>
 
@@ -41,11 +39,15 @@ import url from "@/utils/url"
 import logger from "@/logging"
 import LibraryWidget from "@/components/federation/LibraryWidget"
 import TrackTable from "@/components/audio/track/Table"
+import ChannelEntries from '@/components/audio/ChannelEntries'
+import AlbumEntries from '@/components/audio/AlbumEntries'
 
 export default {
-  props: ["object", "libraries", "discs"],
+  props: ["object", "libraries", "discs", "isSerie", "artist"],
   components: {
     LibraryWidget,
+    AlbumEntries,
+    ChannelEntries,
     TrackTable
   },
   data() {

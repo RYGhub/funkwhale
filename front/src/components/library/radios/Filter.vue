@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="actions">
-          <div class="ui black deny button">
+          <div class="ui basic black deny button">
             <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
           </div>
         </div>

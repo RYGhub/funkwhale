@@ -1,4 +1,8 @@
+import json
+
 from django.urls import reverse
+
+from funkwhale_api.federation import utils as federation_utils
 
 
 def test_nodeinfo_endpoint(db, api_client, mocker):
@@ -10,14 +14,6 @@ def test_nodeinfo_endpoint(db, api_client, mocker):
     assert response.status_code == 200
     assert response["Content-Type"] == ct
     assert response.data == payload
-
-
-def test_nodeinfo_endpoint_disabled(db, api_client, preferences):
-    preferences["instance__nodeinfo_enabled"] = False
-    url = reverse("api:v1:instance:nodeinfo-2.0")
-    response = api_client.get(url)
-
-    assert response.status_code == 404
 
 
 def test_settings_only_list_public_settings(db, api_client, preferences):
@@ -45,3 +41,26 @@ def test_admin_settings_correct_permission(db, logged_in_api_client, preferences
 
     assert response.status_code == 200
     assert len(response.data) == len(preferences.all())
+
+
+def test_manifest_endpoint(api_client, mocker, preferences, tmp_path, settings):
+    settings.FUNKWHALE_SPA_HTML_ROOT = str(tmp_path / "index.html")
+    preferences["instance__name"] = "Test pod"
+    preferences["instance__short_description"] = "Test description"
+    base_payload = {
+        "foo": "bar",
+    }
+    manifest = tmp_path / "manifest.json"
+    expected = {
+        "foo": "bar",
+        "name": "Test pod",
+        "short_name": "Test pod",
+        "description": "Test description",
+        "start_url": federation_utils.full_url("/"),
+    }
+    manifest.write_bytes(json.dumps(base_payload).encode())
+
+    url = reverse("api:v1:instance:spa-manifest")
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert response.data == expected

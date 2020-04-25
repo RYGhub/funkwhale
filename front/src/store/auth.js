@@ -22,7 +22,9 @@ export default {
   },
   getters: {
     header: state => {
-      return 'JWT ' + state.token
+      if (state.token) {
+        return 'JWT ' + state.token
+      }
     }
   },
   mutations: {
@@ -138,8 +140,11 @@ export default {
           }
           if (response.data.permissions.moderation) {
             dispatch('ui/fetchPendingReviewReports', null, { root: true })
+            dispatch('ui/fetchPendingReviewRequests', null, { root: true })
           }
           dispatch('favorites/fetch', null, { root: true })
+          dispatch('channels/fetchSubscriptions', null, { root: true })
+          dispatch('libraries/fetchFollows', null, { root: true })
           dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })
         }, (response) => {

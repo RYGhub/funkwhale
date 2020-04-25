@@ -10,15 +10,14 @@ def test_get_ident_anonymous(api_request):
 
     expected = {"id": ip, "type": "anonymous"}
 
-    assert throttling.get_ident(request) == expected
+    assert throttling.get_ident(None, request) == expected
 
 
 def test_get_ident_authenticated(api_request, factories):
     user = factories["users.User"]()
     request = api_request.get("/")
-    setattr(request, "user", user)
     expected = {"id": user.pk, "type": "authenticated"}
-    assert throttling.get_ident(request) == expected
+    assert throttling.get_ident(user, request) == expected
 
 
 @pytest.mark.parametrize(

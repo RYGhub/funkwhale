@@ -1,7 +1,12 @@
+import html.parser
 import unicodedata
+import urllib.parse
 import re
+
+from django.apps import apps
 from django.conf import settings
-from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import CharField, Q, Value
 
 from funkwhale_api.common import session
 from funkwhale_api.moderation import mrf
@@ -84,8 +89,6 @@ def retrieve_ap_object(
     response = session.get_session().get(
         fid,
         auth=auth,
-        timeout=5,
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         headers={
             "Accept": "application/activity+json",
             "Content-Type": "application/activity+json",
@@ -104,7 +107,10 @@ def retrieve_ap_object(
         return data
     serializer = serializer_class(data=data, context={"fetch_actor": actor})
     serializer.is_valid(raise_exception=True)
-    return serializer.save()
+    try:
+        return serializer.save()
+    except NotImplementedError:
+        return serializer.validated_data
 
 
 def get_domain_query_from_url(domain, url_field="fid"):
@@ -118,6 +124,15 @@ def get_domain_query_from_url(domain, url_field="fid"):
         **{"{}__startswith".format(url_field): "https://{}/".format(domain)}
     )
     return query
+
+
+def local_qs(queryset, url_field="fid", include=True):
+    query = get_domain_query_from_url(
+        domain=settings.FEDERATION_HOSTNAME, url_field=url_field
+    )
+    if not include:
+        query = ~query
+    return queryset.filter(query)
 
 
 def is_local(url):
@@ -157,3 +172,123 @@ def get_actor_from_username_data_query(field, data):
                 "domain__name__iexact": data["domain"],
             }
         )
+
+
+class StopParsing(Exception):
+    pass
+
+
+class AlternateLinkParser(html.parser.HTMLParser):
+    def __init__(self, *args, **kwargs):
+        self.result = None
+        super().__init__(*args, **kwargs)
+
+    def handle_starttag(self, tag, attrs):
+        if tag != "link":
+            return
+
+        attrs_dict = dict(attrs)
+        if attrs_dict.get("rel") == "alternate" and attrs_dict.get(
+            "type", "application/activity+json"
+        ):
+            self.result = attrs_dict.get("href")
+            raise StopParsing()
+
+    def handle_endtag(self, tag):
+        if tag == "head":
+            raise StopParsing()
+
+
+def find_alternate(response_text):
+    if not response_text:
+        return
+
+    parser = AlternateLinkParser()
+    try:
+        parser.feed(response_text)
+    except StopParsing:
+        return parser.result
+
+
+def should_redirect_ap_to_html(accept_header, default=True):
+    if not accept_header:
+        return False
+
+    redirect_headers = [
+        "text/html",
+    ]
+    no_redirect_headers = [
+        "*/*",  # XXX backward compat with older Funkwhale instances that don't send the Accept header
+        "application/json",
+        "application/activity+json",
+        "application/ld+json",
+    ]
+
+    parsed_header = [ct.lower().strip() for ct in accept_header.split(",")]
+    for ct in parsed_header:
+        if ct in redirect_headers:
+            return True
+        if ct in no_redirect_headers:
+            return False
+
+    return default
+
+
+FID_MODEL_LABELS = [
+    "music.Artist",
+    "music.Album",
+    "music.Track",
+    "music.Library",
+    "music.Upload",
+    "federation.Actor",
+]
+
+
+def get_object_by_fid(fid, local=None):
+
+    if local is True:
+        parsed = urllib.parse.urlparse(fid)
+        if parsed.netloc != settings.FEDERATION_HOSTNAME:
+            raise ObjectDoesNotExist()
+
+    models = [apps.get_model(*l.split(".")) for l in FID_MODEL_LABELS]
+
+    def get_qs(model):
+        return (
+            model.objects.all()
+            .filter(fid=fid)
+            .annotate(__type=Value(model._meta.label, output_field=CharField()))
+            .values("fid", "__type")
+        )
+
+    qs = get_qs(models[0])
+    for m in models[1:]:
+        qs = qs.union(get_qs(m))
+
+    result = qs.order_by("fid").first()
+
+    if not result:
+        raise ObjectDoesNotExist()
+    model = apps.get_model(*result["__type"].split("."))
+    instance = model.objects.get(fid=fid)
+    if model._meta.label == "federation.Actor":
+        channel = instance.get_channel()
+        if channel:
+            return channel
+
+    return instance
+
+
+def can_manage(obj_owner, actor):
+    if not obj_owner:
+        return False
+
+    if not actor:
+        return False
+
+    if obj_owner == actor:
+        return True
+    if obj_owner.domain.service_actor == actor:
+        return True
+
+    return False

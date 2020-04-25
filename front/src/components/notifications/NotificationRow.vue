@@ -8,10 +8,14 @@
 
       </router-link>
       <template v-else v-html="notificationData.message"></template>
-      <template v-if="notificationData.action">&nbsp;
-        <div @click="handleAction(notificationData.action.handler)" :class="['ui', 'basic', 'tiny', notificationData.action.buttonClass || '', 'button']">
-          <i v-if="notificationData.action.icon" :class="[notificationData.action.icon, 'icon']" />
-          {{ notificationData.action.label }}
+      <template v-if="notificationData.acceptFollow">&nbsp;
+        <div @click="handleAction(notificationData.acceptFollow.handler)" :class="['ui', 'basic', 'tiny', notificationData.acceptFollow.buttonClass || '', 'button']">
+          <i v-if="notificationData.acceptFollow.icon" :class="[notificationData.acceptFollow.icon, 'icon']" />
+          {{ notificationData.acceptFollow.label }}
+        </div>
+        <div @click="handleAction(notificationData.rejectFollow.handler)" :class="['ui', 'basic', 'tiny', notificationData.rejectFollow.buttonClass || '', 'button']">
+          <i v-if="notificationData.rejectFollow.icon" :class="[notificationData.rejectFollow.icon, 'icon']" />
+          {{ notificationData.rejectFollow.label }}
         </div>
       </template>
     </td>
@@ -38,10 +42,12 @@ export default {
     labels () {
       let libraryFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } followed your library "%{ library }"')
       let libraryAcceptFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } accepted your follow on library "%{ library }"')
+      let libraryRejectMessage = this.$pgettext('Content/Notifications/Paragraph', 'You rejected %{ username }&#39;s request to follow "%{ library }"')
       let libraryPendingFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } wants to follow your library "%{ library }"')
       return {
         libraryFollowMessage,
         libraryAcceptFollowMessage,
+        libraryRejectMessage,
         libraryPendingFollowMessage,
         markRead: this.$pgettext('Content/Notifications/Button.Tooltip/Verb', 'Mark as read'),
         markUnread: this.$pgettext('Content/Notifications/Button.Tooltip/Verb', 'Mark as unread'),
@@ -56,21 +62,31 @@ export default {
       let a = this.item.activity
       if (a.type === 'Follow') {
         if (a.object && a.object.type === 'music.Library') {
-          let action = null
+          let acceptFollow = null
+          let rejectFollow = null
           let message = null
-          if (!a.related_object.approved) {
+          if (a.related_object.approved === null) {
             message = this.labels.libraryPendingFollowMessage
-            action = {
+            acceptFollow = {
               buttonClass: 'green',
               icon: 'check',
               label: this.$pgettext('Content/*/Button.Label/Verb', 'Approve'),
               handler: () => { self.approveLibraryFollow(a.related_object) }
+            },
+            rejectFollow = {
+              buttonClass: 'red',
+              icon: 'x',
+              label: this.$pgettext('Content/*/Button.Label/Verb', 'Reject'),
+              handler: () => { self.rejectLibraryFollow(a.related_object) }
             }
-          } else {
+          } else if (a.related_object.approved) {
             message = this.labels.libraryFollowMessage
+          } else {
+            message = this.labels.libraryRejectMessage
           }
           return {
-            action,
+            acceptFollow,
+            rejectFollow,
             detailUrl: {name: 'content.libraries.detail', params: {id: a.object.uuid}},
             message: this.$gettextInterpolate(
               message,
@@ -105,6 +121,14 @@ export default {
       axios.post(`federation/follows/library/${follow.uuid}/${action}/`).then((response) => {
         follow.isLoading = false
         follow.approved = true
+      })
+    },
+    rejectLibraryFollow (follow) {
+      let self = this
+      let action = 'reject'
+      axios.post(`federation/follows/library/${follow.uuid}/${action}/`).then((response) => {
+        follow.isLoading = false
+        follow.approved = false
       })
     },
     markRead (value) {

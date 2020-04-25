@@ -33,8 +33,7 @@
       </div>
       <dangerous-button
         v-if="token"
-        color="grey"
-        :class="['ui', {'loading': isLoading}, 'button']"
+        :class="['ui', {'loading': isLoading}, 'grey', 'button']"
         :action="requestNewToken">
         <translate translate-context="*/Settings/Button.Label/Verb">Request a new password</translate>
         <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Request a new Subsonic API password?</translate></p>
@@ -48,8 +47,7 @@
         @click="requestNewToken"><translate translate-context="Content/Settings/Button.Label/Verb">Request a password</translate></button>
         <dangerous-button
           v-if="token"
-          color="yellow"
-          :class="['ui', {'loading': isLoading}, 'button']"
+          :class="['ui', {'loading': isLoading}, 'yellow', 'button']"
           :action="disable">
           <translate translate-context="Content/Settings/Button.Label/Verb">Disable Subsonic access</translate>
           <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Disable Subsonic API access?</translate></p>

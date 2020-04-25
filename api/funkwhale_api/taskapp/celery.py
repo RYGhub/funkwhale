@@ -37,16 +37,22 @@ class CeleryConfig(AppConfig):
         app.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
 
 
-def require_instance(model_or_qs, parameter_name, id_kwarg_name=None):
+def require_instance(model_or_qs, parameter_name, id_kwarg_name=None, allow_null=False):
     def decorator(function):
         @functools.wraps(function)
         def inner(*args, **kwargs):
             kw = id_kwarg_name or "_".join([parameter_name, "id"])
-            pk = kwargs.pop(kw)
             try:
-                instance = model_or_qs.get(pk=pk)
-            except AttributeError:
-                instance = model_or_qs.objects.get(pk=pk)
+                pk = kwargs.pop(kw)
+            except KeyError:
+                if not allow_null:
+                    raise
+                instance = None
+            else:
+                try:
+                    instance = model_or_qs.get(pk=pk)
+                except AttributeError:
+                    instance = model_or_qs.objects.get(pk=pk)
             kwargs[parameter_name] = instance
             return function(*args, **kwargs)
 

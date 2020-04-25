@@ -2,7 +2,14 @@ import pytest
 from django.core.paginator import Paginator
 from django.urls import reverse
 
-from funkwhale_api.federation import actors, serializers, webfinger
+from funkwhale_api.common import utils
+
+from funkwhale_api.federation import (
+    actors,
+    serializers,
+    webfinger,
+    utils as federation_utils,
+)
 
 
 def test_authenticate_skips_anonymous_fetch_when_allow_list_enabled(
@@ -46,13 +53,6 @@ def test_wellknown_nodeinfo(db, preferences, api_client, settings):
     assert response.status_code == 200
     assert response["Content-Type"] == "application/jrd+json"
     assert response.data == expected
-
-
-def test_wellknown_nodeinfo_disabled(db, preferences, api_client):
-    preferences["instance__nodeinfo_enabled"] = False
-    url = reverse("federation:well-known-nodeinfo")
-    response = api_client.get(url)
-    assert response.status_code == 404
 
 
 def test_local_actor_detail(factories, api_client):
@@ -103,7 +103,9 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
 
     assert response.status_code == 200
     patched_receive.assert_called_once_with(
-        activity={"hello": "world"}, on_behalf_of=authenticated_actor
+        activity={"hello": "world"},
+        on_behalf_of=authenticated_actor,
+        inbox_actor=user.actor,
     )
 
 
@@ -164,7 +166,7 @@ def test_wellknown_webfinger_local(factories, api_client, settings, mocker):
 
 @pytest.mark.parametrize("privacy_level", ["me", "instance", "everyone"])
 def test_music_library_retrieve(factories, api_client, privacy_level):
-    library = factories["music.Library"](privacy_level=privacy_level)
+    library = factories["music.Library"](privacy_level=privacy_level, actor__local=True)
     expected = serializers.LibrarySerializer(library).data
 
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
@@ -174,8 +176,30 @@ def test_music_library_retrieve(factories, api_client, privacy_level):
     assert response.data == expected
 
 
+def test_music_library_retrieve_excludes_channel_libraries(factories, api_client):
+    channel = factories["audio.Channel"](local=True)
+    library = channel.library
+
+    url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+def test_actor_retrieve_excludes_channel_with_private_library(factories, api_client):
+    channel = factories["audio.Channel"](external=True, library__privacy_level="me")
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
 def test_music_library_retrieve_page_public(factories, api_client):
-    library = factories["music.Library"](privacy_level="everyone")
+    library = factories["music.Library"](privacy_level="everyone", actor__local=True)
     upload = factories["music.Upload"](library=library, import_status="finished")
     id = library.get_federation_id()
     expected = serializers.CollectionPageSerializer(
@@ -196,9 +220,72 @@ def test_music_library_retrieve_page_public(factories, api_client):
     assert response.data == expected
 
 
+def test_channel_outbox_retrieve(factories, api_client):
+    channel = factories["audio.Channel"](actor__local=True)
+    expected = serializers.ChannelOutboxSerializer(channel).data
+
+    url = reverse(
+        "federation:actors-outbox",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_outbox_retrieve_page(factories, api_client):
+    channel = factories["audio.Channel"](actor__local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse(
+        "federation:actors-outbox",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+
+    expected = serializers.CollectionPageSerializer(
+        {
+            "id": channel.actor.outbox_url,
+            "item_serializer": serializers.ChannelCreateUploadSerializer,
+            "actor": channel.actor,
+            "page": Paginator([upload], 1).page(1),
+        }
+    ).data
+
+    response = api_client.get(url, {"page": 1})
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_upload_retrieve(factories, api_client):
+    channel = factories["audio.Channel"](local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
+
+    expected = serializers.ChannelUploadSerializer(upload).data
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_upload_retrieve_activity(factories, api_client):
+    channel = factories["audio.Channel"](local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse("federation:music:uploads-activity", kwargs={"uuid": upload.uuid})
+
+    expected = serializers.ChannelCreateUploadSerializer(upload).data
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
 @pytest.mark.parametrize("privacy_level", ["me", "instance"])
 def test_music_library_retrieve_page_private(factories, api_client, privacy_level):
-    library = factories["music.Library"](privacy_level=privacy_level)
+    library = factories["music.Library"](privacy_level=privacy_level, actor__local=True)
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
     response = api_client.get(url, {"page": 1})
 
@@ -209,7 +296,7 @@ def test_music_library_retrieve_page_private(factories, api_client, privacy_leve
 def test_music_library_retrieve_page_follow(
     factories, api_client, authenticated_actor, approved, expected
 ):
-    library = factories["music.Library"](privacy_level="me")
+    library = factories["music.Library"](privacy_level="me", actor__local=True)
     factories["federation.LibraryFollow"](
         actor=authenticated_actor, target=library, approved=approved
     )
@@ -289,3 +376,144 @@ def test_music_upload_detail_private_approved_follow(
     response = api_client.get(url)
 
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "accept_header,default,expected",
+    [
+        ("text/html,application/xhtml+xml", True, True),
+        ("text/html,application/json", True, True),
+        ("", True, False),
+        (
+            "*/*",
+            True,
+            False,
+        ),  # XXX: compat with older versions of Funkwhale that miss the Accept header
+        (None, True, False),
+        ("application/json", True, False),
+        ("application/activity+json", True, False),
+        ("application/json,text/html", True, False),
+        ("application/activity+json,text/html", True, False),
+        ("unrelated/ct", True, True),
+        ("unrelated/ct", False, False),
+    ],
+)
+def test_should_redirect_ap_to_html(accept_header, default, expected):
+    assert (
+        federation_utils.should_redirect_ap_to_html(accept_header, default) is expected
+    )
+
+
+def test_music_library_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    library = factories["music.Library"](actor__local=True)
+
+    url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_library", kwargs={"uuid": library.uuid}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    actor = factories["federation.Actor"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "actor_detail", kwargs={"username": actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_channel_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    channel = factories["audio.Channel"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "channel_detail", kwargs={"username": channel.actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_upload_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    upload = factories["music.Upload"](library__local=True, playable=True)
+
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_track", kwargs={"pk": upload.track.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_track_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    track = factories["music.Track"](local=True)
+
+    url = reverse("federation:music:tracks-detail", kwargs={"uuid": track.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_track", kwargs={"pk": track.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_album_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    album = factories["music.Album"](local=True)
+
+    url = reverse("federation:music:albums-detail", kwargs={"uuid": album.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_album", kwargs={"pk": album.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_artist_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    artist = factories["music.Artist"](local=True)
+
+    url = reverse("federation:music:artists-detail", kwargs={"uuid": artist.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_artist", kwargs={"pk": artist.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url

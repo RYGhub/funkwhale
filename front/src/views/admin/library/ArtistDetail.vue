@@ -9,7 +9,8 @@
           <div class="ui column">
             <div class="segment-content">
               <h2 class="ui header">
-                <i class="circular inverted user icon"></i>
+                <img v-if="object.cover && object.cover.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+                <img v-else src="../../../assets/audio/default-cover.png">
                 <div class="content">
                   {{ object.name | truncate(100) }}
                   <div class="sub header">
@@ -72,7 +73,7 @@
                 </div>
                 <div class="ui buttons">
                   <dangerous-button
-                    :class="['ui', {loading: isLoading}, 'basic button']"
+                    :class="['ui', {loading: isLoading}, 'basic red button']"
                     :action="remove">
                     <translate translate-context="*/*/*/Verb">Delete</translate>
                     <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this artist?</translate></p>
@@ -107,6 +108,16 @@
                       {{ object.name }}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('category', object.content_category) }}">
+                        <translate translate-context="*/*/*">Category</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ object.content_category }}
+                    </td>
+                  </tr>
                   <tr v-if="!object.is_local">
                     <td>
                       <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
@@ -116,6 +127,12 @@
                     <td>
                       {{ object.domain }}
                     </td>
+                  </tr>
+                  <tr v-if="object.description">
+                    <td>
+                      <translate translate-context="'*/*/*/Noun">Description</translate>
+                    </td>
+                    <td v-html="object.description.html"></td>
                   </tr>
                 </tbody>
               </table>
@@ -258,7 +275,7 @@
                       </router-link>
                     </td>
                     <td>
-                      {{ object.albums.length }}
+                      {{ object.albums_count }}
                     </td>
                   </tr>
                   <tr>
@@ -268,7 +285,7 @@
                       </router-link>
                     </td>
                     <td>
-                      {{ object.tracks.length }}
+                      {{ object.tracks_count }}
                     </td>
                   </tr>
                 </tbody>
@@ -314,8 +331,12 @@ export default {
       this.isLoading = true
       let url = `manage/library/artists/${this.id}/`
       axios.get(url).then(response => {
-        self.object = response.data
-        self.isLoading = false
+        if (response.data.channel) {
+          self.$router.push({name: "manage.channels.detail", params: {id: response.data.channel}})
+        } else {
+          self.object = response.data
+          self.isLoading = false
+        }
       })
     },
     fetchStats() {

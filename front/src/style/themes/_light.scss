@@ -11,9 +11,15 @@
       }
     }
   }
+  .main.with-background, .opaque {
+    background-color: white;
+  }
 
   .discrete {
     color: rgba(0, 0, 0, 0.87);
+  }
+  .really.discrete {
+    color: rgba(0, 0, 0, 0.57);
   }
   .playlist.card {
     .attached.button {
@@ -31,5 +37,16 @@
   footer#footer div.item:hover {
     color: rgba(0, 0, 0, 0.87);
   }
-
+  .ui.fixed-header.segment {
+    background-color: white;
+    box-shadow: inset 0px -1px 0px 0px rgba(34, 36, 38, 0.15);
+  }
+  .ui.fixed-footer.segment {
+    box-shadow: inset 0px 1px 0px 0px rgba(34, 36, 38, 0.15);
+  }
+  .queue.segment .queue-controls {
+    @include media("<desktop") {
+      background-color: white;
+    }
+  }
 }

@@ -9,6 +9,15 @@
           </form>
         </div>
         <div class="field">
+          <label><translate translate-context="*/*/*">Category</translate></label>
+          <select class="ui dropdown" @change="addSearchToken('category', $event.target.value)" :value="getTokenValue('category', '')">
+            <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
+            <option value="podcast">{{ sharedLabels.fields.content_category.choices.podcast }}</option>
+            <option value="music">{{ sharedLabels.fields.content_category.choices.music }}</option>
+            <option value="other">{{ sharedLabels.fields.content_category.choices.other }}</option>
+          </select>
+        </div>
+        <div class="field">
           <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
@@ -45,7 +54,9 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.library.artists.detail', params: {id: scope.obj.id }}">{{ scope.obj.name }}</router-link>
+            <router-link :to="getUrl(scope.obj)">
+              {{ scope.obj.name }}
+            </router-link>
           </td>
           <td>
             <template v-if="!scope.obj.is_local">
@@ -60,10 +71,10 @@
             </span>
           </td>
           <td>
-            {{ scope.obj.albums.length }}
+            {{ scope.obj.albums_count }}
           </td>
           <td>
-            {{ scope.obj.tracks.length }}
+            {{ scope.obj.tracks_count }}
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
@@ -136,6 +147,12 @@ export default {
     this.fetchData()
   },
   methods: {
+    getUrl (artist) {
+      if (artist.channel) {
+        return {name: 'manage.channels.detail', params: {id: artist.channel }}
+      }
+      return {name: 'manage.library.artists.detail', params: {id: artist.id }}
+    },
     fetchData () {
       let params = _.merge({
         'page': this.page,

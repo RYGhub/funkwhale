@@ -5,7 +5,7 @@ from . import models
 
 @admin.register(models.Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ["name", "mbid", "creation_date"]
+    list_display = ["name", "mbid", "creation_date", "modification_date"]
     search_fields = ["name", "mbid"]
 
 
@@ -21,6 +21,13 @@ class TrackAdmin(admin.ModelAdmin):
     list_display = ["title", "artist", "album", "mbid"]
     search_fields = ["title", "artist__name", "album__title", "mbid"]
     list_select_related = ["album__artist", "artist"]
+
+
+@admin.register(models.TrackActor)
+class TrackActorAdmin(admin.ModelAdmin):
+    list_display = ["actor", "track", "upload", "internal"]
+    search_fields = ["actor__preferred_username", "track__name"]
+    list_select_related = ["actor", "track"]
 
 
 @admin.register(models.ImportBatch)

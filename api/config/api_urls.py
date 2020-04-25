@@ -4,6 +4,7 @@ from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from funkwhale_api.activity import views as activity_views
+from funkwhale_api.audio import views as audio_views
 from funkwhale_api.common import views as common_views
 from funkwhale_api.common import routers as common_routers
 from funkwhale_api.music import views
@@ -21,6 +22,8 @@ router.register(r"uploads", views.UploadViewSet, "uploads")
 router.register(r"libraries", views.LibraryViewSet, "libraries")
 router.register(r"listen", views.ListenViewSet, "listen")
 router.register(r"artists", views.ArtistViewSet, "artists")
+router.register(r"channels", audio_views.ChannelViewSet, "channels")
+router.register(r"subscriptions", audio_views.SubscriptionsViewSet, "subscriptions")
 router.register(r"albums", views.AlbumViewSet, "albums")
 router.register(r"licenses", views.LicenseViewSet, "licenses")
 router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
@@ -28,6 +31,7 @@ router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
 )
 router.register(r"mutations", common_views.MutationViewSet, "mutations")
+router.register(r"attachments", common_views.AttachmentViewSet, "attachments")
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)
@@ -84,6 +88,9 @@ v1_patterns += [
     url(r"^token/?$", jwt_views.obtain_jwt_token, name="token"),
     url(r"^token/refresh/?$", jwt_views.refresh_jwt_token, name="token_refresh"),
     url(r"^rate-limit/?$", common_views.RateLimitView.as_view(), name="rate-limit"),
+    url(
+        r"^text-preview/?$", common_views.TextPreviewView.as_view(), name="text-preview"
+    ),
 ]
 
 urlpatterns = [

@@ -1,9 +1,12 @@
+import datetime
+
 import pytest
 
 from django.urls import reverse
 
 from funkwhale_api.federation import api_serializers
 from funkwhale_api.federation import serializers
+from funkwhale_api.federation import tasks
 from funkwhale_api.federation import views
 
 
@@ -170,7 +173,8 @@ def test_user_can_update_read_status_of_inbox_item(factories, logged_in_api_clie
 
 
 def test_can_detail_fetch(logged_in_api_client, factories):
-    fetch = factories["federation.Fetch"](url="http://test.object")
+    actor = logged_in_api_client.user.create_actor()
+    fetch = factories["federation.Fetch"](url="http://test.object", actor=actor)
     url = reverse("api:v1:federation:fetches-detail", kwargs={"pk": fetch.pk})
 
     response = logged_in_api_client.get(url)
@@ -179,3 +183,143 @@ def test_can_detail_fetch(logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_user_can_list_domains(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    allowed = factories["federation.Domain"]()
+    factories["moderation.InstancePolicy"](
+        actor=None, for_domain=True, block_all=True
+    ).target_domain
+    url = reverse("api:v1:federation:domains-list")
+    response = api_client.get(url)
+
+    expected = {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [api_serializers.DomainSerializer(allowed).data],
+    }
+    assert response.data == expected
+
+
+def test_can_retrieve_actor(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    actor = factories["federation.Actor"]()
+    url = reverse(
+        "api:v1:federation:actors-detail", kwargs={"full_username": actor.full_username}
+    )
+    response = api_client.get(url)
+
+    expected = api_serializers.FullActorSerializer(actor).data
+    assert response.data == expected
+
+
+def test_can_retrieve_local_actor_with_allow_list_enabled(
+    factories, api_client, preferences
+):
+    preferences["common__api_authentication_required"] = False
+    preferences["moderation__allow_list_enabled"] = True
+    actor = factories["federation.Actor"](local=True)
+    url = reverse(
+        "api:v1:federation:actors-detail", kwargs={"full_username": actor.full_username}
+    )
+    response = api_client.get(url)
+
+    expected = api_serializers.FullActorSerializer(actor).data
+    assert response.data == expected
+
+
+@pytest.mark.parametrize(
+    "object_id, expected_url",
+    [
+        ("https://fetch.url", "https://fetch.url"),
+        ("name@domain.tld", "webfinger://name@domain.tld"),
+        ("@name@domain.tld", "webfinger://name@domain.tld"),
+    ],
+)
+def test_can_fetch_using_url_synchronous(
+    object_id, expected_url, factories, logged_in_api_client, mocker, settings
+):
+    settings.FEDERATION_SYNCHRONOUS_FETCH = True
+    actor = logged_in_api_client.user.create_actor()
+
+    def fake_task(fetch_id):
+        actor.fetches.filter(id=fetch_id).update(status="finished")
+
+    fetch_task = mocker.patch.object(tasks, "fetch", side_effect=fake_task)
+
+    url = reverse("api:v1:federation:fetches-list")
+    data = {"object": object_id}
+    response = logged_in_api_client.post(url, data)
+    assert response.status_code == 201
+
+    fetch = actor.fetches.latest("id")
+
+    assert fetch.status == "finished"
+    assert fetch.url == expected_url
+    assert response.data == api_serializers.FetchSerializer(fetch).data
+    fetch_task.assert_called_once_with(fetch_id=fetch.pk)
+
+
+def test_fetch_duplicate(factories, logged_in_api_client, settings, now):
+    object_id = "http://example.test"
+    settings.FEDERATION_DUPLICATE_FETCH_DELAY = 60
+    actor = logged_in_api_client.user.create_actor()
+    duplicate = factories["federation.Fetch"](
+        actor=actor,
+        status="finished",
+        url=object_id,
+        creation_date=now - datetime.timedelta(seconds=59),
+    )
+    url = reverse("api:v1:federation:fetches-list")
+    data = {"object": object_id}
+    response = logged_in_api_client.post(url, data)
+    assert response.status_code == 201
+    assert response.data == api_serializers.FetchSerializer(duplicate).data
+
+
+def test_fetch_duplicate_bypass_with_force(
+    factories, logged_in_api_client, mocker, settings, now
+):
+    fetch_task = mocker.patch.object(tasks, "fetch")
+    object_id = "http://example.test"
+    settings.FEDERATION_DUPLICATE_FETCH_DELAY = 60
+    actor = logged_in_api_client.user.create_actor()
+    duplicate = factories["federation.Fetch"](
+        actor=actor,
+        status="finished",
+        url=object_id,
+        creation_date=now - datetime.timedelta(seconds=59),
+    )
+    url = reverse("api:v1:federation:fetches-list")
+    data = {"object": object_id, "force": True}
+    response = logged_in_api_client.post(url, data)
+
+    fetch = actor.fetches.latest("id")
+    assert fetch != duplicate
+    assert response.status_code == 201
+    assert response.data == api_serializers.FetchSerializer(fetch).data
+    fetch_task.assert_called_once_with(fetch_id=fetch.pk)
+
+
+def test_library_follow_get_all(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    library = factories["music.Library"]()
+    follow = factories["federation.LibraryFollow"](target=library, actor=actor)
+    factories["federation.LibraryFollow"]()
+    factories["music.Library"]()
+    url = reverse("api:v1:federation:library-follows-all")
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "results": [
+            {
+                "uuid": str(follow.uuid),
+                "library": str(library.uuid),
+                "approved": follow.approved,
+            }
+        ],
+        "count": 1,
+    }

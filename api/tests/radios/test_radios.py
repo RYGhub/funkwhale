@@ -47,6 +47,28 @@ def test_can_pick_by_weight():
     assert picks[2] > picks[1]
 
 
+def test_session_radio_excludes_previous_picks(factories):
+    tracks = factories["music.Track"].create_batch(5)
+    user = factories["users.User"]()
+    previous_choices = []
+    for i in range(5):
+        TrackFavorite.add(track=random.choice(tracks), user=user)
+
+    radio = radios.SessionRadio()
+    radio.radio_type = "favorites"
+    radio.start_session(user)
+
+    for i in range(5):
+        pick = radio.pick(user=user, filter_playable=False)
+        assert pick in tracks
+        assert pick not in previous_choices
+        previous_choices.append(pick)
+
+    with pytest.raises(ValueError):
+        # no more picks available
+        radio.pick(user=user, filter_playable=False)
+
+
 def test_can_get_choices_for_favorites_radio(factories):
     files = factories["music.Upload"].create_batch(10)
     tracks = [f.track for f in files]
@@ -211,6 +233,77 @@ def test_can_start_tag_radio(factories):
 
     for i in range(3):
         assert radio.pick(filter_playable=False) in good_tracks
+
+
+def test_can_start_actor_content_radio(factories):
+    actor_library = factories["music.Library"](actor__local=True)
+    good_tracks = [
+        factories["music.Upload"](playable=True, library=actor_library).track,
+        factories["music.Upload"](playable=True, library=actor_library).track,
+        factories["music.Upload"](playable=True, library=actor_library).track,
+    ]
+    factories["music.Upload"].create_batch(3, playable=True)
+
+    radio = radios.ActorContentRadio()
+    session = radio.start_session(
+        actor_library.actor.user, related_object=actor_library.actor
+    )
+    assert session.radio_type == "actor_content"
+
+    for i in range(3):
+        assert radio.pick() in good_tracks
+
+
+def test_can_start_actor_content_radio_from_api(
+    logged_in_api_client, preferences, factories
+):
+    actor = factories["federation.Actor"]()
+    url = reverse("api:v1:radios:sessions-list")
+
+    response = logged_in_api_client.post(
+        url, {"radio_type": "actor_content", "related_object_id": actor.full_username}
+    )
+
+    assert response.status_code == 201
+
+    session = models.RadioSession.objects.latest("id")
+
+    assert session.radio_type == "actor_content"
+    assert session.related_object == actor
+
+
+def test_can_start_library_radio(factories):
+    user = factories["users.User"]()
+    library = factories["music.Library"]()
+    good_tracks = [
+        factories["music.Upload"](library=library).track,
+        factories["music.Upload"](library=library).track,
+        factories["music.Upload"](library=library).track,
+    ]
+    factories["music.Upload"].create_batch(3)
+
+    radio = radios.LibraryRadio()
+    session = radio.start_session(user, related_object=library)
+    assert session.radio_type == "library"
+
+    for i in range(3):
+        assert radio.pick(filter_playable=False) in good_tracks
+
+
+def test_can_start_library_radio_from_api(logged_in_api_client, preferences, factories):
+    library = factories["music.Library"]()
+    url = reverse("api:v1:radios:sessions-list")
+
+    response = logged_in_api_client.post(
+        url, {"radio_type": "library", "related_object_id": library.uuid}
+    )
+
+    assert response.status_code == 201
+
+    session = models.RadioSession.objects.latest("id")
+
+    assert session.radio_type == "library"
+    assert session.related_object == library
 
 
 def test_can_start_artist_radio_from_api(logged_in_api_client, preferences, factories):

@@ -18,8 +18,7 @@
         </div>
         <div class="meta">
           <dangerous-button
-            :class="['ui', {loading: isLoading}, 'basic borderless mini button']"
-            color="grey"
+            :class="['ui', {loading: isLoading}, 'basic borderless mini grey button']"
             @confirm="remove(note)">
             <i class="trash icon"></i>
             <translate translate-context="*/*/*/Verb">Delete</translate>

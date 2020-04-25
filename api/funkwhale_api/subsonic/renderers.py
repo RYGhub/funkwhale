@@ -1,3 +1,4 @@
+import collections
 import xml.etree.ElementTree as ET
 
 from rest_framework import renderers
@@ -5,19 +6,42 @@ from rest_framework import renderers
 import funkwhale_api
 
 
+# from https://stackoverflow.com/a/8915039
+# because I want to avoid a lxml dependency just for outputting cdata properly
+# in a RSS feed
+def CDATA(text=None):
+    element = ET.Element("![CDATA[")
+    element.text = text
+    return element
+
+
+ET._original_serialize_xml = ET._serialize_xml
+
+
+def _serialize_xml(write, elem, qnames, namespaces, **kwargs):
+    if elem.tag == "![CDATA[":
+        write("<%s%s]]>" % (elem.tag, elem.text))
+        return
+    return ET._original_serialize_xml(write, elem, qnames, namespaces, **kwargs)
+
+
+ET._serialize_xml = ET._serialize["xml"] = _serialize_xml
+# end of tweaks
+
+
 def structure_payload(data):
     payload = {
-        "status": "ok",
-        "version": "1.16.0",
-        "type": "funkwhale",
         "funkwhaleVersion": funkwhale_api.__version__,
+        "status": "ok",
+        "type": "funkwhale",
+        "version": "1.16.0",
     }
     payload.update(data)
     if "detail" in payload:
         payload["error"] = {"code": 0, "message": payload.pop("detail")}
     if "error" in payload:
         payload["status"] = "failed"
-    return payload
+    return collections.OrderedDict(sorted(payload.items(), key=lambda v: v[0]))
 
 
 class SubsonicJSONRenderer(renderers.JSONRenderer):
@@ -55,6 +79,8 @@ def dict_to_xml_tree(root_tag, d, parent=None):
         else:
             if key == "value":
                 root.text = str(value)
+            elif key == "cdata_value":
+                root.append(CDATA(value))
             else:
                 root.set(key, str(value))
     return root

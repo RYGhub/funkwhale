@@ -4,11 +4,12 @@ Compute different sizes of image used for Album covers and User avatars
 
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
-from funkwhale_api.music.models import Album
-from funkwhale_api.users.models import User
+from funkwhale_api.common.models import Attachment
 
 
-MODELS = [(Album, "cover", "square"), (User, "avatar", "square")]
+MODELS = [
+    (Attachment, "file", "attachment_square"),
+]
 
 
 def main(command, **kwargs):

@@ -85,9 +85,6 @@ class MutationSerializer(serializers.Serializer):
 
 
 class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
-    serialized_relations = {}
-    previous_state_handlers = {}
-
     def __init__(self, *args, **kwargs):
         # we force partial mode, because update mutations are partial
         kwargs.setdefault("partial", True)
@@ -106,13 +103,14 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         return super().validate(validated_data)
 
     def db_serialize(self, validated_data):
+        serialized_relations = self.get_serialized_relations()
         data = {}
         # ensure model fields are serialized properly
         for key, value in list(validated_data.items()):
             if not isinstance(value, models.Model):
                 data[key] = value
                 continue
-            field = self.serialized_relations[key]
+            field = serialized_relations[key]
             data[key] = getattr(value, field)
         return data
 
@@ -121,7 +119,7 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         # we use our serialized_relations configuration
         # to ensure we store ids instead of model instances in our json
         # payload
-        for field, attr in self.serialized_relations.items():
+        for field, attr in self.get_serialized_relations().items():
             try:
                 obj = data[field]
             except KeyError:
@@ -140,9 +138,15 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         return get_update_previous_state(
             obj,
             *list(validated_data.keys()),
-            serialized_relations=self.serialized_relations,
-            handlers=self.previous_state_handlers,
+            serialized_relations=self.get_serialized_relations(),
+            handlers=self.get_previous_state_handlers(),
         )
+
+    def get_serialized_relations(self):
+        return {}
+
+    def get_previous_state_handlers(self):
+        return {}
 
 
 def get_update_previous_state(obj, *fields, serialized_relations={}, handlers={}):

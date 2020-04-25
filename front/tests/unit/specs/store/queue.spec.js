@@ -226,7 +226,6 @@ describe('store/queue', () => {
         expectedMutations: [
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
-          { type: 'player/playing', payload: true, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
       })
@@ -239,7 +238,6 @@ describe('store/queue', () => {
         expectedMutations: [
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
-          { type: 'player/playing', payload: true, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
       })
@@ -252,7 +250,6 @@ describe('store/queue', () => {
         expectedMutations: [
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
-          { type: 'player/playing', payload: true, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ],
         expectedActions: [

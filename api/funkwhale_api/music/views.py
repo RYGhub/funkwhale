@@ -1,3 +1,4 @@
+import base64
 import datetime
 import logging
 import urllib.parse
@@ -5,6 +6,7 @@ import urllib.parse
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch, Sum, F, Q
+import django.db.utils
 from django.utils import timezone
 
 from rest_framework import mixins
@@ -48,7 +50,7 @@ def get_libraries(filter_uploads):
         uploads = filter_uploads(obj, uploads)
         uploads = uploads.playable_by(actor)
         qs = models.Library.objects.filter(
-            pk__in=uploads.values_list("library", flat=True)
+            pk__in=uploads.values_list("library", flat=True), channel=None,
         ).annotate(_uploads_count=Count("uploads"))
         qs = qs.prefetch_related("actor")
         page = self.paginate_queryset(qs)
@@ -93,16 +95,32 @@ def refetch_obj(obj, queryset):
     return obj
 
 
-class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class HandleInvalidSearch(object):
+    def list(self, *args, **kwargs):
+        try:
+            return super().list(*args, **kwargs)
+        except django.db.utils.ProgrammingError as e:
+            if "in tsquery:" in str(e):
+                return Response({"detail": "Invalid query"}, status=400)
+            else:
+                raise
+
+
+class ArtistViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    viewsets.ReadOnlyModelViewSet,
+):
     queryset = (
         models.Artist.objects.all()
-        .prefetch_related("attributed_to")
+        .prefetch_related("attributed_to", "attachment_cover")
         .prefetch_related(
+            "channel__actor",
             Prefetch(
                 "tracks",
                 queryset=models.Track.objects.all(),
                 to_attr="_prefetched_tracks",
-            )
+            ),
         )
         .order_by("-id")
     )
@@ -111,7 +129,7 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     required_scope = "libraries"
     anonymous_policy = "setting"
     filterset_class = filters.ArtistFilter
-    ordering_fields = ("id", "name", "creation_date")
+    ordering_fields = ("id", "name", "creation_date", "modification_date")
 
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
@@ -126,9 +144,16 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
             obj = refetch_obj(obj, self.get_queryset())
         return obj
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        albums = models.Album.objects.with_tracks_count()
+        albums = models.Album.objects.with_tracks_count().select_related(
+            "attachment_cover"
+        )
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
@@ -145,17 +170,28 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     )
 
 
-class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.ReadOnlyModelViewSet,
+):
     queryset = (
         models.Album.objects.all()
         .order_by("-creation_date")
-        .prefetch_related("artist", "attributed_to")
+        .prefetch_related("artist", "attributed_to", "attachment_cover")
     )
     serializer_class = serializers.AlbumSerializer
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
     anonymous_policy = "setting"
-    ordering_fields = ("creation_date", "release_date", "title")
+    ordering_fields = (
+        "creation_date",
+        "release_date",
+        "title",
+        "artist__modification_date",
+    )
     filterset_class = filters.AlbumFilter
 
     fetches = federation_decorators.fetches_route()
@@ -171,8 +207,21 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
             obj = refetch_obj(obj, self.get_queryset())
         return obj
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in [
+            "retrieve",
+            "create",
+        ]
+        context["user"] = self.request.user
+        return context
+
     def get_queryset(self):
         queryset = super().get_queryset()
+        if self.action in ["destroy"]:
+            queryset = queryset.exclude(artist__channel=None).filter(
+                artist__attributed_to=self.request.user.actor
+            )
         tracks = (
             models.Track.objects.prefetch_related("artist")
             .with_playable_uploads(utils.get_actor_from_request(self.request))
@@ -187,6 +236,19 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
     )
 
+    def get_serializer_class(self):
+        if self.action in ["create"]:
+            return serializers.AlbumCreateSerializer
+        return super().get_serializer_class()
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Album"}},
+            context={"album": instance},
+        )
+        models.Album.objects.filter(pk=instance.pk).delete()
+
 
 class LibraryViewSet(
     mixins.CreateModelMixin,
@@ -199,6 +261,8 @@ class LibraryViewSet(
     lookup_field = "uuid"
     queryset = (
         models.Library.objects.all()
+        .filter(channel=None)
+        .select_related("actor")
         .order_by("-creation_date")
         .annotate(_uploads_count=Count("uploads"))
         .annotate(_size=Sum("uploads__size"))
@@ -211,11 +275,15 @@ class LibraryViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
     owner_field = "actor.user"
-    owner_checks = ["read", "write"]
+    owner_checks = ["write"]
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(actor=self.request.user.actor)
+        # allow retrieving a single library by uuid if request.user isn't
+        # the owner. Any other get should be from the owner only
+        if self.action != "retrieve":
+            qs = qs.filter(actor=self.request.user.actor)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(actor=self.request.user.actor)
@@ -250,7 +318,12 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    mixins.DestroyModelMixin,
+    viewsets.ReadOnlyModelViewSet,
+):
     """
     A simple ViewSet for viewing and editing accounts.
     """
@@ -258,7 +331,7 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     queryset = (
         models.Track.objects.all()
         .for_nested_serialization()
-        .prefetch_related("attributed_to")
+        .prefetch_related("attributed_to", "attachment_cover")
         .order_by("-creation_date")
     )
     serializer_class = serializers.TrackSerializer
@@ -269,11 +342,13 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     ordering_fields = (
         "creation_date",
         "title",
+        "album__title",
         "album__release_date",
         "size",
         "position",
         "disc_number",
         "artist__name",
+        "artist__modification_date",
     )
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
@@ -290,6 +365,10 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if self.action in ["destroy"]:
+            queryset = queryset.exclude(artist__channel=None).filter(
+                artist__attributed_to=self.request.user.actor
+            )
         filter_favorites = self.request.GET.get("favorites", None)
         user = self.request.user
         if user.is_authenticated and filter_favorites == "true":
@@ -303,6 +382,30 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
     )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        uploads = instance.uploads.order_by("id")
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Audio"}},
+            context={"uploads": list(uploads)},
+        )
+        instance.delete()
+
+
+def strip_absolute_media_url(path):
+    if (
+        settings.MEDIA_URL.startswith("http://")
+        or settings.MEDIA_URL.startswith("https://")
+        and path.startswith(settings.MEDIA_URL)
+    ):
+        path = path.replace(settings.MEDIA_URL, "/media/", 1)
+    return path
 
 
 def get_file_path(audio_file):
@@ -321,6 +424,7 @@ def get_file_path(audio_file):
                     "MUSIC_DIRECTORY_PATH to serve in-place imported files"
                 )
             path = "/music" + audio_file.replace(prefix, "", 1)
+        path = strip_absolute_media_url(path)
         if path.startswith("http://") or path.startswith("https://"):
             protocol, remainder = path.split("://", 1)
             hostname, r_path = remainder.split("/", 1)
@@ -341,6 +445,7 @@ def get_file_path(audio_file):
                     "MUSIC_DIRECTORY_PATH to serve in-place imported files"
                 )
             path = audio_file.replace(prefix, serve_path, 1)
+        path = strip_absolute_media_url(path)
         return path.encode("utf-8")
 
 
@@ -377,7 +482,26 @@ def get_content_disposition(filename):
     return "attachment; {}".format(filename)
 
 
-def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
+def record_downloads(f):
+    def inner(*args, **kwargs):
+        user = kwargs.get("user")
+        wsgi_request = kwargs.pop("wsgi_request")
+        upload = kwargs.get("upload")
+        response = f(*args, **kwargs)
+        if response.status_code >= 200 and response.status_code < 400:
+            utils.increment_downloads_count(
+                upload=upload, user=user, wsgi_request=wsgi_request
+            )
+
+        return response
+
+    return inner
+
+
+@record_downloads
+def handle_serve(
+    upload, user, format=None, max_bitrate=None, proxy_media=True, download=True
+):
     f = upload
     # we update the accessed_date
     now = timezone.now()
@@ -434,7 +558,8 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
     file_header = mapping[settings.REVERSE_PROXY_TYPE]
     response[file_header] = file_path
-    response["Content-Disposition"] = get_content_disposition(filename)
+    if download:
+        response["Content-Disposition"] = get_content_disposition(filename)
     if mt:
         response["Content-Type"] = mt
 
@@ -460,6 +585,7 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             "track__album__artist", "track__artist"
         )
         explicit_file = request.GET.get("upload")
+        download = request.GET.get("download", "true").lower() == "true"
         if explicit_file:
             queryset = queryset.filter(uuid=explicit_file)
         queryset = queryset.playable_by(actor)
@@ -478,11 +604,13 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
         return handle_serve(
-            upload,
+            upload=upload,
             user=request.user,
             format=format,
             max_bitrate=max_bitrate,
             proxy_media=settings.PROXY_MEDIA,
+            download=download,
+            wsgi_request=request._request,
         )
 
 
@@ -490,6 +618,7 @@ class UploadViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -497,7 +626,12 @@ class UploadViewSet(
     queryset = (
         models.Upload.objects.all()
         .order_by("-creation_date")
-        .prefetch_related("library", "track__artist", "track__album__artist")
+        .prefetch_related(
+            "library__actor",
+            "track__artist",
+            "track__album__artist",
+            "track__attachment_cover",
+        )
     )
     serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [
@@ -507,7 +641,7 @@ class UploadViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
     owner_field = "library.actor.user"
-    owner_checks = ["read", "write"]
+    owner_checks = ["write"]
     filterset_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
@@ -519,7 +653,35 @@ class UploadViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(library__actor=self.request.user.actor)
+        if self.action in ["update", "partial_update"]:
+            # prevent updating an upload that is already processed
+            qs = qs.filter(import_status="draft")
+        if self.action != "retrieve":
+            qs = qs.filter(library__actor=self.request.user.actor)
+        else:
+            actor = utils.get_actor_from_request(self.request)
+            qs = qs.playable_by(actor)
+        return qs
+
+    @action(methods=["get"], detail=True, url_path="audio-file-metadata")
+    def audio_file_metadata(self, request, *args, **kwargs):
+        upload = self.get_object()
+        try:
+            m = tasks.metadata.Metadata(upload.get_audio_file())
+        except FileNotFoundError:
+            return Response({"detail": "File not found"}, status=500)
+        serializer = tasks.metadata.TrackMetadataSerializer(
+            data=m, context={"strict": False}
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=500)
+        payload = serializer.validated_data
+        cover_data = payload.get(
+            "cover_data", payload.get("album", {}).get("cover_data", {})
+        )
+        if cover_data and "content" in cover_data:
+            cover_data["content"] = base64.b64encode(cover_data["content"])
+        return Response(payload, status=200)
 
     @action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
@@ -536,7 +698,13 @@ class UploadViewSet(
 
     def perform_create(self, serializer):
         upload = serializer.save()
-        common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
+        if upload.import_status == "pending":
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
+
+    def perform_update(self, serializer):
+        upload = serializer.save()
+        if upload.import_status == "pending":
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
 
     @transaction.atomic
     def perform_destroy(self, instance):
@@ -554,20 +722,30 @@ class Search(views.APIView):
     anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
-        query = request.GET["query"]
-        results = {
-            # 'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
-            "artists": serializers.ArtistWithAlbumsSerializer(
-                self.get_artists(query), many=True
-            ).data,
-            "tracks": serializers.TrackSerializer(
-                self.get_tracks(query), many=True
-            ).data,
-            "albums": serializers.AlbumSerializer(
-                self.get_albums(query), many=True
-            ).data,
-            "tags": TagSerializer(self.get_tags(query), many=True).data,
-        }
+        query = request.GET.get("query", request.GET.get("q", "")) or ""
+        query = query.strip()
+        if not query:
+            return Response({"detail": "empty query"}, status=400)
+        try:
+            results = {
+                # 'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
+                "artists": serializers.ArtistWithAlbumsSerializer(
+                    self.get_artists(query), many=True
+                ).data,
+                "tracks": serializers.TrackSerializer(
+                    self.get_tracks(query), many=True
+                ).data,
+                "albums": serializers.AlbumSerializer(
+                    self.get_albums(query), many=True
+                ).data,
+                "tags": TagSerializer(self.get_tags(query), many=True).data,
+            }
+        except django.db.utils.ProgrammingError as e:
+            if "in tsquery:" in str(e):
+                return Response({"detail": "Invalid query"}, status=400)
+            else:
+                raise
+
         return Response(results, status=200)
 
     def get_tracks(self, query):
@@ -577,28 +755,59 @@ class Search(views.APIView):
             "album__title__unaccent",
             "artist__name__unaccent",
         ]
-        query_obj = utils.get_query(query, search_fields)
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(
+                query,
+                fts_fields=["body_text", "album__body_text", "artist__body_text"],
+                model=models.Track,
+            )
+        else:
+            query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Track.objects.all()
             .filter(query_obj)
-            .prefetch_related("artist", "album__artist")
+            .prefetch_related(
+                "artist",
+                "attributed_to",
+                Prefetch(
+                    "album",
+                    queryset=models.Album.objects.select_related(
+                        "artist", "attachment_cover", "attributed_to"
+                    ),
+                ),
+            )
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_albums(self, query):
         search_fields = ["mbid", "title__unaccent", "artist__name__unaccent"]
-        query_obj = utils.get_query(query, search_fields)
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(
+                query, fts_fields=["body_text", "artist__body_text"], model=models.Album
+            )
+        else:
+            query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Album.objects.all()
             .filter(query_obj)
-            .prefetch_related("tracks__artist", "artist", "attributed_to")
+            .select_related("artist", "attachment_cover", "attributed_to")
+            .prefetch_related("tracks__artist")
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_artists(self, query):
         search_fields = ["mbid", "name__unaccent"]
-        query_obj = utils.get_query(query, search_fields)
-        qs = models.Artist.objects.all().filter(query_obj).with_albums()
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(query, model=models.Artist)
+        else:
+            query_obj = utils.get_query(query, search_fields)
+        qs = (
+            models.Artist.objects.all()
+            .filter(query_obj)
+            .with_albums()
+            .prefetch_related("channel__actor")
+            .select_related("attributed_to")
+        )
         return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):

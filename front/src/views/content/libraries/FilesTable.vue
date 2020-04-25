@@ -28,6 +28,9 @@
             <option value>
               <translate translate-context="Content/*/Dropdown">All</translate>
             </option>
+            <option value="draft">
+              <translate translate-context="Content/Library/*/Short">Draft</translate>
+            </option>
             <option value="pending">
               <translate translate-context="Content/Library/*/Short">Pending</translate>
             </option>
@@ -120,7 +123,9 @@
         <template slot="row-cells" slot-scope="scope">
           <template v-if="scope.obj.track">
             <td>
-              <span :title="scope.obj.track.title">{{ scope.obj.track.title|truncate(25) }}</span>
+              <router-link :to="{name: 'library.tracks.detail', params: {id: scope.obj.track.id }}" :title="scope.obj.track.title">
+                {{ scope.obj.track.title|truncate(25) }}
+              </router-link>
             </td>
             <td>
               <span
@@ -131,6 +136,7 @@
             </td>
             <td>
               <span
+                v-if="scope.obj.track.album"
                 class="discrete link"
                 @click="addSearchToken('album', scope.obj.track.album.title)"
                 :title="scope.obj.track.album.title"
@@ -159,7 +165,7 @@
               <i class="question circle outline icon"></i>
             </button>
           </td>
-          <td v-if="scope.obj.duration">{{ time.parse(scope.obj.duration) }}</td>
+          <td v-if="scope.obj.duration">{{ scope.obj.duration | duration }}</td>
           <td v-else>
             <translate translate-context="*/*/*">N/A</translate>
           </td>
@@ -173,7 +179,7 @@
     <div>
       <pagination
         v-if="result && result.count > paginateBy"
-        @page-changed="selectPage"
+        @page-changed="page = $event; fetchData()"
         :compact="true"
         :current="page"
         :paginate-by="paginateBy"
@@ -229,13 +235,10 @@ export default {
       isLoading: false,
       result: null,
       page: 1,
-      paginateBy: 25,
       search: {
         query: this.defaultQuery,
         tokens: parseTokens(normalizeQuery(this.defaultQuery))
       },
-      orderingDirection: "-",
-      ordering: "creation_date",
       orderingOptions: [
         ["creation_date", "creation_date"],
         ["title", "track_title"],
@@ -258,7 +261,8 @@ export default {
           page: this.page,
           page_size: this.paginateBy,
           ordering: this.getOrderingAsString(),
-          q: this.search.query
+          q: this.search.query,
+          include_channels: 'true',
         },
         this.filters || {}
       );
@@ -288,7 +292,8 @@ export default {
     },
     actionFilters() {
       var currentFilters = {
-        q: this.search.query
+        q: this.search.query,
+        include_channels: 'true',
       };
       if (this.filters) {
         return _.merge(currentFilters, this.filters);

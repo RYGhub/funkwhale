@@ -10,6 +10,7 @@
           <translate translate-context="Content/Radio/Title">Instance radios</translate>
         </h3>
         <div class="ui cards">
+          <radio-card v-if="isAuthenticated" :type="'actor_content'" :object-id="$store.state.auth.fullUsername"></radio-card>
           <radio-card v-if="isAuthenticated && hasFavorites" :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
           <radio-card v-if="$store.state.auth.authenticated" :type="'less-listened'"></radio-card>
@@ -93,7 +94,7 @@
             v-for="radio in result.results"
             :key="radio.id"
             :custom-radio="radio"></radio-card>
-        </div>        
+        </div>
       </div>
       <div class="ui center aligned basic segment">
         <pagination
@@ -126,24 +127,19 @@ const FETCH_URL = "radios/radios/"
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
-    defaultQuery: { type: String, required: false, default: "" }
+    defaultQuery: { type: String, required: false, default: "" },
+    scope: { type: String, required: false, default: "all" },
   },
   components: {
     RadioCard,
     Pagination
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [["creation_date", "creation_date"], ["name", "name"]]
     }
   },
@@ -188,10 +184,11 @@ export default {
       this.isLoading = true
       let url = FETCH_URL
       let params = {
+        scope: this.scope,
         page: this.page,
         page_size: this.paginateBy,
         name__icontains: this.query,
-        ordering: this.getOrderingAsString()
+        ordering: this.getOrderingAsString(),
       }
       logger.default.debug("Fetching radios")
       axios.get(url, { params: params }).then(response => {

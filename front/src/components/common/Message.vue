@@ -1,33 +1,25 @@
 <template>
-  <div class="ui message">
-    <div class="content">
-      <slot></slot>
-    </div>
-    <i class="close icon"></i>
-  </div>
+  <div></div>
 </template>
 <script>
 import $ from 'jquery'
 
 export default {
+  props: ['message'],
   mounted () {
     let self = this
-    $(this.$el).on('click', function () {
-      $(self.$el).transition('fade', 125)
-    })
+    let params = {
+      context: "#app",
+      message: this.message.content,
+      showProgress: 'top',
+      position: "bottom right",
+      progressUp: true,
+      onRemove () {
+        self.$store.commit("ui/removeMessage", self.message.key)
+      },
+      ...this.message,
+    }
+    $("body").toast(params)
   }
 }
 </script>
-<style scoped>
-.ui.message .content {
-  padding-right: 0.5em;
-  cursor: pointer;
-}
-.ui.message .content :first-child {
-  margin-top: 0;
-}
-
-.ui.message .content :last-child {
-  margin-bottom: 0;
-}
-</style>

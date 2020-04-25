@@ -17,4 +17,11 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    execute_from_command_line(sys.argv)
+    if len(sys.argv) > 1 and sys.argv[1] in ["fw", "funkwhale"]:
+        # trigger our own click-based cli
+        from funkwhale_api.cli import main
+
+        sys.argv = sys.argv[1:]
+        main.invoke()
+    else:
+        execute_from_command_line(sys.argv)

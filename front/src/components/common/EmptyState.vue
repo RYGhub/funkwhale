@@ -11,7 +11,7 @@
         </slot>
       </div>
     </div>
-    <div class="inline">
+    <div class="inline center aligned text">
       <slot></slot>
       <button v-if="refresh" class="ui button" @click="$emit('refresh')">
         <translate translate-context="Content/*/Button.Label/Short, Verb">

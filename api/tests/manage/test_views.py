@@ -3,6 +3,7 @@ from django.urls import reverse
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers
+from funkwhale_api.moderation import tasks as moderation_tasks
 
 
 def test_user_view(factories, superuser_api_client, mocker):
@@ -185,6 +186,7 @@ def test_artist_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -235,6 +237,7 @@ def test_album_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -282,6 +285,7 @@ def test_track_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -314,6 +318,17 @@ def test_library_list(factories, superuser_api_client, settings):
     assert response.data["results"][0]["id"] == library.id
 
 
+def test_library_list_exclude_channel_libraries(
+    factories, superuser_api_client, settings
+):
+    factories["audio.Channel"]()
+    url = reverse("api:v1:manage:library:libraries-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["count"] == 0
+
+
 def test_library_detail(factories, superuser_api_client):
     library = factories["music.Library"]()
     url = reverse(
@@ -326,7 +341,7 @@ def test_library_detail(factories, superuser_api_client):
 
 
 def test_library_update(factories, superuser_api_client):
-    library = factories["music.Library"](privacy_level="public")
+    library = factories["music.Library"](privacy_level="everyone")
     url = reverse(
         "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
     )
@@ -395,12 +410,28 @@ def test_upload_delete(factories, superuser_api_client):
     assert response.status_code == 204
 
 
-def test_note_create(factories, superuser_api_client):
+def test_note_create_actor(factories, superuser_api_client):
     actor = superuser_api_client.user.create_actor()
     target = factories["federation.Actor"]()
     data = {
         "summary": "Hello",
         "target": {"type": "account", "full_username": target.full_username},
+    }
+    url = reverse("api:v1:manage:moderation:notes-list")
+    response = superuser_api_client.post(url, data, format="json")
+    assert response.status_code == 201
+
+    note = actor.moderation_notes.latest("id")
+    assert note.target == target
+    assert response.data == serializers.ManageNoteSerializer(note).data
+
+
+def test_note_create_user_request(factories, superuser_api_client):
+    actor = superuser_api_client.user.create_actor()
+    target = factories["moderation.UserRequest"]()
+    data = {
+        "summary": "Hello",
+        "target": {"type": "request", "uuid": target.uuid},
     }
     url = reverse("api:v1:manage:moderation:notes-list")
     response = superuser_api_client.post(url, data, format="json")
@@ -513,3 +544,105 @@ def test_report_update_is_handled_true_assigns(factories, superuser_api_client):
     report.refresh_from_db()
     assert report.is_handled is True
     assert report.assigned_to == actor
+
+
+def test_request_detail(factories, superuser_api_client):
+    request = factories["moderation.UserRequest"]()
+    url = reverse(
+        "api:v1:manage:moderation:requests-detail", kwargs={"uuid": request.uuid}
+    )
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["uuid"] == str(request.uuid)
+
+
+def test_request_list(factories, superuser_api_client, settings):
+    request = factories["moderation.UserRequest"]()
+    url = reverse("api:v1:manage:moderation:requests-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["uuid"] == str(request.uuid)
+
+
+def test_user_request_update(factories, superuser_api_client):
+    user_request = factories["moderation.UserRequest"](signup=True)
+    url = reverse(
+        "api:v1:manage:moderation:requests-detail", kwargs={"uuid": user_request.uuid}
+    )
+    response = superuser_api_client.patch(url, {"status": "approved"})
+
+    assert response.status_code == 200
+    user_request.refresh_from_db()
+    assert user_request.status == "approved"
+
+
+def test_user_request_update_status_assigns(factories, superuser_api_client, mocker):
+    actor = superuser_api_client.user.create_actor()
+    user_request = factories["moderation.UserRequest"](signup=True)
+    url = reverse(
+        "api:v1:manage:moderation:requests-detail", kwargs={"uuid": user_request.uuid}
+    )
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+    response = superuser_api_client.patch(url, {"status": "refused"})
+
+    assert response.status_code == 200
+    user_request.refresh_from_db()
+    assert user_request.status == "refused"
+    assert user_request.assigned_to == actor
+    on_commit.assert_called_once_with(
+        moderation_tasks.user_request_handle.delay,
+        user_request_id=user_request.pk,
+        new_status="refused",
+        old_status="pending",
+    )
+
+
+def test_channel_list(factories, superuser_api_client, settings):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == channel.id
+
+
+def test_channel_detail(factories, superuser_api_client):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-detail", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == channel.id
+
+
+def test_channel_delete(factories, superuser_api_client, mocker):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-detail", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_channel_detail_stats(factories, superuser_api_client):
+    channel = factories["audio.Channel"]()
+    url = reverse("api:v1:manage:channels-stats", kwargs={"composite": channel.uuid})
+    response = superuser_api_client.get(url)
+    expected = {
+        "uploads": 0,
+        "playlists": 0,
+        "listenings": 0,
+        "mutations": 0,
+        "reports": 0,
+        "follows": 0,
+        "track_favorites": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected

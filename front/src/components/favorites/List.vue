@@ -13,7 +13,7 @@
           :translate-n="$store.state.favorites.count"
           :translate-params="{count: results.count}"
           translate-context="Content/Favorites/Title">
-          1 favorite
+	%{ count } favorite
         </translate>
       </h2>
       <radio-button v-if="hasFavorites" type="favorites"></radio-button>
@@ -92,18 +92,12 @@ export default {
     Pagination
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       results: null,
       isLoading: false,
       nextLink: null,
       previousLink: null,
       page: parseInt(this.defaultPage),
-      paginateBy: parseInt(this.defaultPaginateBy || 25),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [
         ["creation_date", "creation_date"],
         ["title", "track_title"],
@@ -117,6 +111,7 @@ export default {
       this.$router.push({name: 'login', query: {next: this.$router.currentRoute.fullPath}})
     }
     this.fetchFavorites(FAVORITES_URL)
+
   },
   mounted() {
     $(".ui.dropdown").dropdown()
@@ -140,6 +135,7 @@ export default {
           ordering: this.getOrderingAsString()
         }
       })
+      this.fetchFavorites(FAVORITES_URL)
     },
     fetchFavorites(url) {
       var self = this

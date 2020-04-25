@@ -185,18 +185,17 @@ def test_get_channels_groups(factories):
     ]
 
 
-def test_user_quota_default_to_preference(factories, preferences):
-    preferences["users__upload_quota"] = 42
+@pytest.mark.parametrize(
+    "default_quota, user_quota, expected",
+    [(1000, None, 1000), (1000, 42, 42), (1000, 0, 0)],
+)
+def test_user_quota_set_on_user(
+    default_quota, user_quota, expected, factories, preferences
+):
+    preferences["users__upload_quota"] = default_quota
 
-    user = factories["users.User"]()
-    assert user.get_upload_quota() == 42
-
-
-def test_user_quota_set_on_user(factories, preferences):
-    preferences["users__upload_quota"] = 42
-
-    user = factories["users.User"](upload_quota=66)
-    assert user.get_upload_quota() == 66
+    user = factories["users.User"](upload_quota=user_quota)
+    assert user.get_upload_quota() == expected
 
 
 def test_user_get_quota_status(factories, preferences, mocker):
@@ -204,21 +203,23 @@ def test_user_get_quota_status(factories, preferences, mocker):
     mocker.patch(
         "funkwhale_api.federation.models.Actor.get_current_usage",
         return_value={
-            "total": 10 * 1000 * 1000,
+            "total": 15 * 1000 * 1000,
             "pending": 1 * 1000 * 1000,
             "skipped": 2 * 1000 * 1000,
             "errored": 3 * 1000 * 1000,
             "finished": 4 * 1000 * 1000,
+            "draft": 5 * 1000 * 1000,
         },
     )
     assert user.get_quota_status() == {
         "max": 66,
-        "remaining": 56,
-        "current": 10,
+        "remaining": 51,
+        "current": 15,
         "pending": 1,
         "skipped": 2,
         "errored": 3,
         "finished": 4,
+        "draft": 5,
     }
 
 
@@ -237,3 +238,24 @@ def test_creating_user_set_support_display_date(
     user = factories["users.User"]()
 
     assert getattr(user, field) == expected
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_no_email(factories):
+    user = factories["users.User"]()
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is None
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_true(factories):
+    user = factories["users.User"](verified_email=True)
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is True
+
+
+def test_get_by_natural_key_annotates_primary_email_verified_false(factories):
+    user = factories["users.User"](verified_email=False)
+    user = models.User.objects.get_by_natural_key(user.username)
+
+    assert user.has_verified_primary_email is False

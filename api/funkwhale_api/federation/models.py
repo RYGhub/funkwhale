@@ -68,7 +68,7 @@ class ActorQuerySet(models.QuerySet):
 
     def with_current_usage(self):
         qs = self
-        for s in ["pending", "skipped", "errored", "finished"]:
+        for s in ["draft", "pending", "skipped", "errored", "finished"]:
             uploads_query = models.Q(
                 libraries__uploads__import_status=s,
                 libraries__uploads__audio_file__isnull=False,
@@ -145,6 +145,7 @@ class Domain(models.Model):
             actors=models.Count("actors", distinct=True),
             outbox_activities=models.Count("actors__outbox_activities", distinct=True),
             libraries=models.Count("actors__libraries", distinct=True),
+            channels=models.Count("actors__owned_channels", distinct=True),
             received_library_follows=models.Count(
                 "actors__libraries__received_follows", distinct=True
             ),
@@ -180,8 +181,8 @@ class Actor(models.Model):
 
     fid = models.URLField(unique=True, max_length=500, db_index=True)
     url = models.URLField(max_length=500, null=True, blank=True)
-    outbox_url = models.URLField(max_length=500)
-    inbox_url = models.URLField(max_length=500)
+    outbox_url = models.URLField(max_length=500, null=True, blank=True)
+    inbox_url = models.URLField(max_length=500, null=True, blank=True)
     following_url = models.URLField(max_length=500, null=True, blank=True)
     followers_url = models.URLField(max_length=500, null=True, blank=True)
     shared_inbox_url = models.URLField(max_length=500, null=True, blank=True)
@@ -189,6 +190,9 @@ class Actor(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name="actors")
     summary = models.CharField(max_length=500, null=True, blank=True)
+    summary_obj = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
     preferred_username = models.CharField(max_length=200, null=True, blank=True)
     public_key = models.TextField(max_length=5000, null=True, blank=True)
     private_key = models.TextField(max_length=5000, null=True, blank=True)
@@ -201,6 +205,13 @@ class Actor(models.Model):
         through="Follow",
         through_fields=("target", "actor"),
         related_name="following",
+    )
+    attachment_icon = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="iconed_actor",
     )
 
     objects = ActorQuerySet.as_manager()
@@ -236,6 +247,8 @@ class Actor(models.Model):
         return self.followers.filter(pk__in=follows.values_list("actor", flat=True))
 
     def should_autoapprove_follow(self, actor):
+        if self.get_channel():
+            return True
         return False
 
     def get_user(self):
@@ -244,10 +257,21 @@ class Actor(models.Model):
         except ObjectDoesNotExist:
             return None
 
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
+
+    def get_absolute_url(self):
+        if self.is_local:
+            return federation_utils.full_url("/@{}".format(self.preferred_username))
+        return self.url or self.fid
+
     def get_current_usage(self):
         actor = self.__class__.objects.filter(pk=self.pk).with_current_usage().get()
         data = {}
-        for s in ["pending", "skipped", "errored", "finished"]:
+        for s in ["draft", "pending", "skipped", "errored", "finished"]:
             data[s] = getattr(actor, "_usage_{}".format(s)) or 0
 
         data["total"] = sum(data.values())
@@ -260,6 +284,7 @@ class Actor(models.Model):
         data = Actor.objects.filter(pk=self.pk).aggregate(
             outbox_activities=models.Count("outbox_activities", distinct=True),
             libraries=models.Count("libraries", distinct=True),
+            channels=models.Count("owned_channels", distinct=True),
             received_library_follows=models.Count(
                 "libraries__received_follows", distinct=True
             ),
@@ -269,6 +294,9 @@ class Actor(models.Model):
             from_activity__actor=self.pk
         ).count()
         data["reports"] = moderation_models.Report.objects.get_for_target(self).count()
+        data["requests"] = moderation_models.UserRequest.objects.filter(
+            submitter=self
+        ).count()
         data["albums"] = music_models.Album.objects.filter(
             from_activity__actor=self.pk
         ).count()
@@ -312,6 +340,10 @@ class Actor(models.Model):
             "https://{}/".format(domain)
         )
 
+    @property
+    def display_name(self):
+        return self.name or self.preferred_username
+
 
 FETCH_STATUSES = [
     ("pending", "Pending"),
@@ -345,7 +377,7 @@ class Fetch(models.Model):
     objects = FetchQuerySet.as_manager()
 
     def save(self, **kwargs):
-        if not self.url and self.object:
+        if not self.url and self.object and hasattr(self.object, "fid"):
             self.url = self.object.fid
 
         super().save(**kwargs)
@@ -356,11 +388,19 @@ class Fetch(models.Model):
         from . import serializers
 
         return {
-            contexts.FW.Artist: serializers.ArtistSerializer,
-            contexts.FW.Album: serializers.AlbumSerializer,
-            contexts.FW.Track: serializers.TrackSerializer,
-            contexts.AS.Audio: serializers.UploadSerializer,
-            contexts.FW.Library: serializers.LibrarySerializer,
+            contexts.FW.Artist: [serializers.ArtistSerializer],
+            contexts.FW.Album: [serializers.AlbumSerializer],
+            contexts.FW.Track: [serializers.TrackSerializer],
+            contexts.AS.Audio: [
+                serializers.UploadSerializer,
+                serializers.ChannelUploadSerializer,
+            ],
+            contexts.FW.Library: [serializers.LibrarySerializer],
+            contexts.AS.Group: [serializers.ActorSerializer],
+            contexts.AS.Person: [serializers.ActorSerializer],
+            contexts.AS.Organization: [serializers.ActorSerializer],
+            contexts.AS.Service: [serializers.ActorSerializer],
+            contexts.AS.Application: [serializers.ActorSerializer],
         }
 
 
@@ -411,26 +451,29 @@ class Activity(models.Model):
     type = models.CharField(db_index=True, null=True, max_length=100)
 
     # generic relations
-    object_id = models.IntegerField(null=True)
+    object_id = models.IntegerField(null=True, blank=True)
     object_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="objecting_activities",
     )
     object = GenericForeignKey("object_content_type", "object_id")
-    target_id = models.IntegerField(null=True)
+    target_id = models.IntegerField(null=True, blank=True)
     target_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="targeting_activities",
     )
     target = GenericForeignKey("target_content_type", "target_id")
-    related_object_id = models.IntegerField(null=True)
+    related_object_id = models.IntegerField(null=True, blank=True)
     related_object_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="related_objecting_activities",
     )
@@ -541,8 +584,7 @@ class LibraryTrack(models.Model):
             auth=auth,
             stream=True,
             timeout=20,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-            headers={"Content-Type": "application/activity+json"},
+            headers={"Accept": "application/activity+json"},
         )
         with remote_response as r:
             remote_response.raise_for_status()
