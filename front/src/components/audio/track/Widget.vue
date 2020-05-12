@@ -4,7 +4,7 @@
       <slot name="title"></slot>
       <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
-    <div v-if="count > 0" class="ui divided unstackable items">
+    <div v-if="count > 0" class="ui unstackable items">
       <div :class="['item', itemClasses]" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
           <img v-if="object.track.album && object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
@@ -43,9 +43,9 @@
             </div>
           </div>
         </div>
-      </div>
-      <div v-if="isLoading" class="ui inverted active dimmer">
-        <div class="ui loader"></div>
+        <div v-if="isLoading" class="ui inverted active dimmer">
+          <div class="ui loader"></div>
+        </div>
       </div>
     </div>
     <div v-else class="ui placeholder segment">
@@ -80,7 +80,7 @@ export default {
     url: {type: String, required: true},
     isActivity: {type: Boolean, default: true},
     showCount: {type: Boolean, default: false},
-    limit: {type: Number, default: 5},
+    limit: {type: Number, default: 7},
     itemClasses: {type: String, default: ''},
   },
   components: {

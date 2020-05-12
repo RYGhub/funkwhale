@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       objects: [],
-      limit: this.filters.limit || 3,
+      limit: this.filters.limit || 4,
       isLoading: false,
       errors: null,
       previousPage: null,
