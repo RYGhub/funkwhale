@@ -34,9 +34,7 @@
           <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
-              <option :value="parseInt(12)">12</option>
-              <option :value="parseInt(30)">30</option>
-              <option :value="parseInt(50)">50</option>
+              <option :value="parseInt(49)">49</option>
             </select>
           </div>
         </div>

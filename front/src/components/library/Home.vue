@@ -21,7 +21,7 @@
       <div class="ui section hidden divider"></div>
       <div class="ui stackable one column grid">
         <div class="column">
-          <album-widget :filters="{scope: scope, playable: true, ordering: '-creation_date'}">
+          <album-widget :filters="{scope: scope, playable: true, ordering: '-creation_date'}" :limit="49">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently added</translate></template>
           </album-widget>
         </div>
@@ -30,7 +30,7 @@
         <h3 class="ui header" >
           <translate translate-context="*/*/*">New channels</translate>
         </h3>
-        <channels-widget :show-modification-date="true" :limit="12" :filters="{ordering: '-creation_date', external: 'false'}"></channels-widget>
+        <channels-widget :show-modification-date="true" :limit="49" :filters="{ordering: '-creation_date', external: 'false'}"></channels-widget>
       </template>
 
 

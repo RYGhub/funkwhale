@@ -41,7 +41,7 @@ export default {
   data () {
     return {
       objects: [],
-      limit: 12,
+      limit: 49,
       count: 0,
       isLoading: false,
       errors: null,

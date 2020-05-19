@@ -35,7 +35,7 @@ export default {
     controls: {type: Boolean, default: true},
     showCount: {type: Boolean, default: false},
     search: {type: Boolean, default: false},
-    limit: {type: Number, default: 12},
+    limit: {type: Number, default: 49},
   },
   components: {
     AlbumCard
