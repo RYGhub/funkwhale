@@ -13,8 +13,8 @@
             <router-link class="item" to="/about">
               <translate translate-context="Footer/About/List item.Link">About page</translate>
             </router-link>
-              <a v-if="version" class="item" href="https://docs.funkwhale.audio/changelog.html" target="_blank">
-                <translate translate-context="Footer/*/List item" :translate-params="{version: version}" >Version %{version}</translate> <a href="https://github.com/Steffo99/funkwhale-ryg" title="Forked by Steffo99">*</a>
+              <a v-if="version" class="item" href="https://github.com/Steffo99/funkwhale-ryg" target="_blank">
+                <translate translate-context="Footer/*/List item" :translate-params="{version: version}" >funkwhale-ryg %{version}</translate>
               </a>
             <div role="button" class="item" @click="$emit('show:set-instance-modal')" >
               <translate translate-context="Footer/*/List item.Link">Use another instance</translate>
@@ -46,24 +46,12 @@
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate translate-context="Footer/*/Link" class="ui header">Getting help</h4>
+          <h4 v-translate translate-context="Footer/*/Link" class="ui header">Royal Games</h4>
           <div class="ui link list">
-            <a href="https://governance.funkwhale.audio/g/kQgxNq15/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/Listitem.Link">Support forum</translate></a>
-            <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Chat room</translate></a>
-            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Issue tracker</translate></a>
+            <a href="https://ryg.steffo.eu" class="item" target="_blank">Sito</a>
+            <a href="https://discord.gg/UpuU9Y4" class="item" target="_blank">Discord</a>
+            <a href="https://combo.steffo.eu" class="item" target="_blank">Files</a>
           </div>
-        </section>
-        <section class="four wide column">
-          <h4 v-translate class="ui header" translate-context="Footer/*/Title/Short">About Funkwhale</h4>
-          <div class="ui link list">
-            <a href="https://funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Official website</translate></a>
-            <a href="https://contribute.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Contribute</translate></a>
-            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Source code</translate></a>
-          </div>
-          <div class="ui hidden divider"></div>
-          <p>
-            <translate translate-context="Footer/*/List item.Link">The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
-          </p>
         </section>
       </div>
     </div>
