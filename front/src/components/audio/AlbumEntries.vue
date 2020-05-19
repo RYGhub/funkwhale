@@ -11,9 +11,7 @@
         </router-link>
       </div>
       <div class="meta">
-        <template v-if="$store.state.auth.authenticated && $store.getters['favorites/isFavorite'](track.id)">
-         <track-favorite-icon class="tiny" :track="track"></track-favorite-icon>
-        </template>
+        <track-favorite-icon class="tiny" :track="track"></track-favorite-icon>
         <human-duration v-if="track.uploads[0] && track.uploads[0].duration" :duration="track.uploads[0].duration"></human-duration>
       </div>
     </div>

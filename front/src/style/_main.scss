@@ -664,6 +664,14 @@ input + .help {
     border: none !important;
     padding: 0 !important;
     margin: 0 0.5em;
+
+    &:not(.favorited) {
+      opacity: 0.3;
+
+      &:hover {
+        opacity: 1.0;
+      }
+    }
   }
 }
 .channel-image {
